@@ -7,14 +7,6 @@ mutable struct Examinee1D <: AbstractExaminee
     Examinee1D(idx,id,latent) = new(idx,id,latent)
 end
 
-"""
-    get_items(examinee_idx::Int64, responses::Vector{<:AbstractResponse})
-
-It returns the items answered by the examinee with index `examinee_idx`.
-"""
-function get_items(examinee_idx::Int64, responses::Vector{<:AbstractResponse})
-   filter(r -> r.examinee.idx == examinee_idx,responses)
-end
 
 """
     answer(examinee::AbstractExaminee, item::AbstractParameters)

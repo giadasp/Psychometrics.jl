@@ -11,6 +11,25 @@ mutable struct Response <: AbstractResponse
 end
 
 # Outer Constructor Methods
+
+"""
+    get_examinees(item_idx::Int64, responses::Vector{<:AbstractResponse})
+
+It returns the esaminees who answered to the item with index `item_idx`.
+"""
+function get_examinees(item_idx::Int64, responses::Vector{<:AbstractResponse})
+   filter(r -> r.item.idx == item_idx,responses)
+end
+
+"""
+    get_items(examinee_idx::Int64, responses::Vector{<:AbstractResponse})
+
+It returns the items answered by the examinee with index `examinee_idx`.
+"""
+function get_items(examinee_idx::Int64, responses::Vector{<:AbstractResponse})
+   filter(r -> r.examinee.idx == examinee_idx,responses)
+end
+
 """
     add_response!(response::AbstractResponse, responses::Vector{Response})
 
@@ -34,7 +53,7 @@ end
 
 It returns the vector of responses given to item with index `idx`.
 """
-function get_examinee_responses(idx::Int64, responses::Vector{Response})
+function get_item_responses(idx::Int64, responses::Vector{Response})
     filter(r -> r.item.idx == idx, responses)
 end
 
@@ -56,3 +75,4 @@ Randomly generate a response by `examinee` to `item`.
 function generate_response(examinee::AbstractExaminee, item::AbstractItem)
     Response(item, examinee,generate_response(examinee.latent, item.parameters), Dates.now())::Response
 end
+

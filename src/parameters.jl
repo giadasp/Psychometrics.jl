@@ -27,8 +27,8 @@ mutable struct Parameters2PL <: AbstractParameters
     a::Float64
     bounds_a::Vector{Float64}
     b::Float64
-    bounds_b::Vector{Float64}
-    prior::Distributions.MultivariateDistribution
+    bounds_b::Vector{Float64} 
+    prior::Distributions.MultivariateDistribution 
     posterior::Distributions.MultivariateDistribution
     chain::Vector{Vector{Float64}}
     expected_information::Matrix{Float64}
@@ -36,18 +36,19 @@ mutable struct Parameters2PL <: AbstractParameters
     Parameters2PL(a, bounds_a, b, bounds_b, prior, posterior, chain, expected_information) = new(a, bounds_a, b, bounds_b, prior, posterior, chain, expected_information)
 
     # Random Initializers
-    function Parameters2PL(;univariate_distribution_a = Distributions.LogNormal(0, 1),
-    bounds_a = [1e-5, 5.0] , univariate_distribution_b = Distributions.Normal(0, 1),
-    bounds_b = [-6.0, 6.0], bivariate_distribution = Distributions.Product(univariate_distribution_a,univariate_distribution_b)
-    ) 
-        pars = truncate_rand(bivariate_distribution, bounds)
-        new(pars[1], bounds_a, pars[2], bounds_b, bivariate_distribution, bivariate_distribution, Vector{Vector{Float64}}(undef, 0), [1.0 0.0; 0.0 1.0])
+    function Parameters2PL(posterior, bounds_a, bounds_b) 
+        pars = truncate_rand(posterior, [bounds_a, bounds_b])
+        new(pars[1], bounds_a, pars[2], bounds_b, posterior, posterior, Vector{Vector{Float64}}(undef, 0), [1.0 0.0; 0.0 1.0])
     end
 
-    function Parameters2PL(; bivariate_distribution = Distributions.Product([LogNormal(0,1),Normal(0, 1)]), bounds = [[1e-5, 5.0], [-6.0, 6.0]])
-        pars = truncate_rand(bivariate_distribution, bounds)
-        new(pars[1][1], bounds[1], pars[1][2], bounds[2], bivariate_distribution, bivariate_distribution, Vector{Vector{Float64}}(undef, 0), Distributions.cov(bivariate_distribution))
+    function Parameters2PL() 
+        posterior =  Distributions.Product([Distributions.LogNormal(0, 1), Distributions.Normal(0, 1)])
+        bounds_a = [1e-5, 5.0]
+        bounds_b = [-6.0, 6.0]
+        pars = truncate_rand(posterior, [bounds_a, bounds_b])
+        new(pars[1], bounds_a, pars[2], bounds_b, posterior, posterior, Vector{Vector{Float64}}(undef, 0), [1.0 0.0; 0.0 1.0])
     end
+
 end
 
 ## 3PL
@@ -68,20 +69,56 @@ mutable struct Parameters3PL <: AbstractParameters
 
     # Random Initializers
     
-    function Parameters3PL(;univariate_distribution_a = Distributions.LogNormal(0, 1),  bounds_a = [1e-5, 5.0],  
-        univariate_distribution_b = Distributions.Normal(0, 1), bounds_b = [-6.0, 6.0],
-        univariate_distribution_c = Distributions.Uniform(0, 1),  bounds_c = [1e-5, 1.0 - 1e-5], 
-    )
-        trivariate_distribution = Distributions.Product([univariate_distribution_a, univariate_distribution_b, univariate_distribution_c])
-        pars = truncate_rand(trivariate_distribution, bounds)
-        new(pars[1], bounds_a, pars[2], bounds_b, pars[3], bounds_c, trivariate_distribution, trivariate_distribution, zeros(Int64, 0))
+    function Parameters3PL(posterior, bounds_a, bounds_b, bounds_c) 
+        pars = truncate_rand(posterior, [bounds_a, bounds_b, bounds_c])
+        new(pars[1], bounds_a, pars[2], bounds_b, pars[3], bounds_c, posterior, posterior, Vector{Vector{Float64}}(undef, 0), [1.0 0.0; 0.0 1.0])
     end
 
-    function Parameters3PL(; trivariate_distribution = Distributions.Product([LogNormal(0,1), Normal(0, 1), Uniform(0, 1)]), bounds = [[1e-5, 5.0], [-6.0, 6.0], [1e-5, 1.0 - 1e-5]]
-        )
-        pars = truncate_rand(trivariate_distribution, bounds)
-        new(pars[1][1], bounds[1], pars[1][2], bounds[2], pars[1][3], bounds[3], trivariate_distribution, trivariate_distribution, Vector{Vector{Float64}}(undef, 0), Distributions.cov(trivariate_distribution))
+    function Parameters3PL() 
+        posterior =  Distributions.Product([Distributions.LogNormal(0, 1), Distributions.Normal(0, 1), Distributions.Uniform(0, 1)])
+        bounds_a = [1e-5, 5.0]
+        bounds_b = [-6.0, 6.0]
+        bounds_c = [1e-5, 1.0 - 1e-5]
+        pars = truncate_rand(posterior, [bounds_a, bounds_b, bounds_c])
+        new(pars[1], bounds_a, pars[2], bounds_b, posterior, posterior, Vector{Vector{Float64}}(undef, 0), [1.0 0.0; 0.0 1.0])
     end
 end
 
+mutable struct ParametersNPL <: AbstractParameters
+    names::Vector{String}
+    vals::Vector{Vector{Float64}}
+    bounds::Vector{Vector{Float64}}
+    prior::Distributions.MultivariateDistribution
+    posterior::Distributions.MultivariateDistribution
+    chain::Vector{Vector{Float64}}
+    expected_information::Matrix{Float64}
 
+    ParametersNPL(names, vals, bounds, prior, posterior, chain, expected_information) = new(names, vals, bounds, prior, posterior, chain, expected_information)
+
+    # Random Initializers
+    
+    function ParametersNPL(posterior, bounds)
+        N = size(bounds,1)
+        pars = truncate_rand(posterior, bounds)
+        new(string.("par_",collect(1:N)), pars, bounds, posterior, posterior,[zeros(Float64, 0) for n=1:N], LinearAlgebra.I(N))
+    end
+
+end
+
+# Assign prior
+
+function add_prior!(parameters::AbstractParameters, prior::Distributions.Distribution) 
+    parameters.prior .= prior
+end
+
+function add_prior!(parameters::AbstractParameters, priors::Vector{Distributions.Distribution}) 
+    parameters.prior .= Distributions.Product(priors)
+end
+
+function add_posterior!(parameters::AbstractParameters, posterior::Distributions.Distribution) 
+    parameters.posterior .= posterior
+end
+
+function add_posterior!(parameters::AbstractParameters, posteriors::Vector{Distributions.Distribution}) 
+    parameters.posterior .= Distributions.Product(posteriors)
+end

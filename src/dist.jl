@@ -28,21 +28,3 @@ function truncate_rand(distribution::Distributions.MultivariateDistribution, bou
         min(max(x, bound[1]), bound[2])
             end, [1:n])
 end
-
-# Assign prior
-
-function add_prior!(parameters::AbstractParameters, prior::Distributions.Distribution) 
-    parameters.prior .= prior
-end
-
-function add_prior!(parameters::AbstractParameters, priors::Vector{Distributions.Distribution}) 
-    parameters.prior .= Distributions.Product(priors)
-end
-
-function add_posterior!(parameters::AbstractParameters, posterior::Distributions.Distribution) 
-    parameters.posterior .= posterior
-end
-
-function add_posterior!(parameters::AbstractParameters, posteriors::Vector{Distributions.Distribution}) 
-    parameters.posterior .= Distributions.Product(posteriors)
-end

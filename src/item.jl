@@ -35,15 +35,6 @@ mutable struct Item3PL <: AbstractItem
 end
 
 """
-    get_examinees(item_idx::Int64, responses::Vector{<:AbstractResponse})
-
-It returns the esaminees who answered to the item with index `item_idx`.
-"""
-function get_examinees(item_idx::Int64, responses::Vector{<:AbstractResponse})
-   filter(r -> r.item.idx == item_idx,responses)
-end
-
-"""
     get_item_by_idx(item_idx::Int64, items::Vector{<:AbstractItem})
 
 It returns the item with index `item_idx` from a vector of <:AbstractItem.

@@ -34,7 +34,7 @@ function expected_information_item(latent::Latent1D, parameters::Parameters3PL)
     return [i_aa  i_ab  i_ac; i_ab  i_bb  i_bc; i_ac  i_bc  i_cc]
 end
 
-function observed_information_item(response_val::Float64, latent::latent1D, parameters::Parameters3PL)
+function observed_information_item(response_val::Float64, latent::Latent1D, parameters::Parameters3PL)
     p = probability(latent.val, parameters)
     i = (1 - p) * (p - c)
     h = (response_val * parameters.c - p^2) * i
@@ -49,7 +49,7 @@ function observed_information_item(response_val::Float64, latent::latent1D, para
     return [i_aa  i_ab  i_ac; i_ab  i_bb  i_bc; i_ac  i_bc  i_cc]
 end
 
-function observed_information_latent(response_val::Float64, latent::latent1D, parameters::Parameters3PL)
+function observed_information_latent(response_val::Float64, latent::Latent1D, parameters::Parameters3PL)
     p = probability(latent.val, parameters)
     i = (1 - p) * (p - c)
     h = (response_val * parameters.c - p^2) * i
