@@ -7,7 +7,7 @@ using Psychometrics
 makedocs(
     sitename="Psychometrics",
     format=Documenter.HTML(),
-    modules=[ATA],
+    modules=[Psychometrics],
     doctest=true,
     pages = [
         "index.md",
