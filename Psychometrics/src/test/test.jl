@@ -1,17 +1,5 @@
 using Distributions
 using Dates
-include("utils.jl")
-include("dist.jl")
-include("latent.jl")
-include("parameters.jl")
-include("item.jl")
-include("examinee.jl")
-include("design.jl")
-include("response.jl")
-include("latent.jl")
-include("probability.jl")
-include("likelihood.jl")
-include("information.jl")
 
 
 

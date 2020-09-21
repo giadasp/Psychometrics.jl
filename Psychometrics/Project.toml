@@ -1,0 +1,6 @@
+name = "Psychometrics"
+uuid = "57e514aa-f106-4021-952e-a4958d9053bb"
+authors = ["Giada Spaccapanico Proietti (giadasp)"]
+version = "0.1.0"
+
+[deps]

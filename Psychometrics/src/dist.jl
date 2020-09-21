@@ -31,18 +31,18 @@ end
 
 # Assign prior
 
-function prior!(parameters::AbstractParameters, prior::Distributions.Distribution) 
+function add_prior!(parameters::AbstractParameters, prior::Distributions.Distribution) 
     parameters.prior .= prior
 end
 
-function prior!(parameters::AbstractParameters, priors::Vector{Distributions.Distribution}) 
+function add_prior!(parameters::AbstractParameters, priors::Vector{Distributions.Distribution}) 
     parameters.prior .= Distributions.Product(priors)
 end
 
-function posterior!(parameters::AbstractParameters, posterior::Distributions.Distribution) 
+function add_posterior!(parameters::AbstractParameters, posterior::Distributions.Distribution) 
     parameters.posterior .= posterior
 end
 
-function posterior!(parameters::AbstractParameters, posteriors::Vector{Distributions.Distribution}) 
+function add_posterior!(parameters::AbstractParameters, posteriors::Vector{Distributions.Distribution}) 
     parameters.posterior .= Distributions.Product(posteriors)
 end

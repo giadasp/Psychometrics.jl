@@ -8,11 +8,11 @@ mutable struct Examinee1D <: AbstractExaminee
 end
 
 """
-    get_items!(examinee_idx::Int64, responses::Vector{<:AbstractResponse})
+    get_items(examinee_idx::Int64, responses::Vector{<:AbstractResponse})
 
 It returns the items answered by the examinee with index `examinee_idx`.
 """
-function get_items!(examinee_idx::Int64, responses::Vector{<:AbstractResponse})
+function get_items(examinee_idx::Int64, responses::Vector{<:AbstractResponse})
    filter(r -> r.examinee.idx == examinee_idx,responses)
 end
 
@@ -48,6 +48,6 @@ end
 
 It returns the examinee with index `examinee_idx` from a vector of ::AbstractExaminee.
 """
-function get_examinee_by_idx!(examinee_idx::Int64, examinees::Vector{<:AbstractItem})
+function get_examinee_by_idx(examinee_idx::Int64, examinees::Vector{<:AbstractItem})
    filter(e -> e.idx == examinee_idx, examinees)
 end
