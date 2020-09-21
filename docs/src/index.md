@@ -4,7 +4,7 @@ DocTestSetup = quote
     using Psychometrics
 end
 ```
-## Documentation Contents
+# Documentation Contents
 
 ```@contents
 Pages = ["parameter.md", "item.md", "latent.md", "examinee.md", "response.md", "probability.md" "information.md", "likelihood.md"]

@@ -49,7 +49,7 @@ function log_likelihood(response::AbstractResponse, g_item::Vector{Float64}, g_l
 end
 
 """
-log_likelihood(responses::Vector{<:AbstractResponse}, g_item::Vector{Float64}, g_latent::Vector{Float64})
+    log_likelihood(responses::Vector{<:AbstractResponse}, g_item::Vector{Float64}, g_latent::Vector{Float64})
 
 It computes the log likelihood for a vector of responses `responses`. 
 It updates also the gradient vectors.
