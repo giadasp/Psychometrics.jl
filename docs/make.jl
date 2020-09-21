@@ -11,12 +11,15 @@ makedocs(
     doctest=true,
     pages = [
         "index.md",
-        "utils.md",
-        "build.md",
-        "opt.md",
-        "print.md",
-        "examples.md"
-    ]
+        "item.md",
+        "parameter.md",
+        "examiness.md",
+        "latent.md",
+        "response.md",
+        "probability.md",
+        "information.md",
+        "likelihood.md"
+         ]
 )
 
 deploydocs(
