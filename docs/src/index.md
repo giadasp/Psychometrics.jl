@@ -4,7 +4,11 @@ DocTestSetup = quote
     using Psychometrics
 end
 ```
-# Documentation Contents
+# Psychometrics.js
+
+A package for psychometric data analysis.
+
+## Documentation Contents
 
 ```@contents
 Pages = ["parameter.md", "item.md", "latent.md", "examinee.md", "response.md", "probability.md" "information.md", "likelihood.md"]
