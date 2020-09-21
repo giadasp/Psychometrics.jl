@@ -4,7 +4,7 @@ DocTestSetup = quote
     using Psychometrics
 end
 ```
-# Psychometrics.js
+# Psychometrics.jl
 
 A package for psychometric data analysis.
 
