@@ -21,20 +21,20 @@ function add_response!(response::AbstractResponse, responses::Vector{Response})
 end
 
 """
-    get_examinee_responses!(idx::Int64, responses::Vector{Response})
+    get_examinee_responses(idx::Int64, responses::Vector{Response})
 
 It returns the vector of responses given by examinee with index `idx`.
 """
-function get_examinee_responses!(idx::Int64, responses::Vector{Response})
+function get_examinee_responses(idx::Int64, responses::Vector{Response})
     filter(r -> r.examinee.idx == idx, responses)
 end
 
 """
-    get_item_responses!(idx::Int64, responses::Vector{Response})
+    get_item_responses(idx::Int64, responses::Vector{Response})
 
 It returns the vector of responses given to item with index `idx`.
 """
-function get_examinee_responses!(idx::Int64, responses::Vector{Response})
+function get_examinee_responses(idx::Int64, responses::Vector{Response})
     filter(r -> r.item.idx == idx, responses)
 end
 
