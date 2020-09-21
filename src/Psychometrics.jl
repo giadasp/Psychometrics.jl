@@ -16,5 +16,5 @@ include("probability.jl")
 include("likelihood.jl")
 include("information.jl")
 
-export add_prior!,add_posterior!,get_items,answer,get_examinee_by_idx,information_latent,informationi
+export add_prior!,add_posterior!,get_items,answer,get_examinee_by_idx,probability,information_latent,information
 end # module

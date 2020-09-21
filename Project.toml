@@ -1,8 +1,4 @@
 name = "Psychometrics"
-uuid = "a8b2d191-9814-11e9-3a67-ff0161457e0c"
-authors = ["Giada Spaccapanico Prioietti (giadasp) <giadasp@users.noreply.github.com>"]
+uuid = "ce8202d9-98c3-4990-890a-8616ce2c06f9"
+authors = ["giada "]
 version = "0.1.0"
-
-[deps]
-Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
-Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
