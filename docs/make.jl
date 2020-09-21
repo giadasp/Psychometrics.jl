@@ -13,7 +13,7 @@ makedocs(
         "index.md",
         "item.md",
         "parameter.md",
-        "examiness.md",
+        "examinee.md",
         "latent.md",
         "response.md",
         "probability.md",
