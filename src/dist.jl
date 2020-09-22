@@ -2,18 +2,19 @@ import Base.+
 import Base.-
 import Base.*
 import Base./
-+(dist::Normal{Float64}, x::Float64) = Normal(location(dist) + x, scale(dist))
--(dist::Normal{Float64}, x::Float64) = Normal(location(dist) - x, scale(dist))
-*(dist::Normal{Float64}, x::Float64) = Normal(location(dist) * x, scale(dist) * x)
-/(dist::Normal{Float64}, x::Float64) = Normal(location(dist) / x, scale(dist) / x)
 
-+(dist::Uniform{Float64}, x::Float64) = Uniform(location(dist) + x, scale(dist))
--(dist::Uniform{Float64}, x::Float64) = Uniform(location(dist) - x, scale(dist))
-*(dist::Uniform{Float64}, x::Float64) = Uniform(location(dist), scale(dist) * x)
-/(dist::Uniform{Float64}, x::Float64) = Uniform(location(dist), scale(dist) / x)
++(dist::Distributions.Normal{Float64}, x::Float64) = Distributions.Normal(Distributions.location(dist) + x, Distributions.scale(dist))
+-(dist::Distributions.Normal{Float64}, x::Float64) = Distributions.Normal(Distributions.location(dist) - x, Distributions.scale(dist))
+*(dist::Distributions.Normal{Float64}, x::Float64) = Distributions.Normal(Distributions.location(dist) * x, Distributions.scale(dist) * x)
+/(dist::Distributions.Normal{Float64}, x::Float64) = Distributions.Normal(Distributions.location(dist) / x, Distributions.scale(dist) / x)
 
-*(dist::LogNormal{Float64}, x::Float64) = LogNormal(location(dist)+log(x), scale(dist) )
-/(dist::LogNormal{Float64}, x::Float64) = LogNormal(location(dist)-log(x), scale(dist) )
++(dist::Distributions.Uniform{Float64}, x::Float64) = Distributions.Uniform(Distributions.location(dist) + x, Distributions.scale(dist))
+-(dist::Distributions.Uniform{Float64}, x::Float64) = Distributions.Uniform(Distributions.location(dist) - x, Distributions.scale(dist))
+*(dist::Distributions.Uniform{Float64}, x::Float64) = Distributions.Uniform(Distributions.location(dist), Distributions.scale(dist) * x)
+/(dist::Distributions.Uniform{Float64}, x::Float64) = Distributions.Uniform(Distributions.location(dist), Distributions.scale(dist) / x)
+
+*(dist::Distributions.LogNormal{Float64}, x::Float64) = Distributions.LogNormal(Distributions.location(dist)+log(x), Distributions.scale(dist) )
+/(dist::Distributions.LogNormal{Float64}, x::Float64) = Distributions.LogNormal(Distributions.location(dist)-log(x), Distributions.scale(dist) )
 
 # Truncation
 
