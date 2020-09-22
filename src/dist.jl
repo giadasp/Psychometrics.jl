@@ -1,5 +1,3 @@
-using Distributions
-
 import Base.+
 import Base.-
 import Base.*
@@ -19,11 +17,11 @@ import Base./
 
 # Truncation
 
-function truncate_rand(distribution::Distributions.UnivariateDistribution, bounds::Vector{Float64}; n = 1)
+function truncate_rand(distribution::Distributions.UnivariateDistribution, bounds::Vector{Float64}; n::Int64 = 1)
     return map(x -> min(max(rand(distribution), bounds[1]), bounds[2]), [1:n])
 end
 
-function truncate_rand(distribution::Distributions.MultivariateDistribution, bounds::Vector{Vector{Float64}}; n = 1)
+function truncate_rand(distribution::Distributions.MultivariateDistribution, bounds::Vector{Vector{Float64}}; n::Int64 = 1)
      return map( y ->  map(rand(distribution), bounds) do x, bound
         min(max(x, bound[1]), bound[2])
             end, [1:n])
