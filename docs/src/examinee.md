@@ -1,4 +1,4 @@
-# Examinee Structs and Methods
+# Examinees
 
 ```@autodocs
 Modules = [Psychometrics]
