@@ -1,3 +1,6 @@
+using Pkg
+Pkg.activate(".")
+using Psychometrics
 using Distributions
 using Dates
 
@@ -10,27 +13,21 @@ using Dates
 ## Speed tests
 
 I = 200
-N = 20_000
+N = 10_000
 
 items = [Item2PL(i, string("item_",i), ["math"], Parameters2PL()) for i = 1 : I];
 examinees = [Examinee1D(n, string("examinee_",n), Latent1D()) for n = 1 : N]; 
 
-responses = map( (e, i) -> generate_response(e, i), examinees, items)
+responses = vcat(map( e -> map( i -> generate_response(e, i), items), examinees)...);
 
-log_likelihood_item_g = zeros(2)
-log_likelihood_latent_g = zeros(1)
-l_sum = log_likelihood(responses, log_likelihood_item_g, log_likelihood_latent_g)
+g_item = zeros(2)
+g_latent = zeros(1)
+l_sum = log_likelihood(responses, g_item, g_latent);
 # @benchmark gradients_1 = [ probability_item_g(examinees[n].val, items[i]) for n = 1 : 10_000, i = 1 : 200]
 # @benchmark gradients_2 = [ probability_item_g_2(examinees[n].val, items[i]) for n = 1 : 10_000, i = 1 : 200] #faster than 1
 
-information = [expected_information_item(examinees[n].val, items[i]) for n = 1 : 20_000, i = 1 : 200];
+expected_information_item_val = map( r -> expected_information_item(r.examinee.latent, r.item.parameters), responses);
+#only for 3PL
+#observed_information_item_val = map( r -> observed_information_item(r), responses);
+information_latent_val = map( r -> information_latent(r.examinee.latent, r.item.parameters), responses);
 
-
-@show information
-
-
-
-using StatsBase
-StatsBase.cov(hcat([rand(Normal(0,1),2) for n=1:1000]...), dims=2)
-
-#StatsBase.cov(rand(MvNormal([0.0,0.0],[1.0 0.0 ; 0.0 1.0]),10000),dims=2)

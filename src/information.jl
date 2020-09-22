@@ -54,6 +54,20 @@ function information_latent(latent::Latent1D, parameters::Parameters3PL)
     return (p - parameters.c)^2 * (1 - p) * parameters.a^2 / (1 - parameters.c)^2 / p
 end
 
+"""
+    information_latent(examinee::AbstractExaminee, item::AbstractItem)
+
+# Description
+An abstraction of `information_latent(latent::AbstractLatent, parameters::AbstractParameters)` on examinee and item.
+
+# Arguments
+- **`examinee::AbstractExaminee`** : Required. 
+- **`item::AbstractItem`** : Required. 
+
+"""
+function information_latent(examinee::AbstractExaminee, item::AbstractItem)
+    information_latent(examinee.latent, item.parameter)
+end
 ## Item Expected Informations
 
 """
@@ -91,7 +105,7 @@ function  expected_information_item(latent::Latent1D, parameters::Parameters2PL)
     p = probability(latent, parameters)
     i_aa =                  (1 - p) * p *                         (latent.val - parameters.b)^2 
     i_ab = - parameters.a * (1 - p) * p *                         (latent.val - parameters.b)  
-    i_bb = parameters.a^2 * (1 - p) * p *
+    i_bb = parameters.a^2 * (1 - p) * p 
     return [i_aa  i_ab; i_ab  i_bb]
 end
 
@@ -119,6 +133,23 @@ function expected_information_item(latent::Latent1D, parameters::Parameters3PL)
     i_bb = - parameters.a * i_bc    * (p - parameters.c)
     i_cc =                  (1 - p)                                                            / den
     return [i_aa  i_ab  i_ac; i_ab  i_bb  i_bc; i_ac  i_bc  i_cc]
+end
+
+"""
+    expected_information_item(examinee::AbstractExaminee, item::AbstractItem)
+
+# Description
+Abstraction of expected_information_item(latent, parameters) on examinee and item.
+
+# Arguments
+- **`examinee::AbstractExaminee`** : Required. 
+- **`item::AbstractItem`** : Required. 
+
+# Output
+A matrix (or a scalar if there is only on item parameter) of the expected informations. 
+"""
+function expected_information_item(examinee::AbstractExaminee, item::AbstractItem)
+    expected_information_item(examinee.latent, item.parameters)
 end
 
 ## Item Observed Informations
@@ -162,13 +193,13 @@ It computes the observed information (-second derivative of the likelihood) with
 - **`response::AbstractResponse`** : Required. An instance of the `AbstractResponse` struct. 
 
 # Output
-A ``3 \\times 3`` matrix of the observed informations. 
+A matrix (or scalar if the item has only 1 parameter) of the observed informations. 
 """
 function observed_information_item(response::AbstractResponse)
     observed_information_item(response.val, response.examinee.latent, response.item.parameters)
 end
 
-expected_information_item
+
 
 
 

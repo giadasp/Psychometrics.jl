@@ -7,6 +7,13 @@ mutable struct Examinee1D <: AbstractExaminee
     Examinee1D(idx,id,latent) = new(idx,id,latent)
 end
 
+mutable struct Examinee <: AbstractExaminee
+    idx::Int64
+    id::String
+    latent::AbstractLatent
+    Examinee1D(idx,id,latent) = new(idx,id,latent)
+end
+
 
 """
     answer(examinee::AbstractExaminee, item::AbstractParameters)

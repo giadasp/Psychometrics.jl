@@ -48,4 +48,4 @@ It returns the item with index `item_idx` from a vector of <:AbstractItem.
 """
 function get_item_by_idx(item_idx::Int64, items::Vector{<:AbstractItem})
    filter(i -> i.idx == item_idx, items)
-end()
+end
