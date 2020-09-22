@@ -107,6 +107,21 @@ end
 
 # Assign prior
 
+"""
+    add_prior!(parameters::AbstractParameters, prior::Distributions.Distribution) 
+
+# Description
+It assigns the prior `prior` to a `AbstractParameters` instance.
+
+# Arguments
+- **`parameters::AbstractParameters`** : Required. Any type of parameters object. 
+- **`prior::Distributions.Distribution`** : Required. A probability distribution. It must be the same dimension as `parameters`. 
+
+# Examples
+    parameters2PL = Parameters2PL()
+    bivariate_normal = Distributions.MultivariateNormal([0,0], LinearAlgebra.I(2))
+    add_prior!(parameters2PL, bivariate_normal)
+"""
 function add_prior!(parameters::AbstractParameters, prior::Distributions.Distribution) 
     parameters.prior .= prior
 end

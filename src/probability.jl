@@ -1,4 +1,3 @@
-
 """
      probability(latent_val::Float64, parameters::Parameters1PL)
 
