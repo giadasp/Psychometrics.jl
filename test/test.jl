@@ -9,7 +9,6 @@ using Dates
 
 ## Speed tests
 
-using BenchmarkTools
 I = 200
 N = 20_000
 

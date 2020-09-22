@@ -59,3 +59,29 @@ mutable struct LatentND <: AbstractLatent
             LinearAlgebra.I(N))
     end
 end
+
+mutable struct Latent <: AbstractLatent
+    names::Vector{String}
+    val::Vector{Float64}
+    bounds::Vector{Vector{Float64}} 
+    prior::Union{Distributions.ContinuousUnivariateDistribution, Distributions.MultivariateDistribution}
+    posterior::Union{Distributions.ContinuousUnivariateDistribution, Distributions.MultivariateDistribution}
+    chain::Vector{Vector{Float64}} 
+    expected_information::Matrix{Float64}
+
+    function Latent(names,val,bounds,prior,posterior,chain,expected_information)
+    new(names,val,bounds,prior,posterior,chain,expected_information)
+    end
+    
+    function Latent(bounds, dist::Union{Distributions.ContinuousUnivariateDistribution, Distributions.MultivariateDistribution})
+        N = 1
+        val = truncate_rand(dist, bounds)
+        new(string.("L_",collect(1:N)),
+            val,
+            bounds,
+            dist,
+            dist,
+            [zeros(Float64, 0) for n=1:N],
+            LinearAlgebra.I(N))
+    end
+end
