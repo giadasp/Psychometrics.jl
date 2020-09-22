@@ -1,4 +1,4 @@
-# Response Structs and Methods
+# Responses
 
 ```@autodocs
 Modules = [Psychometrics]

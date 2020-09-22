@@ -1,4 +1,4 @@
-# Item Parameters Structs and Methods
+# Item Parameters
 
 ```@autodocs
 Modules = [Psychometrics]

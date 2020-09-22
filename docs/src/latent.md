@@ -1,4 +1,4 @@
-# Latent Variable Structs and Methods
+# Latent Variables
 
 ```@autodocs
 Modules = [Psychometrics]
