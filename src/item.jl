@@ -107,7 +107,7 @@ mutable struct Item3PL <: AbstractItem
     # Factories
     Item3PL(idx, id, content, parameters) = new(idx, id, content, parameters)
 
-    # Random initilizer
+    # Random initilizers
     Item3PL(idx, id, content) = new(idx, id, content, Parameters3PL())
 end
 
@@ -143,7 +143,7 @@ mutable struct Item <: AbstractItem
     #Factories
     Item(idx, id, content, parameters) = new(idx, id, content, parameters)
 
-    # Random initilizer
+    # Random initilizers
     Item(idx, id, content) = new(idx, id, content, Parameters1PL())
 end
 

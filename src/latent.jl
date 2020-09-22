@@ -101,7 +101,7 @@ mutable struct LatentND <: AbstractLatent
     
     # Random Initializers
 
-    function LatentND(bounds, dist::MultivariateDistribution)
+    function LatentND(bounds, dist::Distributions.MultivariateDistribution)
         N = size(bounds,1)
         val = truncate_rand(dist, bounds)
         new(string.("L_",collect(1:N)),
