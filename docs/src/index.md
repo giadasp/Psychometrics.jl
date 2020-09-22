@@ -1,5 +1,5 @@
 ```@meta
-CurrentModule = ATA
+CurrentModule = Psychometrics
 DocTestSetup = quote
     using Psychometrics
 end
