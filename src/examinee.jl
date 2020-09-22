@@ -1,5 +1,21 @@
 abstract type AbstractExaminee end
 
+"""
+    Examinee1D <: AbstractExaminee
+
+# Description
+Examinee struct with a 1-dimensional latent variable.
+
+# Fields
+  - **`idx::Int64`**: An integer that identifies the examinee.
+  - **`id::String`**: A string that identifies the examinee.
+  - **`latent::Latent1D`**: A 1-dimensional latent variable associated with the examinee.
+
+# Inner Methods
+    Examinee1D(idx, id, latent) = new(idx, id, latent)
+
+Creates a new examinee with custom index, id and 1-dimensional latent variable.
+"""
 mutable struct Examinee1D <: AbstractExaminee
     idx::Int64
     id::String
@@ -7,11 +23,27 @@ mutable struct Examinee1D <: AbstractExaminee
     Examinee1D(idx,id,latent) = new(idx,id,latent)
 end
 
+"""
+    Examinee <: AbstractExaminee
+
+# Description
+Examinee struct with a generic latent variable.
+
+# Fields
+  - **`idx::Int64`**: An integer that identifies the examinee.
+  - **`id::String`**: A string that identifies the examinee.
+  - **`latent::Latent`**: A generic latent variable associated with the examinee.
+
+# Inner Methods
+    Examinee1D(idx, id, latent) = new(idx, id, latent)
+
+Creates a new examinee with custom index, id and a generic latent variable.
+"""
 mutable struct Examinee <: AbstractExaminee
     idx::Int64
     id::String
     latent::AbstractLatent
-    Examinee1D(idx,id,latent) = new(idx,id,latent)
+    Examinee(idx,id,latent) = new(idx,id,latent)
 end
 
 
