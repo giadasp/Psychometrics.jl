@@ -13,7 +13,7 @@ Item struct under the 1-parameter logistic model.
   - **`content::Vector{String}`**: A string vector containing the content features of an item.
   - **`parameters::Parameters1PL`**: A `Parameters1PL` object.
 
-# Inner Methods
+# Factories
     Item1PL(idx, id, content, parameters) = new(idx, id, content, parameters)
 
 Creates a new 1PL item with custom index, id, content features and item parameters.
@@ -29,8 +29,11 @@ mutable struct Item1PL <: AbstractItem
     id::String
     content::Vector{String}
     parameters::Parameters1PL
+
+    # Factories
     Item1PL(idx, id, content, parameters) = new(idx, id, content, parameters)
-    # Random initilizer
+
+    # Random initilizers
     Item1PL(idx, id, content) = new(idx, id, content, Parameters1PL())
 end 
 
@@ -47,7 +50,7 @@ Item struct under the 2-parameter logistic model.
   - **`content::Vector{String}`**: A string vector containing the content features of an item.
   - **`parameters::Parameters2PL`**: A `Parameters2PL` object.
 
-# Inner Methods
+# Factories
     Item2PL(idx, id, content, parameters) = new(idx, id, content, parameters)
 
 Creates a new 2PL item with custom index, id, content features and item parameters.
@@ -63,8 +66,11 @@ mutable struct Item2PL <: AbstractItem
     id::String
     content::Vector{String}
     parameters::Parameters2PL
+
+    #Factories
     Item2PL(idx, id, content, parameters) = new(idx, id, content, parameters)
-    # Random initilizer
+
+    # Random initilizers
     Item2PL(idx, id, content) = new(idx, id, content, Parameters2PL())
 end
     
@@ -81,7 +87,7 @@ Item struct under the 3-parameter logistic model.
   - **`content::Vector{String}`**: A string vector containing the content features of an item.
   - **`parameters::Parameters2PL`**: A `Parameters3PL` object.
 
-# Inner Methods
+# Factories
     Item3PL(idx, id, content, parameters) = new(idx, id, content, parameters)
 
 Creates a new 3PL item with custom index, id, content features and item parameters.
@@ -97,7 +103,10 @@ mutable struct Item3PL <: AbstractItem
     id::String
     content::Vector{String}
     parameters::Parameters3PL
+
+    # Factories
     Item3PL(idx, id, content, parameters) = new(idx, id, content, parameters)
+
     # Random initilizer
     Item3PL(idx, id, content) = new(idx, id, content, Parameters3PL())
 end
@@ -114,7 +123,7 @@ A generic item struct.
   - **`content::Vector{String}`**: A string vector containing the content features of an item.
   - **`parameters::AbstractParameters`**: A generic item parameters object.
 
-# Inner Methods
+# Factories
     Item(idx, id, content, parameters) = new(idx, id, content, parameters)
 
 Creates a new 3PL item with custom index, id, content features and item parameters.
@@ -130,7 +139,10 @@ mutable struct Item <: AbstractItem
     id::String
     content::Vector{String}
     parameters::AbstractParameters
+
+    #Factories
     Item(idx, id, content, parameters) = new(idx, id, content, parameters)
+
     # Random initilizer
     Item(idx, id, content) = new(idx, id, content, Parameters1PL())
 end

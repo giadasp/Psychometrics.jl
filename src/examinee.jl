@@ -11,16 +11,27 @@ Examinee struct with a 1-dimensional latent variable.
   - **`id::String`**: A string that identifies the examinee.
   - **`latent::Latent1D`**: A 1-dimensional latent variable associated with the examinee.
 
-# Inner Methods
+# Factories
     Examinee1D(idx, id, latent) = new(idx, id, latent)
 
 Creates a new examinee with custom index, id and 1-dimensional latent variable.
+
+# Random initializers
+    Examinee1D(idx, id) = new(idx, id, Latent1D())
+
+Randomly generates an examinee with custom index and id and with a default 1-dimensional latent variable 
+(Look at (`Latent1D`)[#Psychometrics.Latent1D] for the defaults).
 """
 mutable struct Examinee1D <: AbstractExaminee
     idx::Int64
     id::String
     latent::Latent1D
-    Examinee1D(idx,id,latent) = new(idx,id,latent)
+
+    # Factories
+    Examinee1D(idx, id, latent) = new(idx, id, latent)
+
+    # Random initializers
+    Examinee1D(idx, id) = new(idx, id, Latent1D())
 end
 
 """
@@ -34,16 +45,27 @@ Examinee struct with a generic latent variable.
   - **`id::String`**: A string that identifies the examinee.
   - **`latent::Latent`**: A generic latent variable associated with the examinee.
 
-# Inner Methods
+# Factories
     Examinee1D(idx, id, latent) = new(idx, id, latent)
 
 Creates a new examinee with custom index, id and a generic latent variable.
+
+# Random initializers
+    Examinee(idx, id) = Examinee1D(idx, id)
+
+Randomly generates an examinee with custom index and id and with a default 1-dimensional latent variable 
+(Look at (`Latent1D`)[#Psychometrics.Latent1D] for the defaults).
 """
 mutable struct Examinee <: AbstractExaminee
     idx::Int64
     id::String
     latent::AbstractLatent
-    Examinee(idx,id,latent) = new(idx,id,latent)
+
+    # Factories
+    Examinee(idx, id, latent) = new(idx, id, latent)
+
+    # Random initializers
+    Examinee(idx, id) = Examinee1D(idx, id)
 end
 
 

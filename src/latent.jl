@@ -1,7 +1,32 @@
 abstract type AbstractLatent end
 
 # Structs
+"""
+    Latent1D <: AbstractLatent
 
+# Description
+1-dimensional latent variable struct.
+
+# Fields
+    - **`val::Float64`**
+    - **`bounds::Vector{Float64}`**
+    - **`prior::Distributions.ContinuousUnivariateDistribution`**
+    - **`posterior::Distributions.ContinuousUnivariateDistribution`**
+    - **`chain::Vector{Float64}`**
+    - **`expected_information::Float64`**
+
+# Factories
+    Latent1D(val,bounds,prior,posterior,chain,expected_information) = new(val,bounds,prior,posterior,chain,expected_information)
+Creates a new 1-dimensional latent variable with custom fields.
+
+# Random Initializers
+    Latent1D()
+
+Randomly generates a value for the 1-dimensional latent variable and assigns a default standardized Gaussian prior and posterior
+    Latent1D(bounds, posterior)
+
+Randomly generates a value for the 1-dimensional latent variable and assigns a custom univariate distribution to prior and posterior with specific bounds.
+"""
 mutable struct Latent1D <: AbstractLatent
     val::Float64
     bounds::Vector{Float64} 
@@ -14,52 +39,104 @@ mutable struct Latent1D <: AbstractLatent
     # Random Initializers
     function Latent1D()
         bounds = [-6.0,6.0]
-        posterior = Distributions.Normal(0.0, 1.0)
-        val = truncate_rand(posterior, bounds)[1]
+        dist = Distributions.Normal(0.0, 1.0)
+        val = truncate_rand(dist, bounds)[1]
         new(val,
             bounds,
-            posterior,
-            posterior,
+            dist,
+            dist,
             zeros(Float64, 0),
             1.0)
     end
-    function Latent1D(bounds, posterior)
-        val = truncate_rand(posterior, bounds)[1]
+    function Latent1D(bounds, dist::Distributions.UnivariateDistribution)
+        val = truncate_rand(dist, bounds)[1]
         new(val,
             bounds,
-            posterior,
-            posterior,
+            dist,
+            dist,
             zeros(Float64, 0),
             1.0)
     end
 end
 
+"""
+    LatentND <: AbstractLatent
+
+# Description
+N-dimensional latent variable struct.
+
+# Fields
+    - **`names::Vector{String}`**
+    - **`val::Vector{Float64}`**
+    - **`bounds::Vector{Vector{Float64}}`**
+    - **`prior::Distributions.MultivariateDistribution`**
+    - **`posterior::Distributions.MultivariateDistribution`**
+    - **`chain::Vector{Vector{Float64}}`**
+    - **`expected_information::Matrix{Float64}`**
+
+# Factories
+    LatentND(names, val, bounds, prior, posterior, chain, expected_information) = new(names, val, bounds, prior, posterior, chain, expected_information)
+Creates a new N-dimensional latent variable with custom fields.
+
+# Random Initializers
+    LatentND()
+
+Randomly generates a value for the N-dimensional latent variable and assigns a default standardized Gaussian prior and posterior
+    LatentND(bounds, posterior)
+
+Randomly generates a value for the N-dimensional latent variable and assigns a custom multivariate distribution to prior and posterior with specific bounds.
+"""
 mutable struct LatentND <: AbstractLatent
     names::Vector{String}
     val::Vector{Float64}
     bounds::Vector{Vector{Float64}} 
-    prior::Distributions.ContinuousUnivariateDistribution 
-    posterior::Distributions.ContinuousUnivariateDistribution
+    prior::Distributions.MultivariateDistribution 
+    posterior::Distributions.MultivariateDistribution
     chain::Vector{Vector{Float64}} 
     expected_information::Matrix{Float64}
 
-    function LatentND(names,val,bounds,prior,posterior,chain,expected_information)
-    new(names,val,bounds,prior,posterior,chain,expected_information)
+    function LatentND(names, val, bounds, prior, posterior, chain, expected_information)
+        new(names, val, bounds, prior, posterior, chain, expected_information)
     end
     
-    function LatentND(bounds, posterior)
+    # Random Initializers
+
+    function LatentND(bounds, dist::MultivariateDistribution)
         N = size(bounds,1)
-        val = truncate_rand(posterior, bounds)
+        val = truncate_rand(dist, bounds)
         new(string.("L_",collect(1:N)),
             val,
             bounds,
-            posterior,
-            posterior,
+            dist,
+            dist,
             [zeros(Float64, 0) for n=1:N],
             LinearAlgebra.I(N))
     end
 end
 
+"""
+    Latent <: AbstractLatent
+
+# Description
+Generic latent variable struct.
+
+# Fields
+    - **`val::Vector{Float64}`**
+    - **`bounds::Vector{Vector{Float64}}`**
+    - **`prior::Union{Distributions.ContinuousUnivariateDistribution, Distributions.MultivariateDistribution}`**
+    - **`posterior::Union{Distributions.ContinuousUnivariateDistribution, Distributions.MultivariateDistribution}`**
+    - **`chain::Vector{Vector{Float64}} `**
+    - **`expected_information::Matrix{Float64}`**
+
+# Factories
+    Latent(names, val, bounds, prior, posterior, chain, expected_information) = new(val, bounds, prior, posterior, chain, expected_information)
+Creates a new generic latent variable with custom fields.
+
+# Random Initializers
+    Latent(bounds, posterior)
+
+Randomly generates a value for the generic latent variable and assigns a custom univariate or multivariate distribution to prior and posterior with specific bounds.
+"""
 mutable struct Latent <: AbstractLatent
     names::Vector{String}
     val::Vector{Float64}
@@ -69,8 +146,8 @@ mutable struct Latent <: AbstractLatent
     chain::Vector{Vector{Float64}} 
     expected_information::Matrix{Float64}
 
-    function Latent(names,val,bounds,prior,posterior,chain,expected_information)
-    new(names,val,bounds,prior,posterior,chain,expected_information)
+    function Latent(names, val, bounds, prior, posterior, chain, expected_information)
+        new(names, val, bounds, prior, posterior, chain, expected_information)
     end
     
     function Latent(bounds, dist::Union{Distributions.ContinuousUnivariateDistribution, Distributions.MultivariateDistribution})
