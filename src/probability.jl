@@ -1,5 +1,10 @@
+
+function probability(latent_val::Float64, parameters::Parameters1PL)
+    1 / (1 + _exp_c(parameters.b - latent_val))
+end
+
 function probability(latent::Latent1D, parameters::Parameters1PL)
-    1 / (1 + _exp_c(parameters.b - latent.val))
+    probability(latent.val, parameters)
 end
 
 function probability(latent::Latent1D, parameters::Parameters1PL, g_item::Vector{Float64}, g_latent::Vector{Float64})
@@ -16,8 +21,12 @@ function probability(latent::Latent1D, parameters::Parameters1PL, g_item::Vector
     return p
 end
 
+function probability(latent_val::Float64, parameters::Parameters2PL)
+    1 / (1 + _exp_c( - parameters.a * (latent_val - parameters.b)))
+ end
+
 function probability(latent::Latent1D, parameters::Parameters2PL)
-   1 / (1 + _exp_c( - parameters.a * (latent.val - parameters.b)))
+    probability(latent.val, parameters)
 end
 
 function probability(latent::Latent1D, parameters::Parameters2PL, g_item::Vector{Float64}, g_latent::Vector{Float64})
@@ -37,8 +46,12 @@ function probability(latent::Latent1D, parameters::Parameters2PL, g_item::Vector
     return p
 end
 
+function probability(latent_val::Float64, parameters::Parameters3PL)
+    parameters.c + (1 - parameters.c) * (1 / (1 + _exp_c( - parameters.a * (latent_val - parameters.b ))))
+end
+
 function probability(latent::Latent1D, parameters::Parameters3PL)
-    parameters.c + (1 - parameters.c) * (1 / (1 + _exp_c( - parameters.a * (latent.val - parameters.b ))))
+    probability(latent.val, parameters)
 end
 
 function probability(latent::Latent1D, parameters::Parameters3PL,  g_item::Vector{Float64}, g_latent::Vector{Float64})
