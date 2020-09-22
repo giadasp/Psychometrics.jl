@@ -126,6 +126,22 @@ function add_prior!(parameters::AbstractParameters, prior::Distributions.Distrib
     parameters.prior .= prior
 end
 
+"""
+    add_prior!(parameters::AbstractParameters, priors::Vector{Distributions.Distribution}) 
+
+# Description
+It transforms the vector of univariate priors `priors` to their products and assign it to `AbstractParameters` instance.
+
+# Arguments
+- **`parameters::AbstractParameters`** : Required. Any type of parameters object. 
+- **`priors::Vector{Distributions.Distribution}`** : Required. A vector of probability distributions. The size of the vector must be the same as `parameters`. 
+
+# Examples
+    parameters2PL = Parameters2PL()
+    a_dist = Distributions.Normal(0,1)
+    b_dist = Distributions.Normal(0,1)
+    add_prior!(parameters2PL, [a_dist, b_dist»])
+"""
 function add_prior!(parameters::AbstractParameters, priors::Vector{Distributions.Distribution}) 
     parameters.prior .= Distributions.Product(priors)
 end
