@@ -140,7 +140,7 @@ It transforms the vector of univariate priors `priors` to their products and ass
     parameters2PL = Parameters2PL()
     a_dist = Distributions.Normal(0,1)
     b_dist = Distributions.Normal(0,1)
-    add_prior!(parameters2PL, [a_dist, b_dist»])
+    add_prior!(parameters2PL, [a_dist, b_dist])
 """
 function add_prior!(parameters::AbstractParameters, priors::Vector{Distributions.Distribution}) 
     parameters.prior .= Distributions.Product(priors)
