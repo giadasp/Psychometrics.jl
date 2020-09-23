@@ -55,19 +55,20 @@ function information_latent(latent::Latent1D, parameters::Parameters3PL)
 end
 
 """
-    information_latent(examinee::AbstractExaminee, item::AbstractItem)
+    information_latent(examinees::Dict{Int64,<:AbstractExaminee}, items::Dict{Int64,<:AbstractItem})
 
 # Description
 An abstraction of `information_latent(latent::AbstractLatent, parameters::AbstractParameters)` on examinee and item.
 
 # Arguments
-- **`examinee::AbstractExaminee`** : Required. 
+- **`examinee::Dict{Int64,<:AbstractExaminee}`** : Required. 
 - **`item::AbstractItem`** : Required. 
 
 """
-function information_latent(examinee::AbstractExaminee, item::AbstractItem)
-    information_latent(examinee.latent, item.parameter)
+function information_latent(examinees::Dict{Int64,<:AbstractExaminee}, items::Dict{Int64,<:AbstractItem})
+    sum([information_latent(e.latent, i.parameters) for (key_i, i) in items, (key_e, e) in examinees])
 end
+
 ## Item Expected Informations
 
 """
@@ -136,20 +137,20 @@ function expected_information_item(latent::Latent1D, parameters::Parameters3PL)
 end
 
 """
-    expected_information_item(examinee::AbstractExaminee, item::AbstractItem)
+    expected_information_item(examinees::Dict{Int64,<:AbstractExaminee}, items::Dict{Int64,<:AbstractItem})
 
 # Description
-Abstraction of expected_information_item(latent, parameters) on examinee and item.
+Abstraction of expected_information_item(latent, parameters) on Dict{Int64,<:AbstractExaminee} and items::Dict{Int64,<:AbstractItem}.
 
 # Arguments
-- **`examinee::AbstractExaminee`** : Required. 
+- **`examinee::Dict{Int64,<:AbstractExaminee}`** : Required. 
 - **`item::AbstractItem`** : Required. 
 
 # Output
 A matrix (or a scalar if there is only on item parameter) of the expected informations. 
 """
-function expected_information_item(examinee::AbstractExaminee, item::AbstractItem)
-    expected_information_item(examinee.latent, item.parameters)
+function expected_information_item(examinees::Dict{Int64,<:AbstractExaminee}, items::Dict{Int64,<:AbstractItem})
+    sum([expected_information_item(e.latent, i.parameters) for (key_e, e) in examinees, (key_i, i) in items])
 end
 
 ## Item Observed Informations
@@ -184,19 +185,15 @@ function observed_information_item(response_val::Float64, latent::Latent1D, para
 end
 
 """
-    observed_information_item(response::AbstractResponse)
+    observed_information_item(responses::Vector{<:AbstractResponse}, examinees::Dict{Int64,<:AbstractExaminee}, items::Dict{Int64,<:AbstractItem})
 
 # Description
-It computes the observed information (-second derivative of the likelihood) with respect to the 3 parameters of the 3PL model. 
-
-# Arguments
-- **`response::AbstractResponse`** : Required. An instance of the `AbstractResponse` struct. 
-
-# Output
-A matrix (or scalar if the item has only 1 parameter) of the observed informations. 
+Abstraction to response, item and examinee of `observed_information_item(response_val::Float64, latent::Latent1D, parameters::Parameters3PL)`.
 """
-function observed_information_item(response::AbstractResponse)
-    observed_information_item(response.val, response.examinee.latent, response.item.parameters)
+function observed_information_item(responses::Vector{<:AbstractResponse}, examinees::Dict{Int64,<:AbstractExaminee}, items::Dict{Int64,<:AbstractItem})
+    mapreduce(responses, +) do r
+       observed_information_item(r, examinees[r.examinee_idx], items[r.items_idx])
+    end    
 end
 
 

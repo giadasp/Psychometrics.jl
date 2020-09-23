@@ -2,5 +2,5 @@
 
 ```@autodocs
 Modules = [Psychometrics]
-Pages   = ["examinee.jl"]
+Pages   = ["examinee_core.jl",  "examinee.jl"]
 ```

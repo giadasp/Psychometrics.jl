@@ -8,18 +8,7 @@ makedocs(
     sitename="Psychometrics",
     format=Documenter.HTML(),
     modules=[Psychometrics],
-    doctest=true,
-    pages = [
-        "index.md",
-        "item.md",
-        "parameter.md",
-        "examinee.md",
-        "latent.md",
-        "response.md",
-        "probability.md",
-        "information.md",
-        "likelihood.md"
-         ]
+    doctest=true
 )
 
 deploydocs(

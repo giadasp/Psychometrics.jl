@@ -16,7 +16,7 @@ abstract type AbstractLatent end
     - **`expected_information::Float64`**
 
 # Factories
-    Latent1D(val,bounds,prior,posterior,chain,expected_information) = new(val,bounds,prior,posterior,chain,expected_information)
+    Latent1D(val, bounds, prior, posterior, chain, expected_information) = new(val, bounds, prior, posterior, chain, expected_information)
 Creates a new 1-dimensional latent variable with custom fields.
 
 # Random Initializers

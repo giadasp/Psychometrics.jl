@@ -1,33 +1,33 @@
 abstract type AbstractResponse end
 
 mutable struct Response <: AbstractResponse
-    item::AbstractItem
-    examinee::AbstractExaminee
+    item_idx::Int64
+    examinee_idx::Int64
     val::Union{Missing,Float64}
     start_time::Dates.DateTime
     end_time::Dates.DateTime
-    Response(item, examinee, val, start_time, end_time) = new(item, examinee, val, start_time, end_time)
-    Response(item, examinee, val, time::Dates.DateTime) = new(item, examinee, val, time, time)
+    Response(item_idx, examinee_idx, val, start_time, end_time) = new(item_idx, examinee_idx, val, start_time, end_time)
+    Response(item_idx, examinee_idx, val, time::Dates.DateTime) = new(item_idx, examinee_idx, val, time, time)
 end
 
 # Outer Constructor Methods
 
 """
-    get_examinees(item_idx::Int64, responses::Vector{<:AbstractResponse})
+    get_examinees(item_idx::Int64, responses::Vector{<:AbstractResponse}, examinees::Dict{Int64,<:AbstractExaminee})
 
-It returns the esaminees who answered to the item with index `item_idx`.
+It returns the examinees who answered to the item with index `item_idx`.
 """
-function get_examinees(item_idx::Int64, responses::Vector{<:AbstractResponse})
-   filter(r -> r.item.idx == item_idx,responses)
+function get_examinees(item_idx::Int64, responses::Vector{<:AbstractResponse}, examinees::Dict{Int64,<:AbstractExaminee})
+    examinees[filter(r -> r.item_idx == item_idx, responses).examinee_idx]
 end
 
 """
-    get_items(examinee_idx::Int64, responses::Vector{<:AbstractResponse})
+    get_items(examinee_idx::Int64, responses::Dict{Int64,<:AbstractItem})
 
 It returns the items answered by the examinee with index `examinee_idx`.
 """
-function get_items(examinee_idx::Int64, responses::Vector{<:AbstractResponse})
-   filter(r -> r.examinee.idx == examinee_idx,responses)
+function get_items(examinee_idx::Int64, responses::Vector{<:AbstractResponse}, items::Dict{Int64,<:AbstractItem})
+        items[filter(r -> r.examinee_idx == examinee_idx, responses).item_idx]
 end
 
 """
@@ -45,7 +45,7 @@ end
 It returns the vector of responses given by examinee with index `idx`.
 """
 function get_examinee_responses(idx::Int64, responses::Vector{Response})
-    filter(r -> r.examinee.idx == idx, responses)
+    filter(r -> r.examinee_idx == idx, responses)
 end
 
 """
@@ -54,7 +54,7 @@ end
 It returns the vector of responses given to item with index `idx`.
 """
 function get_item_responses(idx::Int64, responses::Vector{Response})
-    filter(r -> r.item.idx == idx, responses)
+    filter(r -> r.item_idx == idx, responses)
 end
 
 """
@@ -68,11 +68,10 @@ end
 
 
 """
-    generate_response(examinee::AbstractExaminee, item::AbstractItem)
+    generate_response(examinee::Dict{Int64,<:AbstractExaminee}, item::Dict{Int64,<:AbstractItem})
 
 Randomly generate a response by `examinee` to `item`.
 """
-function generate_response(examinee::AbstractExaminee, item::AbstractItem)
-    Response(item, examinee,generate_response(examinee.latent, item.parameters), Dates.now())::Response
+function generate_response(examinees::Dict{Int64,<:AbstractExaminee}, items::Dict{Int64,<:AbstractItem})
+    vcat([[Response(i_key, e_key, generate_response(e.latent, i.parameters), Dates.now()) for (e_key, e) in examinees] for (i_key, i) in items]...)
 end
-
