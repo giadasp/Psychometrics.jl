@@ -6,6 +6,10 @@ function _log_c(x::Float64)
 	ccall(:log, Float64, (Float64,), x)
 end
 
+function _log_cosh_c(x::Float64)
+	ccall(:log, Float64, (Float64,), ccall(:cosh, Float64, (Float64,), x))
+end
+
 function _log1p_c(x::Float64)
 	ccall(:log1p, Float64, (Float64,), x)
 end
@@ -17,6 +21,17 @@ end
 function _sig_cplus(x::Float64)
 	1 / ( 1 + _exp_c(x))
 end
+
+# log1pexp(x::Real) = x < 18.0 ? _log1p_c(_exp_c(x)) : x < 33.3 ? x + _exp_c(-x) : oftype(_exp_c(-x), x)
+
+# """
+#     cosh(x) = (1+e⁻²ˣ)/(2e⁻ˣ)
+#     so _log_cosh_c(x) = _log_c((1+e⁻²ˣ)) + x - _log_c(2)
+#                   = x + log1pexp(-2x) - _log_c(2)
+# """
+# function logcosh(x::Real)
+#     return x + log1pexp(-2x) - _log_c(2)
+# end 
 
 function _gemmblas(A::Matrix{Float64}, B::Matrix{Float64}, ol_max::Matrix{Float64})
 	sa = size(A)

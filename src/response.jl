@@ -75,3 +75,13 @@ Randomly generate a response by `examinee` to `item`.
 function generate_response(examinees::Dict{Int64,<:AbstractExaminee}, items::Dict{Int64,<:AbstractItem})
     vcat([[Response(i_key, e_key, generate_response(e.latent, i.parameters), Dates.now()) for (e_key, e) in examinees] for (i_key, i) in items]...)
 end
+
+
+"""
+    generate_response(examinees::Dict{Int64,<:AbstractExaminee}, items::Dict{Int64,<:AbstractItem}, design::Dict{Int64,Vector{Int64}})
+
+Randomly generate a response by `examinee` to `item` under a `design` dictionary of the same size of examinees with indices of items which must be answered by each examinee.
+"""
+function generate_response(examinees::Dict{Int64,<:AbstractExaminee}, items::Dict{Int64,<:AbstractItem}, design::Dict{Int64,Vector{Int64}})
+    vcat([[Response(i_key, e_key, generate_response(e.latent, i.parameters), Dates.now()) for (e_key, e) in examinees] for (i_key, i) in items]...)
+end

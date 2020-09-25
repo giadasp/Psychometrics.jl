@@ -10,11 +10,12 @@ include("latent.jl")
 include("parameters.jl")
 include("item.jl")
 include("examinee.jl")
-include("design.jl")
 include("response.jl")
 include("probability.jl")
 include("likelihood.jl")
 include("information.jl")
+include("truncated_inverse_gaussian/truncated_inverse_gaussian.jl")
+include("polyagamma/polyagamma.jl")
 
 export add_prior!,
 add_posterior!,
@@ -27,6 +28,7 @@ get_examinee_responses,
 get_examinee_by_idx,
 probability,
 log_likelihood,
+likelihood,
 information_latent,
 observed_information_item,
 expected_information_item,
@@ -48,5 +50,8 @@ Examinee,
 Examinee1D,
 AbstractExaminee,
 Response,
-AbstractResponse
+AbstractResponse,
+TruncatedInverseGaussian,
+PolyaGamma
+
 end # module
