@@ -1,20 +1,20 @@
 const _TRUNC = 0.64
 const _TERMS = 200
 
-struct PolyaGamma{T1<:Real, T2<:Real} <: Distributions.ContinuousUnivariateDistribution
+struct PolyaGamma{T1<:Real,T2<:Real} <: Distributions.ContinuousUnivariateDistribution
     h::T1
     z::T2
     PolyaGamma{T1,T2}(h, z) where {T1,T2} = new{T1,T2}(h, z)
 end
 
-function PolyaGamma(h::T1, z::T2; check_args=true) where {T1 <: Real, T2 <:Real}
+function PolyaGamma(h::T1, z::T2; check_args = true) where {T1<:Real,T2<:Real}
     check_args && Distributions.@check_args(PolyaGamma, h > zero(h) && z >= zero(z))
-    return PolyaGamma{T1, T2}(h, z)
+    return PolyaGamma{T1,T2}(h, z)
 end
 
 #### Outer constructors
 PolyaGamma(h::T) where {T<:Real} = PolyaGamma(h, one(T))
-PolyaGamma() = PolyaGamma(1, 1.0, check_args=false)
+PolyaGamma() = PolyaGamma(1, 1.0, check_args = false)
 
 #@distr_support PolyaGamma -Inf Inf #TODO
 
@@ -23,12 +23,12 @@ PolyaGamma() = PolyaGamma(1, 1.0, check_args=false)
 scale(d::PolyaGamma) = d.h
 tilting(d::PolyaGamma) = d.z
 
-params(d::PolyaGamma) = (d.n, d.z)
-partype(::PolyaGamma{T1,T2}) where {T1,T2} = (T1,T2)
+params(d::PolyaGamma) = (d.h, d.z)
+partype(::PolyaGamma{T1,T2}) where {T1,T2} = (T1, T2)
 
 #### Statistics
 
-mean(d::PolyaGamma) = d.h / (2 * d.z) * tanh( d.z / 2 ) # ord.h / (2 * d.z) * ((_exp_c(d.z) - 1) / (1 + _exp_c(d.z)))
+mean(d::PolyaGamma) = d.h / (2 * d.z) * tanh(d.z / 2) # ord.h / (2 * d.z) * ((_exp_c(d.z) - 1) / (1 + _exp_c(d.z)))
 
 var(d::PolyaGamma) = d.h / (4 * d.z^3) * (sinh(d.z) - d.z) * sech(d.z / 2)^2
 
@@ -36,17 +36,17 @@ var(d::PolyaGamma) = d.h / (4 * d.z^3) * (sinh(d.z) - d.z) * sech(d.z / 2)^2
 
 ## Calculate coefficient n in density of PG(1.0, 0.0), i.e. J* from Devroye.
 ##------------------------------------------------------------------------------
-function _a_coef(n,x)
+function _a_coef(n, x)
     if (x > _TRUNC)
-        return pi * (n + 0.5) * _exp_c(-(n + 0.5)^2 * pi^2 * x / 2 )
+        return pi * (n + 0.5) * _exp_c(-(n + 0.5)^2 * pi^2 * x / 2)
     else
-        return (2 / pi / x)^1.5 * pi * (n + 0.5) * _exp_c( -2 * (n + 0.5)^2 / x )
+        return (2 / pi / x)^1.5 * pi * (n + 0.5) * _exp_c(-2 * (n + 0.5)^2 / x)
     end
 end
 
-function _jacobi_logpdf(z, x; ntrunc::Int)
+function _jacobi_logpdf(z::Float64, x::Float64; ntrunc::Int = _TERMS)
     v = mapreduce(n -> (iseven(n) ? 1 : -1) * _a_coef(n, x), +, 0:ntrunc)
-    return _log_cosh_c(z) -x*z^2/2 + _log_c(v)
+    return _log_cosh_c(z) - x * z^2 / 2 + _log_c(v)
 end
 
 """
@@ -54,30 +54,31 @@ end
     See Polson et al. 2013, section 2.3.
 """
 function _pg_logcoef(x, b, n)
-    loggamma(n+b) - loggamma(n+1) - loggamma(b) + _log_c(2n+b) - _log_c(2π * x^3)/2 - (2n+b)^2/8x
+    loggamma(n + b) - loggamma(n + 1) - loggamma(b) + _log_c(2n + b) -
+    _log_c(2π * x^3) / 2 - (2n + b)^2 / 8x
 end
 """
    log density of the PG(b, 0) distribution.
     See Polson et al. 2013, section 2.3.
 """
-function _pg0_logpdf(x, b; ntrunc::Int)
+function _pg0_logpdf(x::Float64, b::Float64; ntrunc::Int = _TERMS)
     v = zero(x)
-    for n in 0:ntrunc
+    for n = 0:ntrunc
         v += (iseven(n) ? 1 : -1) * _exp_c(_pg_logcoef(x, b, n))
     end
-    return (b-1)*_log_c(2)  + _log_c(abs(v))
+    return (b - 1) * _log_c(2) + _log_c(abs(v))
 end
 """
     log density of the PG(b, c) distribution.
     See Polson et al. 2013, section 2.2 and equation (5).
 """
-function _pg_logpdf(b, c, x; ntrunc::Int)
-    b*_log_cosh_c(c/2) - x*c^2/2 + _pg0_logpdf(x, b; ntrunc=ntrunc)
+function _pg_logpdf(b::Float64, c::Float64, x::Float64; ntrunc::Int = _TERMS)
+    b * _log_cosh_c(c / 2) - x * c^2 / 2 + _pg0_logpdf(x, b; ntrunc = ntrunc)
 end
 
-function Distributions.logpdf(d::PolyaGamma, x::Real; ntrunc::Int=_TERMS)
+function logpdf(d::PolyaGamma, x::Float64; ntrunc::Int = _TERMS)
     if d.h == 1
-        return _jacobi_logpdf(d.z/2, 4*x; ntrunc = ntrunc) + _log_c(4)
+        return _jacobi_logpdf(d.z / 2, 4 * x; ntrunc = ntrunc) + _log_c(4)
     else
         return _pg_logpdf(d.h, d.z, x; ntrunc = ntrunc)
     end
@@ -135,25 +136,29 @@ end
 #         return pg_pdf(d.h, d.z, x; ntrunc=ntrunc)
 #     end
 # end
-Distributions.pdf(d::PolyaGamma, x::Real; ntrunc::Int=_TERMS) = _exp_c(Distributions.logpdf(d, x; ntrunc=ntrunc))
+Distributions.pdf(d::PolyaGamma, x::Real; ntrunc::Int = _TERMS) =
+    _exp_c(logpdf(d, x; ntrunc = ntrunc))
 
 #### Evaluation & Sampling
 
 
-struct PolyaGammaGammaSumSampler <:  Distributions.Sampleable{Distributions.Univariate,Distributions.Continuous}
+struct PolyaGammaGammaSumSampler <:
+       Distributions.Sampleable{Distributions.Univariate,Distributions.Continuous}
     h::Float64
     z::Float64
 end
 
-struct PolyaGammaDevRoyeSampler <:  Distributions.Sampleable{Distributions.Univariate,Distributions.Continuous}
+struct PolyaGammaDevRoyeSampler <:
+       Distributions.Sampleable{Distributions.Univariate,Distributions.Continuous}
     h::Int64
     z::Float64
 end
 
-struct PolyaGammaDevRoye1Sampler <:  Distributions.Sampleable{Distributions.Univariate,Distributions.Continuous}
+struct PolyaGammaDevRoye1Sampler <:
+       Distributions.Sampleable{Distributions.Univariate,Distributions.Continuous}
     h::Float64
     z::Float64
-end 
+end
 
 # function sampler(d::PolyaGamma{T1,T2}) where {T1,T2}
 #      if d.h == 1.0
@@ -167,12 +172,12 @@ end
 
 function Distributions.rand(rng::Distributions.AbstractRNG, d::PolyaGamma)
     if d.h == 1.0
-        return Distributions.rand(rng, PolyaGammaDevRoye1Sampler(float(d.h),d.z))
+        return Distributions.rand(rng, PolyaGammaDevRoye1Sampler(float(d.h), d.z))
     elseif isa(d.h, Integer)
-        return Distributions.rand(rng, PolyaGammaDevRoyeSampler(d.h,d.z))
+        return Distributions.rand(rng, PolyaGammaDevRoyeSampler(d.h, d.z))
     else
-        return Distributions.rand(rng, PolyaGammaGammaSumSampler(float(d.h),d.z))
-    end 
+        return Distributions.rand(rng, PolyaGammaGammaSumSampler(float(d.h), d.z))
+    end
 end
 
 #Utils
@@ -188,12 +193,12 @@ function _mass_texpon(Z::Real)
     return 1.0 / (1.0 + (4 / pi * (_exp_c(xb) + _exp_c(xa)))) # =p/(p+q)
 end
 
-      
+
 ## Samples from PG(1, z)
-function  Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaDevRoye1Sampler) 
-    Z = abs(s.z) * 0.5;
+function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaDevRoye1Sampler)
+    Z = abs(s.z) * 0.5
     ## PG(1,z) = 1/4 J*(1,Z/2)
-    fz = pi^2 / 8 + s.z^2 / 2;
+    fz = pi^2 / 8 + s.z^2 / 2
     ## p = (0.5 * pi) * _exp_c( -1.0 * fz * TRUNC) / fz;
     ## q = 2 * _exp_c(-1.0 * Z) * pigauss(TRUNC, 1.0 / Z, 1.0);
     #num_trials = 0;
@@ -201,12 +206,12 @@ function  Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaDevRoy
     X = 0.0
     while true
         #num.trials = num.trials + 1;
-        if (Random.rand(rng) < _mass_texpon(Z)) 
+        if (Random.rand(rng) < _mass_texpon(Z))
             ## Truncated Exponential
             X = _TRUNC + Random.randexp(rng) / fz
-        else 
+        else
             ## Truncated Inverse Normal
-            X = Distributions.rand(rng,TruncatedInverseGaussian(1 / Z, 1.0, 0.0, _TRUNC))
+            X = Distributions.rand(rng, TruncatedInverseGaussian(1 / Z, 1.0, 0.0, _TRUNC))
         end
 
         ## C = cosh(Z) * _exp_c( -0.5 * Z^2 * X )
@@ -218,12 +223,12 @@ function  Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaDevRoy
         while true
             n += 1
             #total_iter += 1
-            if ( iseven(n) )
+            if (iseven(n))
                 S -= _a_coef(n, X)
                 (Y <= S) && break
             else
                 S += _a_coef(n, X)
-                (Y > S) && break  
+                (Y > S) && break
             end
         end
         (Y <= S) && break
@@ -234,23 +239,23 @@ end
 ## Sample from PG(h, z) using Devroye-like method.
 ## h is a natural number and z is a positive real.
 ##--------------------------------------------------------------
-function  Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaDevRoyeSampler) 
-  #total_trials = 0
-  x = 0.0
-  devroye1sampler = PolyaGammaDevRoye1Sampler(s.h, s.z)   
+function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaDevRoyeSampler)
+    #total_trials = 0
+    x = 0.0
+    devroye1sampler = PolyaGammaDevRoye1Sampler(s.h, s.z)
     #for j = 1 : s.h
-#       x += Distributions.rand(rng, devroye1sampler)
-#       #total_trials += total_trials_PolyaGammaDevRoye1Sampler;
-#   end
-  ## list("x"=x, "rate"=sum(n)/total.trials)
-  return sum(Distributions.rand(rng, devroye1sampler, s.h))
+    #       x += Distributions.rand(rng, devroye1sampler)
+    #       #total_trials += total_trials_PolyaGammaDevRoye1Sampler;
+    #   end
+    ## list("x"=x, "rate"=sum(n)/total.trials)
+    return sum(Distributions.rand(rng, devroye1sampler, s.h))
 end
-  
+
 const bvec = map(x -> (x - 0.5)^2 * pi^2 * 4, 1:_TERMS)
 
 ## draw sum of gammas
-function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaGammaSumSampler) 
-    g = Distributions.rand(rng, Distributions.Gamma(s.h),_TERMS)
+function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaGammaSumSampler)
+    g = Distributions.rand(rng, Distributions.Gamma(s.h), _TERMS)
     # x = @distributed (+) for k in bvec
     # 2 * Distributions.rand(rng, g) / (s.z^2 + k)
     # end
@@ -260,5 +265,5 @@ function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaGammaSu
     # return (2 * sum( map(bvec, g) do k, g_i
     #          g_i / (k + s.z^2)
     #         end )
-    return  2 * mapreduce((k,g_i) -> Random.rand(rng, g) / (k + s.z^2), +, bvec, g)
+    return 2 * mapreduce((k, g_i) -> Random.rand(rng, g) / (k + s.z^2), +, bvec, g)
 end

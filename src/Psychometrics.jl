@@ -8,8 +8,8 @@ include("utils.jl")
 include("dist.jl")
 include("latent.jl")
 include("parameters.jl")
-include("item.jl")
 include("examinee.jl")
+include("item.jl")
 include("response.jl")
 include("probability.jl")
 include("likelihood.jl")
@@ -17,23 +17,7 @@ include("information.jl")
 include("truncated_inverse_gaussian/truncated_inverse_gaussian.jl")
 include("polyagamma/polyagamma.jl")
 
-export add_prior!,
-add_posterior!,
-get_items,
-generate_response,
-add_response!,
-answer,
-get_item_responses,
-get_examinee_responses,
-get_examinee_by_idx,
-probability,
-log_likelihood,
-likelihood,
-information_latent,
-observed_information_item,
-expected_information_item,
-AbstractLatent,
-Latent1D,
+export Latent1D,
 LatentND,
 Latent,
 AbstractParameters,
@@ -51,6 +35,24 @@ Examinee1D,
 AbstractExaminee,
 Response,
 AbstractResponse,
+add_prior!,
+add_posterior!,
+get_item_by_id,
+get_parameters,
+generate_response,
+add_response!,
+answer,
+get_responses_by_item_id,
+get_responses_by_examinee_id,
+get_examinee_by_id,
+get_latents,
+probability,
+log_likelihood,
+likelihood,
+information_latent,
+observed_information_item,
+expected_information_item,
+AbstractLatent,
 TruncatedInverseGaussian,
 PolyaGamma
 
