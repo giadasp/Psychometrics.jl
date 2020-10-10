@@ -14,6 +14,7 @@ include("response.jl")
 include("probability.jl")
 include("likelihood.jl")
 include("information.jl")
+include("truncated_normal/truncated_normal.jl")
 include("truncated_inverse_gaussian/truncated_inverse_gaussian.jl")
 include("polyagamma/polyagamma.jl")
 
@@ -44,6 +45,9 @@ add_response!,
 answer,
 get_responses_by_item_id,
 get_responses_by_examinee_id,
+get_response_matrix,
+get_design_matrix,
+get_responses,
 get_examinee_by_id,
 get_latents,
 probability,
@@ -54,6 +58,8 @@ observed_information_item,
 expected_information_item,
 AbstractLatent,
 TruncatedInverseGaussian,
-PolyaGamma
+PolyaGamma,
+truncate_rand,
+rand
 
 end # module

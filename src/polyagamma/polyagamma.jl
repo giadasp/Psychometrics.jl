@@ -8,7 +8,7 @@ struct PolyaGamma{T1<:Real,T2<:Real} <: Distributions.ContinuousUnivariateDistri
 end
 
 function PolyaGamma(h::T1, z::T2; check_args = true) where {T1<:Real,T2<:Real}
-    check_args && Distributions.@check_args(PolyaGamma, h > zero(h) && z >= zero(z))
+    check_args && Distributions.@check_args(PolyaGamma, h > zero(h))
     return PolyaGamma{T1,T2}(h, z)
 end
 

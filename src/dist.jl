@@ -37,7 +37,7 @@ function truncate_rand(
     bounds::Vector{Float64};
     n::Int64 = 1,
 )
-    return map(x -> min(max(rand(distribution), bounds[1]), bounds[2]), [1:n])
+    return map(_ -> min(max(rand(distribution), bounds[1]), bounds[2]), 1:n)
 end
 
 function truncate_rand(
@@ -47,5 +47,5 @@ function truncate_rand(
 )
     return map(y -> map(rand(distribution), bounds) do x, bound
         min(max(x, bound[1]), bound[2])
-    end, [1:n])
+    end, 1:n)
 end

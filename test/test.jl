@@ -5,41 +5,52 @@ using Distributions
 using LinearAlgebra
 using Dates
 
+const I = 100
+const N = 1_000
 
 
-# function posterior(f::function; prior = Normal(0,1), N = 1000)
-#     return (1/N)*mapreduce(x -> f(rand(prior)),+,[1:N])
-# end
-
-
-I = 200
-N = 10_000
-
-# 1-dimensional latent variable
+# ITEM PARAMETERS AND LATENTS 
 
 items = [Item2PL(i, string("item_",i), ["math"], Parameters2PL()) for i = 1 : I];
-examinees = [Examinee1D(e, string("examinee_",e), Latent1D()) for e = 1 : N]; 
+examinees = [Examinee1D(e, string("examinee_",e), Latent1D()) for e = 1 : N];   
 
-responses = reduce(vcat, [generate_response([e], items[sample(collect(1:I),40)]) for e in examinees]);
+# Put parameters and latents in matrix  
+parameters_matrix = get_parameters(items)
+latents_matrix = get_latents(examinees)                                                                                                                                                      
+
+
+# RESPONSES
+
+responses = reduce(vcat, [generate_response([e], items[sort!(sample(collect(1:I), 40, replace = false))]) for e in examinees]);
 responses_per_item = map(i -> get_responses_by_item_id(i.id, responses), items);  # slow
 
-# Put parameters and latents in matrix form
-parameters_matrix = get_parameters(items)
-latents_matrix = get_latents(examinees)
+# Get design matrix
+design_matrix = get_design(responses, I, N)
+
+# Get response matrix (zeros are for wrong answers and for missing answers)
+response_matrix = get_response_matrix(responses, I, N)
+
+# Go back to a vector of `Response`s (starting and ending time of response is Dates.now())
+responses2 = get_responses(response_matrix, design_matrix, items, examinees)
+
 
 # ITEM CHARACTERISTIC FUNCTION (ICF)
 
 ## compute probabilities (ICF) by matrix (1PL or 2PL, latent 1D or latend ND) using aθ - b parametrization
 p = probability(parameters_matrix, latents_matrix)
+
 ## compute probabilities (ICF) on vectors of examinees and items using a(θ - b) parametrization
 p_2 = probability(items, examinees)
+
 
 # ITEM INFORMATION FUNCTION (IIF)
 
 ## compute informations (IIF) by matrix (1PL or 2PL, latent 1D) using aθ - b parametrization
 information = information_latent(latents_matrix, parameters_matrix)
+
 ## compute informations (IIF) on vectors of examinees and items using a(θ - b) parametrization
 information_2 = information_latent(examinees, items)
+
 
 # LIKELIHOOD AND LOG-LIKELIHOOD
 
@@ -48,16 +59,7 @@ L_tot = prod(likelihood(responses, examinees, items));
 
 # Total log-likelihood (only for a(θ - b) parametrization)
 l_tot = sum(log_likelihood(responses, examinees, items));
-
-# Log-likelihood per item (only for a(θ - b) parametrization)
-l_items = [sum(log_likelihood(responses_per_item[i], examinees, [items[i]]) for i in 1:I)];
-
-
-# Likelihood per item
-X = range(-6, stop=6, length=61)
-W = fill(1/61,61)
-L_per_item = [ map( (x,w) -> mapreduce(r -> likelihood(r.val, x, items[i].parameters) , * , responses_per_item[i])*w , X, W) for i in 1:I]
-sum_l_per_item = map( l -> sum(l), l_per_item)
+l_tot_per_item = [sum(log_likelihood(responses_per_item[i], examinees, items)) for i in 1:I];
 
 # with gradients
 #g_item = zeros(2)
@@ -65,9 +67,8 @@ sum_l_per_item = map( l -> sum(l), l_per_item)
 #l_sum = log_likelihood(responses, examinees, items, g_item, g_latent);
 
 expected_information_item_val = expected_information_item(examinees, items);
-#only for 3PL
+# only for 3PL the observed information
 #observed_information_item_val = map( r -> observed_information_item(r), responses);
-information_latent_val = information_latent(examinees, items);
 
 ## Estimation
 
