@@ -66,7 +66,7 @@ mutable struct Parameters2PL <: AbstractParameters
     function Parameters2PL()
         Parameters2PL(
             Distributions.Product([
-                Distributions.LogNormal(0, 1),
+                Distributions.LogNormal(0, 0.5),
                 Distributions.Normal(0, 1),
             ]),
             [1e-5, 5.0],
@@ -140,7 +140,7 @@ mutable struct Parameters3PL <: AbstractParameters
     function Parameters3PL()
         Parameters3PL(
             Distributions.Product([
-                Distributions.LogNormal(0, 1),
+                Distributions.LogNormal(0, 0.5),
                 Distributions.Normal(0, 1),
                 Distributions.Uniform(0, 1),
             ]),

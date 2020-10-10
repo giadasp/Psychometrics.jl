@@ -5,7 +5,7 @@ using Plots
 using StatsPlots
 
 using Distributions
-a = rand(LogNormal(0, 1), 500)
+a = rand(LogNormal(0, 0.5), 500)
 b = rand(Normal(0, 1), 500)
 theta = rand(Normal(0, 1), 10_000)
 x = abs.([a[i] * (theta[e] - b[i]) for e = 1:10_000, i = 1:500])

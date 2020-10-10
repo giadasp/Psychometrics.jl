@@ -118,14 +118,12 @@ end
 # }
 
 function theta_sampler(
-id,
 vec_a, # Ni x 1
 vec_b, # Ni x 1
 mat_w_id, # Np x 1
 mat_k_id, # Np x 1
 theta_prior_mu, # 1 X 1
 theta_prior_var,# 1 X 1
-Ni,
 )
     omega_theta = LinearAlgebra.Diagonal(mat_w_id) # Ni x Ni
     theta_variance = 1 / ((vec_a' * omega_theta * vec_a) + (1 / theta_prior_var)) # 1 x 1
@@ -145,21 +143,19 @@ end
 # }
 
 function a_sampler(
-    id, 
     vec_theta, # Np x 1
     vec_b_id, # Ni x 1
     mat_w_id, # Np x Ni
     mat_k_id, # Np x Ni
     a_prior_mu, # 1 x 1
     a_prior_var, # 1 x 1
-    Np, # 1 x 1
     )
     omega_a = LinearAlgebra.Diagonal(mat_w_id) # Np x Np
     a_variance = 1 / ((((vec_theta .- vec_b_id)' * omega_a) * (vec_theta .- vec_b_id)) + (1 / a_prior_var)) # 1 x 1 
     #z_a = mat_k_id ./ mat_w_id # don't need it
     a_mu = a_variance * ((vec_theta .- vec_b_id)' * mat_k_id + (a_prior_mu / a_prior_var)) # ok
-    return tr_norm_gen(1, a_mu, a_variance)[1]
-    #return rand(Distributions.TruncatedNormal(a_mu, sqrt(a_variance), 0.0, Inf))
+    #return tr_norm_gen(1, a_mu, a_variance)[1]
+    return rand(Distributions.TruncatedNormal(a_mu, sqrt(a_variance), 0.0, Inf))
 end
 
 #b_sampler-sampling b for an item(i) across persons
@@ -174,7 +170,7 @@ end
 #   rnorm(1,b_mu,sqrt(b_V))
 # }
 
-function b_sampler(id, vec_theta, vec_a_id, mat_w_id, mat_k_id, b_prior_mu, b_prior_var, Np)
+function b_sampler(vec_theta, vec_a_id, mat_w_id, mat_k_id, b_prior_mu, b_prior_var, Np)
     omega_b = LinearAlgebra.Diagonal(mat_w_id) # Np x Np
     vec_a_id_vec = fill(vec_a_id, Np) #Np
     b_variance = 1 / (vec_a_id_vec' * omega_b * vec_a_id_vec + (1 / b_prior_var))  # 1 x 1 ok, vec_a_id_vec can be positive because it is squared anyway
@@ -206,21 +202,22 @@ end
 #   w_sav[,,1]<-W_gen
 #   w_sav
 # }	
-using RCall
-R"library(BayesLogit)"
-@rlibrary BayesLogit
+# using RCall
+# R"library(BayesLogit)"
+# @rlibrary BayesLogit
+# @rlibrary dplyr
+# R"""
+# rpg_sp <- function(x) BayesLogit::rpg.sp(1, 1, x)
+# """
 function w_sampler(vec_theta, vec_a, vec_b, Np, Ni)
     w_temp = zeros(Float64, Np, Ni)
     W_gen = copy(w_temp)
     w_sav = zeros(Float64, Np, Ni, 2)
     w_temp = [vec_a[i] * (vec_theta[p] - vec_b[i]) for p in 1:Np, i in 1:Ni]
-    #w_sav[:,:,1] = [rand(PolyaGamma(1.0, w_temp[p, i]))  for p in 1:Np, i in 1:Ni]
-    pg = zeros(Np, Ni)
-    for p in 1:Np, i in 1:Ni
-        w_temp_pi = w_temp[p,i]
-        pg[p,i] = rcopy(R"BayesLogit::rpg.sp(1, 1, $w_temp_pi)")
-    end
-    w_sav[:,:,1] = copy(pg)
+    w_sav[:,:,1] = [rand(PolyaGamma(1.0, w_temp[p, i]))  for p in 1:Np, i in 1:Ni]
+    # pg = zeros(Np, Ni)
+    #pg = rcopy(R"apply($w_temp, c(1,2), rpg_sp)")
+    #w_sav[:,:,1] = copy(pg)
     return w_sav
 end
 
@@ -270,15 +267,18 @@ for iter in 2:Iter
     sav_W = w_sampler(sav_theta[iter-1, :], sav_a[iter-1, :], sav_b[iter-1, :], Np, Ni)
     sav_w = sav_W[:, :, 1]
     println(iter)
-    sav_theta_iter = map(p ->  theta_sampler(p, sav_a[iter-1, :], sav_b[iter-1, :], sav_w[p, :], K[p, :], theta_prior_mu, theta_prior_var, Ni), 1:Np)
-    sav_a_iter = map(i -> a_sampler(i, sav_theta[iter, :], sav_b[iter-1, i], sav_w[:, i], K[:, i], a_prior_mu, a_prior_var, Np), 1:Ni)
+    sav_theta_iter = map(p ->  theta_sampler(sav_a[iter-1, :], sav_b[iter-1, :], sav_w[p, :], K[p, :], theta_prior_mu, theta_prior_var), 1:Np)
+    sav_a_iter = map(i -> a_sampler(sav_theta[iter, :], sav_b[iter-1, i], sav_w[:, i], K[:, i], a_prior_mu, a_prior_var), 1:Ni)
     sav_a_iter[findall(sav_a_iter .== Inf)] .= 0.001
-    sav_b_iter = map(i -> b_sampler(i, sav_theta[iter, :], sav_a[iter, i], sav_w[:, i], K[:, i], b_prior_mu, b_prior_var, Np), 1:Ni)
+    sav_b_iter = map(i -> b_sampler(sav_theta[iter, :], sav_a[iter, i], sav_w[:, i], K[:, i], b_prior_mu, b_prior_var, Np), 1:Ni)
     sav_theta[iter, :] = copy(sav_theta_iter)
     sav_a[iter, :] = copy(sav_a_iter)
     sav_b[iter, :] = copy(sav_b_iter)
 end
 
 
-
+mean_a = [mean(sav_a[1000:2000,i]) for i=1:Ni]
+mean_b = [mean(sav_b[1000:2000,i]) for i=1:Ni]
+hcat(map(i -> i.parameters.a, items), mean_a)
+hcat(map(i -> i.parameters.b, items), mean_b)
 

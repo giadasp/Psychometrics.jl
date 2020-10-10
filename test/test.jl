@@ -72,7 +72,7 @@ expected_information_item_val = expected_information_item(examinees, items);
 
 ## Estimation
 
-items_est = [Item2PL(string("item_",i), ["math"], Parameters2PL(1.0, [1e-5,5.0], 0.0, [-6.0, 6.0], Product([LogNormal(0, 1), Normal(0,1)]),  Product([LogNormal(0, 1), Normal(0,1)]), Vector{Vector{Float64}}(undef,2), LinearAlgebra.I(2) )) for i = 1 : I];
+items_est = [Item2PL(string("item_",i), ["math"], Parameters2PL(1.0, [1e-5,5.0], 0.0, [-6.0, 6.0], Product([LogNormal(0, 0.5), Normal(0,1)]),  Product([LogNormal(0, 0.5), Normal(0,1)]), Vector{Vector{Float64}}(undef,2), LinearAlgebra.I(2) )) for i = 1 : I];
 examinees_est = [Examinee1D(string("examinee_",e), Latent1D(0.0, [-6.0, 6.0], Normal(0,1), Normal(0,1), zeros(0), 1.0)) for e = 1 : N]; 
 
 map responses
