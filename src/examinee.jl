@@ -74,7 +74,7 @@ end
 It returns the Examinee with index `examinee_id` from a Vector of AbstractExaminee.
 """
 function get_examinee_by_id(examinee_id::String, examinees::Vector{<:AbstractExaminee})
-    filter( e -> e.id == examinee_id, examinees)[1]
+    filter(e -> e.id == examinee_id, examinees)[1]
 end
 
 
@@ -91,21 +91,21 @@ end
 Returns a matrix with latent values displayed by row.
 """
 function get_latents(examinees::Vector{<:AbstractExaminee})
-        ret = Vector{Vector{Float64}}(undef, size(examinees, 1))
-        max_length = 1
-        e_2 = 0
-        for e in examinees
-            e_2 += 1
-            local latents = get_latents(e)
-            ret[e_2] = copy(latents)
-            max_length = max_length < size(latents,1) ? size(latents,1) : max_length
-        end
-        
-        for e_3 in 1:e_2
-            local length_i = size(ret[e_3], 1)
-            if length_i < max_length
-                ret[e_3] = vcat(ret[e_3], zeros(Float64, max_length - length_i))
-            end
-        end
-        return reduce(hcat, ret)
+    ret = Vector{Vector{Float64}}(undef, size(examinees, 1))
+    max_length = 1
+    e_2 = 0
+    for e in examinees
+        e_2 += 1
+        local latents = get_latents(e)
+        ret[e_2] = copy(latents)
+        max_length = max_length < size(latents, 1) ? size(latents, 1) : max_length
     end
+
+    for e_3 = 1:e_2
+        local length_i = size(ret[e_3], 1)
+        if length_i < max_length
+            ret[e_3] = vcat(ret[e_3], zeros(Float64, max_length - length_i))
+        end
+    end
+    return reduce(hcat, ret)
+end

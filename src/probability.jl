@@ -19,7 +19,7 @@ A `I x N` `Float64` matrix.
 """
 function probability(parameters_matrix::Matrix{Float64}, latents_matrix::Matrix{Float64})
     if size(latents_matrix, 1) < size(parameters_matrix, 2)
-        latents_matrix = vcat(.-ones(Float64, size(latents_matrix,2))', latents_matrix)
+        latents_matrix = vcat(.-ones(Float64, size(latents_matrix, 2))', latents_matrix)
     end
     _sig_c.(_gemmblasAB(parameters_matrix, latents_matrix))
 end
@@ -38,13 +38,16 @@ It follows the parametrization \$aθ - b\$.
 # Output
 A `I x N` `Float64` matrix. 
 """
-function probability_3PL(parameters_matrix::Matrix{Float64}, latents_matrix::Matrix{Float64})
-    parameters_core = parameters_matrix[:,1:(end-1)]
+function probability_3PL(
+    parameters_matrix::Matrix{Float64},
+    latents_matrix::Matrix{Float64},
+)
+    parameters_core = parameters_matrix[:, 1:(end-1)]
     if size(latents_matrix, 1) < size(parameters_core, 2)
-        latents_matrix = vcat(ones(Float64, size(latents_matrix,2))', latents_matrix)
+        latents_matrix = vcat(ones(Float64, size(latents_matrix, 2))', latents_matrix)
     end
     ret = _sig_c.(_gemmblasAB(parameters_core, latents_matrix))
-    return _matrix_rows_vec(ret, parameters_matrix[:,end], (x, y) -> y + (1 - y) * x )
+    return _matrix_rows_vec(ret, parameters_matrix[:, end], (x, y) -> y + (1 - y) * x)
 end
 
 """
@@ -292,7 +295,7 @@ It follows the parametrization \$a(θ - b)\$.
 A `Float64` scalar. 
 """
 function probability(latent_vals::Vector{Float64}, parameters::ParametersNPL)
-    _sig_c(latent_vals'*parameters.a - parameters.b)
+    _sig_c(latent_vals' * parameters.a - parameters.b)
 end
 
 
@@ -311,11 +314,8 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function probability(
-    latent::LatentND,
-    parameters::ParametersNPL,
-)
-    return _sig_c(latent.val'*parameters.a - parameters.b)
+function probability(latent::LatentND, parameters::ParametersNPL)
+    return _sig_c(latent.val' * parameters.a - parameters.b)
 end
 
 ##########################################
@@ -353,7 +353,7 @@ It computes the probability (ICF) that a vector of `examinees` answers correctly
 A matrixexa. 
 """
 function probability(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
-    mapreduce( e -> map( i -> probability(e, i), items), hcat, examinees)
+    mapreduce(e -> map(i -> probability(e, i), items), hcat, examinees)
 end
 
 """
@@ -372,5 +372,3 @@ A matrix.
 function probability(items::Vector{<:AbstractItem}, examinees::Vector{<:AbstractExaminee})
     probability(examinees, items)
 end
-
-

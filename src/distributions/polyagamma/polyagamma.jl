@@ -1,5 +1,10 @@
-const _TRUNC = 0.64
-const _TERMS = 200
+include("invert_Y.jl")
+include("truncated_norm.jl")
+include("inverse_gaussian.jl")
+include("polyagamma_sp.jl")
+include("polyagamma_gamma_sum.jl")
+include("polyagamma_normal.jl")
+
 
 struct PolyaGamma{T1<:Real,T2<:Real} <: Distributions.ContinuousUnivariateDistribution
     h::T1
@@ -33,7 +38,7 @@ mean(d::PolyaGamma) = d.h / (2 * d.z) * tanh(d.z / 2) # ord.h / (2 * d.z) * ((_e
 var(d::PolyaGamma) = d.h / (4 * d.z^3) * (sinh(d.z) - d.z) * sech(d.z / 2)^2
 
 #### pdf
-
+## DEPRECATED IN BAYESLOGIT
 ## Calculate coefficient n in density of PG(1.0, 0.0), i.e. J* from Devroye.
 ##------------------------------------------------------------------------------
 function _a_coef(n, x)
@@ -44,6 +49,7 @@ function _a_coef(n, x)
     end
 end
 
+## DEPRECATED IN BAYESLOGIT
 function _jacobi_logpdf(z::Float64, x::Float64; ntrunc::Int = _TERMS)
     v = mapreduce(n -> (iseven(n) ? 1 : -1) * _a_coef(n, x), +, 0:ntrunc)
     return _log_cosh_c(z) - x * z^2 / 2 + _log_c(v)
@@ -142,11 +148,6 @@ Distributions.pdf(d::PolyaGamma, x::Real; ntrunc::Int = _TERMS) =
 #### Evaluation & Sampling
 
 
-struct PolyaGammaGammaSumSampler <:
-       Distributions.Sampleable{Distributions.Univariate,Distributions.Continuous}
-    h::Float64
-    z::Float64
-end
 
 struct PolyaGammaDevRoyeSampler <:
        Distributions.Sampleable{Distributions.Univariate,Distributions.Continuous}
@@ -173,10 +174,16 @@ end
 function Distributions.rand(rng::Distributions.AbstractRNG, d::PolyaGamma)
     if d.h == 1.0
         return Distributions.rand(rng, PolyaGammaDevRoye1Sampler(float(d.h), d.z))
-    elseif isa(d.h, Integer)
+    elseif d.h == 2.0
         return Distributions.rand(rng, PolyaGammaDevRoyeSampler(d.h, d.z))
-    else
+    elseif d.h <= 13.0
         return Distributions.rand(rng, PolyaGammaGammaSumSampler(float(d.h), d.z))
+    elseif d.h <= 170.0
+        return Distributions.rand(rng, PolyaGammaSPSampler(float(d.h), d.z, 100))
+    else
+        m = pg_m1(d.h, d.z)
+        v = pg_m2(d.h, d.z) - m*m
+        return Distributions.rand(rng,  Distributions.Normal(m, sqrt(v)))
     end
 end
 
@@ -251,19 +258,3 @@ function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaDevRoye
     return sum(Distributions.rand(rng, devroye1sampler, s.h))
 end
 
-const bvec = map(x -> (x - 0.5)^2 * pi^2 * 4, 1:_TERMS)
-
-## draw sum of gammas
-function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaGammaSumSampler)
-    g = Distributions.rand(rng, Distributions.Gamma(s.h), _TERMS)
-    # x = @distributed (+) for k in bvec
-    # 2 * Distributions.rand(rng, g) / (s.z^2 + k)
-    # end
-    # return x
-    # b =  mapreduce(k -> 1 / (k + s.z^2), +, bvec2)
-    #return Distributions.rand(rng,Gamma(2 * s.h * b))#
-    # return (2 * sum( map(bvec, g) do k, g_i
-    #          g_i / (k + s.z^2)
-    #         end )
-    return 2 * mapreduce((k, g_i) -> Random.rand(rng, g) / (k + s.z^2), +, bvec, g)
-end

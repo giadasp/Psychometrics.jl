@@ -16,10 +16,13 @@ It follows the parametrization \$aθ - b\$.
 # Output
 A `I x N` `Float64` matrix. 
 """
-function information_latent(latents_matrix::Matrix{Float64}, parameters_matrix::Matrix{Float64})
+function information_latent(
+    latents_matrix::Matrix{Float64},
+    parameters_matrix::Matrix{Float64},
+)
     p = probability(parameters_matrix, latents_matrix)
-    if size(parameters_matrix, 2) > 1 
-        return _matrix_cols_vec(p, parameters_matrix[:,end], (x,y) -> _p1p(x) * y^2)
+    if size(parameters_matrix, 2) > 1
+        return _matrix_cols_vec(p, parameters_matrix[:, end], (x, y) -> _p1p(x) * y^2)
     else
         return _p1p.(p)
     end
@@ -40,9 +43,13 @@ It follows the parametrization \$aθ - b\$.
 # Output
 A `I x N` `Float64` matrix. 
 """
-function information_latent_3PL(latents_matrix::Matrix{Float64}, parameters_matrix::Matrix{Float64})
+function information_latent_3PL(
+    latents_matrix::Matrix{Float64},
+    parameters_matrix::Matrix{Float64},
+)
     p = probability_3PL(parameters_matrix, latents_matrix)
-    return _matrix_cols_vec(p, parameters_matrix[:,2], (x, y) -> y^2 * (1 - x) * x) .* _matrix_cols_vec(p, parameters_matrix[:,end], (x, y) -> ((x - y) / (1 - y))^2)
+    return _matrix_cols_vec(p, parameters_matrix[:, 2], (x, y) -> y^2 * (1 - x) * x) .*
+           _matrix_cols_vec(p, parameters_matrix[:, end], (x, y) -> ((x - y) / (1 - y))^2)
 end
 
 """
@@ -118,10 +125,7 @@ function information_latent(
     examinees::Vector{<:AbstractExaminee},
     items::Vector{<:AbstractItem},
 )
-    [
-        information_latent(e.latent, i.parameters)
-        for i in items, e in examinees
-    ]
+    [information_latent(e.latent, i.parameters) for i in items, e in examinees]
 end
 
 ## Item Expected Informations
@@ -212,10 +216,7 @@ function expected_information_item(
     examinees::Vector{<:AbstractExaminee},
     items::Vector{<:AbstractItem},
 )
-    sum([
-        expected_information_item(e.latent, i.parameters)
-        for e in examinees, i in items
-    ])
+    sum([expected_information_item(e.latent, i.parameters) for e in examinees, i in items])
 end
 
 ## Item Observed Informations
@@ -271,6 +272,10 @@ function observed_information_item(
     items::Vector{<:AbstractItem},
 )
     mapreduce(responses, +) do r
-        observed_information_item(r, get_examinee_by_id(r.examinee_id,examinees), get_item_by_id(r.item_id,items))
+        observed_information_item(
+            r,
+            get_examinee_by_id(r.examinee_id, examinees),
+            get_item_by_id(r.item_id, items),
+        )
     end
 end

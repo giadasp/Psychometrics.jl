@@ -9,7 +9,7 @@ mutable struct Response <: AbstractResponse
     start_time::Dates.DateTime
     end_time::Dates.DateTime
     Response(item_idx, examinee_idx, item_id, examinee_id, val, start_time, end_time) =
-        new(item_idx, examinee_idx,item_id, examinee_id, val, start_time, end_time)
+        new(item_idx, examinee_idx, item_id, examinee_id, val, start_time, end_time)
     Response(item_idx, examinee_idx, item_id, examinee_id, val, time::Dates.DateTime) =
         new(item_idx, examinee_idx, item_id, examinee_id, val, time, time)
 end
@@ -96,13 +96,18 @@ function generate_response(
     mapreduce(
         e -> map(
             i -> Response(
-                    i.idx, e.idx, i.id, e.id, generate_response(e.latent, i.parameters), Dates.now()
-                    ),
-                items
+                i.idx,
+                e.idx,
+                i.id,
+                e.id,
+                generate_response(e.latent, i.parameters),
+                Dates.now(),
             ),
-            vcat,
-            examinees
-        )
+            items,
+        ),
+        vcat,
+        examinees,
+    )
 end
 
 
@@ -119,13 +124,18 @@ function generate_response(
     mapreduce(
         e -> map(
             i -> Response(
-                    i.idx, e.idx, i.id, e.id, generate_response(e.latent, i.parameters), Dates.now()
-                    ),
-                items
+                i.idx,
+                e.idx,
+                i.id,
+                e.id,
+                generate_response(e.latent, i.parameters),
+                Dates.now(),
             ),
-            vcat,
-            examinees
-        )
+            items,
+        ),
+        vcat,
+        examinees,
+    )
 end
 
 
@@ -158,7 +168,7 @@ end
 Randomly generate responses by all the examinees in `examinees` to items in `items`.
 """
 function answer(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
-    mapreduce( e -> map(i -> answer(e, i), items), vcat, examinees)
+    mapreduce(e -> map(i -> answer(e, i), items), vcat, examinees)
 end
 
 """
@@ -167,7 +177,7 @@ end
 Returns the `I x N` design matrix.
 """
 function get_design_matrix(responses::Vector{<:AbstractResponse}, I::Int64, N::Int64)
-    has_answered = map( r -> CartesianIndex(r.item_idx, r.examinee_idx), responses)
+    has_answered = map(r -> CartesianIndex(r.item_idx, r.examinee_idx), responses)
     design = zeros(Float64, I, N)
     design[has_answered] .= one(Float64)
     return design::Matrix{Float64}
@@ -181,7 +191,7 @@ A non given answer has value `0.0`.
 """
 function get_response_matrix(responses::Vector{<:AbstractResponse}, I::Int64, N::Int64)
     response_matrix = zeros(Float64, I, N)
-    map(r ->  response_matrix[CartesianIndex(r.item_idx, r.examinee_idx)] = r.val, responses)
+    map(r -> response_matrix[CartesianIndex(r.item_idx, r.examinee_idx)] = r.val, responses)
     return response_matrix::Matrix{Float64}
 end
 
@@ -191,12 +201,25 @@ end
 
 Transforms a `I x N` response matrix in a vector of `Response`s given a valid `design_matrix`, a vector of `Item`s and a vector of `Examinee`s.
 """
-function get_responses(response_matrix::Matrix{Float64}, design_matrix::Matrix{Float64}, items::Vector{<:AbstractItem}, examinees::Vector{<:AbstractExaminee})
-    mapreduce(e -> map( i -> Response(
-        i.idx, e.idx, i.id, e.id, response_matrix[i.idx, e.idx], Dates.now()
-        ), items[findall(design_matrix[:, e.idx] .> 0.0)]), vcat, examinees)
+function get_responses(
+    response_matrix::Matrix{Float64},
+    design_matrix::Matrix{Float64},
+    items::Vector{<:AbstractItem},
+    examinees::Vector{<:AbstractExaminee},
+)
+    mapreduce(
+        e -> map(
+            i -> Response(
+                i.idx,
+                e.idx,
+                i.id,
+                e.id,
+                response_matrix[i.idx, e.idx],
+                Dates.now(),
+            ),
+            items[findall(design_matrix[:, e.idx] .> 0.0)],
+        ),
+        vcat,
+        examinees,
+    )
 end
-
-
-
-

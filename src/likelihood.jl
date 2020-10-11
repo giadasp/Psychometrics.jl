@@ -112,10 +112,7 @@ function log_likelihood(
     examinees::Vector{<:AbstractExaminee},
     items::Vector{<:AbstractItem},
 )
-    map(
-        r -> log_likelihood(r, examinees[r.examinee_idx], items[r.item_idx]),
-        responses,
-    )
+    map(r -> log_likelihood(r, examinees[r.examinee_idx], items[r.item_idx]), responses)
 end
 
 """
@@ -177,8 +174,5 @@ function likelihood(
     examinees::Vector{<:AbstractExaminee},
     items::Vector{<:AbstractItem},
 )
-    map(
-        r -> likelihood(r, examinees[r.examinee_idx], items[r.item_idx]),
-        responses,
-    )
+    map(r -> likelihood(r, examinees[r.examinee_idx], items[r.item_idx]), responses)
 end

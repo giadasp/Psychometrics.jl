@@ -37,7 +37,13 @@ end
 #     return x + log1pexp(-2x) - _log_c(2)
 # end 
 
-function _gemmblasATB!(A::Matrix{Float64}, B::Matrix{Float64}, ret::Matrix{Float64}, alpha::Float64, beta::Float64)
+function _gemmblasATB!(
+    A::Matrix{Float64},
+    B::Matrix{Float64},
+    ret::Matrix{Float64},
+    alpha::Float64,
+    beta::Float64,
+)
     sa = size(A)
     ccall(
         ("dgemm_64_", "libopenblas64_"),
@@ -135,7 +141,7 @@ function _gemmblasAB(A::Matrix{Float64}, B::Matrix{Float64})
         'N',
         'N',
         sa[1],
-        size(B,2),
+        size(B, 2),
         sa[2],
         one(Float64),
         A,
@@ -187,7 +193,7 @@ function _gemvblasAx(
 end
 
 function _gemvblasATx(A::Matrix{Float64}, x::Vector{Float64})
-    ret = zeros(Float64, size(A,2))
+    ret = zeros(Float64, size(A, 2))
     ccall(
         ("dgemv_64_", "libopenblas64_"),
         Cvoid,
@@ -231,23 +237,23 @@ end
 
 function _matrix_cols_vec(A::Matrix{Float64}, v::Vector{Float64}, fun::Function)
     #r = similar(A)
-    r = mapreduce( col -> map((x, y) -> fun(x, y), col, v), hcat, eachcol(A))
+    r = mapreduce(col -> map((x, y) -> fun(x, y), col, v), hcat, eachcol(A))
     # @inbounds for j = 1:size(A,2) 
     #     for i = 1:size(A,1) 
     #         r[i,j] = fun(A[i,j], v[j])
     #     end
     # end 
     r::Matrix{Float64}
-end   
+end
 
 
 function _matrix_rows_vec(A::Matrix{Float64}, v::Vector{Float64}, fun::Function)
     #r = similar(A)
-    r = mapreduce( row -> map((x, y) -> fun(x, y), row, v), hcat, eachrow(A))
+    r = mapreduce(row -> map((x, y) -> fun(x, y), row, v), hcat, eachrow(A))
     # @inbounds for j = 1:size(A,2) 
     #     for i = 1:size(A,1) 
     #         r[i,j] = fun(A[i,j], v[j])
     #     end
     # end 
     r::Matrix{Float64}
-end   
+end

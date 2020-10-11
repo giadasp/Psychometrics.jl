@@ -143,7 +143,7 @@ mutable struct Item <: AbstractItem
     Item(idx, id, content, parameters) = new(idx, id, content, parameters)
 
     # Random initilizers
-    Item(idx,  id, content) = new(idx, id, content, Parameters1PL())
+    Item(idx, id, content) = new(idx, id, content, Parameters1PL())
 end
 
 """
@@ -193,10 +193,10 @@ function get_parameters(items::Vector{<:AbstractItem})
         i_2 += 1
         local pars = get_parameters(i)
         ret[i_2] = copy(pars)
-        max_length = max_length < size(pars,1) ? size(pars,1) : max_length
+        max_length = max_length < size(pars, 1) ? size(pars, 1) : max_length
     end
-    
-    for i_3 in 1:i_2
+
+    for i_3 = 1:i_2
         local length_i = size(ret[i_3], 1)
         if length_i < max_length
             ret[i_3] = vcat(ret[i_3], zeros(Float64, max_length - length_i))

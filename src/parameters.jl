@@ -66,7 +66,7 @@ mutable struct Parameters2PL <: AbstractParameters
     function Parameters2PL()
         Parameters2PL(
             Distributions.Product([
-                Distributions.LogNormal(0, 0.5),
+                Distributions.LogNormal(0, 0.25),
                 Distributions.Normal(0, 1),
             ]),
             [1e-5, 5.0],
@@ -133,14 +133,14 @@ mutable struct Parameters3PL <: AbstractParameters
             trivariate_dist,
             trivariate_dist,
             Vector{Vector{Float64}}(undef, 0),
-            [1.0 0.0 0.0; 0.0 1.0 0.0 ; 0.0 0.0 1.0],
+            [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0],
         )
     end
 
     function Parameters3PL()
         Parameters3PL(
             Distributions.Product([
-                Distributions.LogNormal(0, 0.5),
+                Distributions.LogNormal(0, 0.25),
                 Distributions.Normal(0, 1),
                 Distributions.Uniform(0, 1),
             ]),
@@ -166,7 +166,10 @@ mutable struct ParametersNPL <: AbstractParameters
 
     # Random Initializers
 
-    function ParametersNPL(N_variate_dist::Distributions.MultivariateDistribution, bounds::Vector{Vector{Float64}})
+    function ParametersNPL(
+        N_variate_dist::Distributions.MultivariateDistribution,
+        bounds::Vector{Vector{Float64}},
+    )
         N = size(bounds, 1)
         pars = truncate_rand(N_variate_dist, bounds)
         new(
