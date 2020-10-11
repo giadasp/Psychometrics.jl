@@ -6,9 +6,8 @@ using LinearAlgebra
 using Dates
 using Random
 
-const I = 100
-const N = 1_000
-
+const I = 50
+const N = 500
 
 # ITEM PARAMETERS AND LATENTS 
 
@@ -38,6 +37,11 @@ Random.seed!(09192016)
 # histogram(tr_norm_gen(800,0,1))
 # #histogram(truncate_rand(Normal(0.0,1.0), [0.0, Inf], n=800))
 # histogram(rand(Distributions.TruncatedNormal(0.0,1.0, 0.0, Inf), 800))
+
+# Simulation code by Jiang and Templin 
+# Gibbs Samplers for Logistic Item Response Models via the Pólya–GammaDistribution: 
+# A Computationally Efficient Data-Augmentation StrategyArticleinPsychometrika 
+# October 2018 DOI: 10.1007/s11336-018-9641-xCITATIONS2READS692 
 
 ##################################################################################################
 ###########################      Data and Settings    ############################################
@@ -208,3 +212,4 @@ sum((map(i -> i.parameters.b, items) .- mean_b).^2)/I
 sum((map(e -> e.latent.val, examinees) .- mean_theta).^2)/N
 
 using StatsPlots
+plot(sav_a[:,1])
