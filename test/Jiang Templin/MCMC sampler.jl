@@ -22,7 +22,7 @@ responses = generate_response(examinees, items);
 response_matrix = get_response_matrix(responses, I, N);
 
 #Set Seeds for Random Generation
-#Random.seed!(09192016)
+Random.seed!(1234)
 
 # function tr_norm_gen(number, mu, v)
 #     temp_u = Distributions.rand(Distributions.Uniform(zero(Float64),one(Float64)), number)
@@ -33,7 +33,7 @@ response_matrix = get_response_matrix(responses, I, N);
 # end
 
 # using StatsPlots
-# #A short example of sampling truncated standard normal distribution 
+# A short example of sampling truncated standard normal distribution 
 # histogram(tr_norm_gen(800,0,1))
 # #histogram(truncate_rand(Normal(0.0,1.0), [0.0, Inf], n=800))
 # histogram(rand(Distributions.TruncatedNormal(0.0,1.0, 0.0, Inf), 800))
@@ -54,7 +54,7 @@ X = permutedims(response_matrix);
 ##################################################################################################
 
 #K matrix for the coming PolyaGamma samplings
-K = X .- 0.5
+K = X .- 0.5;
 
 #Initial Values, need to make sure that all Variance needs to be positive
 ini_a = ones(I);
@@ -63,7 +63,7 @@ ini_theta = zeros(N);
 ini_kernel = zeros(N, I);
 
 
-ini_w = [Distributions.rand(Psychometrics.PolyaGammaSPSampler(1.0, ini_a[i] * (ini_theta[p] - ini_b[i]))) for p = 1:N, i = 1:I] ;
+ini_w = [Distributions.rand(Psychometrics.PolyaGammaDevRoye1Sampler(1.0, ini_a[i] * (ini_theta[p] - ini_b[i]))) for p = 1:N, i = 1:I] ;
 
 function theta_sampler(
     vec_a, # I x 1
@@ -111,22 +111,21 @@ function b_sampler(vec_theta, vec_a_id, mat_w_id, mat_k_id, b_prior_mu, b_prior_
     b_mu = b_variance * (((.-vec_a_id_vec)' * z_b) + (b_prior_mu / b_prior_var)) # ok
     return rand(Distributions.Normal(b_mu, sqrt(b_variance)))
 end
-# using RCall
-# R""" 
-# rpg_sp <- function(x){
-# BayesLogit::rpg.sp(1,1,x)
-# }
-# """
+using RCall
+R""" 
+rpg_sp <- function(x){
+BayesLogit::rpg.sp(1,1,x)
+}
+"""
 function w_sampler(vec_theta, vec_a, vec_b, N, I)
     # w_temp = zeros(Float64, N, I)
     # W_gen = copy(w_temp)
     #w_sav = zeros(Float64, N, I)
-    #w_temp = [vec_a[i] * (vec_theta[p] - vec_b[i]) for p = 1:N, i = 1:I]
+    w_temp = [vec_a[i] * (vec_theta[p] - vec_b[i]) for p = 1:N, i = 1:I]
     #w_sav[:, :, 1] = [rand(PolyaGamma(1.0, w_temp[p, i])) for p = 1:N, i = 1:I]
-    #w_sav = [rand(Psychometrics.PolyaGammaSPSampler(1.0, vec_a[i] * (vec_theta[p] - vec_b[i]))) for p = 1:N, i = 1:I]
-    #pg = rcopy(R"apply($w_temp, c(1,2), rpg_sp)")
+    pg = rcopy(R"apply($w_temp, c(1,2), rpg_sp)")
     # w_sav = copy(pg)
-    pg =[rand(Psychometrics.PolyaGammaDevRoyeSampler(1.0, vec_a[i] * (vec_theta[p] - vec_b[i]))) for p = 1:N, i = 1:I]
+    #pg =[rand(Psychometrics.PolyaGammaDevRoye1Sampler(1.0, vec_a[i] * (vec_theta[p] - vec_b[i]))) for p = 1:N, i = 1:I]
     return pg
 end
 
@@ -136,7 +135,7 @@ end
 
 #Specified by users:Construct 2PL IRT Estimator
 
-Iter = 1000
+Iter = 5000
 theta_prior_mu = 0
 theta_prior_var = 1
 a_prior_mu = 1
@@ -156,70 +155,50 @@ sav_theta[1, :] = ini_theta
 for iter = 2:Iter
     sav_w = w_sampler(sav_theta[iter-1, :], sav_a[iter-1, :], sav_b[iter-1, :], N, I)
     println(iter)
+    sav_theta_iter = map(
+        p -> theta_sampler(
+        sav_a[iter-1, :],
+        sav_b[iter-1, :],
+        sav_w[p, :],
+        K[p, :],
+        theta_prior_mu,
+        theta_prior_var,
+    ),
+    1:N
+    )
     
-    for p in 1:N
-        sav_theta[iter, p] = theta_sampler(
-            sav_a[iter-1, :],
-            sav_b[iter-1, :],
-            sav_w[p, :],
-            K[p, :],
-            theta_prior_mu,
-            theta_prior_var,
-        )
-    end
-    for i in 1 : I
-        sav_a[iter, i] = a_sampler(
-            sav_theta[iter, :],
+    sav_a_iter = map(
+        i -> a_sampler(
+            sav_theta_iter,
             sav_b[iter-1, i],
             sav_w[:, i],
             K[:, i],
             a_prior_mu,
             a_prior_var,
-        )
-    end
-    for i in 1 : I
-        sav_b[iter, i] = b_sampler(
-            sav_theta[iter, :],
-            sav_a[iter, i],
+        ),
+        1:I,
+    )
+    sav_b_iter = map(
+        i -> b_sampler(
+            sav_theta_iter,
+            sav_a_iter[i],
             sav_w[:, i],
             K[:, i],
             b_prior_mu,
             b_prior_var,
-            N
-        )
-    end
-    # sav_a_iter = map(
-    #     i -> a_sampler(
-    #         sav_theta_iter,
-    #         sav_b[iter-1, i],
-    #         sav_w[:, i],
-    #         K[:, i],
-    #         a_prior_mu,
-    #         a_prior_var,
-    #     ),
-    #     1:I,
-    # )
-    # sav_b_iter = map(
-    #     i -> b_sampler(
-    #         sav_theta_iter,
-    #         sav_a_iter[i],
-    #         sav_w[:, i],
-    #         K[:, i],
-    #         b_prior_mu,
-    #         b_prior_var,
-    #         N,
-    #     ),
-    #     1:I,
-    # )
-    # sav_theta[iter, :] .= copy(sav_theta_iter)
-    # sav_a[iter, :] .= copy(sav_a_iter)
-    # sav_b[iter, :] .= copy(sav_b_iter)
+            N,
+        ),
+        1:I,
+    )
+    sav_theta[iter, :] .= copy(sav_theta_iter)
+    sav_a[iter, :] .= copy(sav_a_iter)
+    sav_b[iter, :] .= copy(sav_b_iter)
 end
 
 
-mean_a = [mean(sav_a[500:1000, i]) for i = 1:I];
-mean_b = [mean(sav_b[500:1000, i]) for i = 1:I];
-mean_theta = [mean(sav_theta[500:1000, i]) for i = 1:N];
+mean_a = [mean(sav_a[4000:5000, i]) for i = 1:I];
+mean_b = [mean(sav_b[4000:5000, i]) for i = 1:I];
+mean_theta = [mean(sav_theta[4000:5000, i]) for i = 1:N];
 
 # hcat(map(i -> i.parameters.a, items), mean_a)
 # hcat(map(i -> i.parameters.b, items), mean_b)
@@ -248,3 +227,18 @@ RMSE_t_500[j]=sqrt(sum((map(e -> e.latent.val, examinees) .- mean_theta).^2)/N)
 end
 
 plot(hcat(RMSE_a_500, RMSE_b_500, RMSE_t_500))
+
+RMSE_a_100 = zeros(Iter-100);
+RMSE_b_100 = zeros(Iter-100);
+RMSE_t_100 = zeros(Iter-100);
+for j in 1:(Iter-100)
+mean_a = [mean(sav_a[j:(j+99), i]) for i = 1:I];
+mean_b = [mean(sav_b[j:(j+99), i]) for i = 1:I];
+mean_theta = [mean(sav_theta[j:(j+99), i]) for i = 1:N];
+# RMSEs
+RMSE_a_100[j]=sqrt(sum((map(i -> i.parameters.a, items) .- mean_a).^2)/I)
+RMSE_b_100[j]=sqrt(sum((map(i -> i.parameters.b, items) .- mean_b).^2)/I)
+RMSE_t_100[j]=sqrt(sum((map(e -> e.latent.val, examinees) .- mean_theta).^2)/N)
+end
+
+plot(hcat(RMSE_a_100, RMSE_b_100, RMSE_t_100))

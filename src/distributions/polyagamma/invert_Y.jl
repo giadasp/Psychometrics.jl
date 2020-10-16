@@ -29,7 +29,6 @@
 const _TRUNC = 0.64
 const _TERMS = 200
 const tol = 1e-8
-const IYPI = 3.141592653589793238462643383279502884197
 const grid_size = 81
 const ygrid = [
     0.0625,
@@ -207,37 +206,36 @@ function y_eval(v::Float64)
     elseif (v < -tol)
         y = tanh(r) / r
     else
-        y = 1 + (1/3) * r^2 + (2/15) * r^4 + (17/315) * r^6
-        #y = 1 + (1 / 3) * v + (2 / 15) * (v^2) + (17 / 315) * (v^3)
+        #y = 1 + (1 / 3) * r^2 + (2 / 15) * r^4 + (17 / 315) * r^6
+        y = 1 + (1 / 3) * v + (2 / 15) * (v^2) + (17 / 315) * (v^3)
     end
     return y::Float64
 end
 
-function ydy_eval(yp::Float64, dyp::Float64, v::Float64) #! put yp from second to first
-    y = y_eval(v)
-    yp = copy(y)
+function ydy_eval(v::Float64) #! put yp from second to first
+    yp2 = y_eval(v)
     if (abs(v) >= tol)
-        dyp = 0.5 * (y^2 + (1 - y) / v)
+        dyp2 = 0.5 * (yp2^2 + (1 - yp2) / v)
     else
-        dyp = 0.5 * (y^2 - (1 / 3) - (2 / 15) * v)
+        dyp2 = 0.5 * (yp2^2 - (1 / 3) - (2 / 15) * v)
     end
-    return yp, dyp
+    return yp2, dyp2
 end
 
 function f_eval(v::Float64, params::Float64)
     return y_eval(v) - params[1]
 end
 
-function fdf_eval(fp::Float64, dfp::Float64, v::Float64, params::Float64)
-    fp, dfp = ydy_eval(fp, dfp, v)
-    fp -= params
-    return fp, dfp
+function fdf_eval(v::Float64, params::Float64)
+    fp2, dfp2 = ydy_eval(v)
+    fp2 = fp2 - params
+    return fp2, dfp2
 end
 
 function df_eval(v::Float64)
     f = 0.0
     df = 0.0
-    f, df = ydy_eval(f, df, v)
+    f, df = ydy_eval(v)
     return df
 end
 
@@ -246,10 +244,10 @@ function v_eval(y::Float64, tol::Float64, max_iter::Int64)
     yupper = ygrid[grid_size]
 
     if (y < ylower)
-        return - (1.0 / (y^2))
+        return -(1.0 / (y^2))
     elseif (y > yupper)
-        v = atan(0.5 * y * IYPI)
-        return v^2 
+        v = atan(0.5 * y * π)
+        return v^2
     elseif (y == 1)
         return 0.0
     end
@@ -271,7 +269,7 @@ function v_eval(y::Float64, tol::Float64, max_iter::Int64)
         vold = copy(vnew)
         f0 = zero(Float64)
         f1 = zero(Float64)
-        f0, f1 = fdf_eval(f0, f1, vold, y)
+        f0, f1 = fdf_eval(vold, y)
         vnew = vold - f0 / f1
         vnew = vnew > vh ? vh : vnew
         vnew = vnew < vl ? vl : vnew
