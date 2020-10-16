@@ -1,5 +1,15 @@
-# Pregenerated tables
-const X_TN = [
+
+const _XMIN = -2.00443204036                 # Left bound
+const _XMAX = 3.48672170399                 # Right bound
+
+const _INVH = 1631.73284006                  # = 1/h, h being the minimal interval range
+const _I0 = 3272                             # = - floor(x(0)/h) +1, was 3271
+const _ALPHA = 1.837877066409345             # = log(2*pi)
+
+const _N = 4002 # was 4001
+
+#4002 was x
+const _XCONST = [
     -2.00443204036,
     -1.99990455547,
     -1.99541747213,
@@ -4004,8 +4014,8 @@ const X_TN = [
     3.48672170399,
 ]
 
-
-const YU = [
+#4001
+const _YU = [
     0.0540012735356,
     0.0544874991381,
     0.054972661389,
@@ -8009,8 +8019,8 @@ const YU = [
     0.00155968193081,
 ]
 
-
-const NCELL = [
+#8962
+const _NCELL = [
     0,
     0,
     0,

@@ -204,41 +204,40 @@ function y_eval(v::Float64)
     r = sqrt(abs(v))
     if (v > tol)
         y = tan(r) / r
-    elseif (v < -1 * tol)
+    elseif (v < -tol)
         y = tanh(r) / r
     else
-        y = 1 + (1 / 3) * v + (2 / 15) * v * v + (17 / 315) * v * v * v
+        y = 1 + (1/3) * r^2 + (2/15) * r^4 + (17/315) * r^6
+        #y = 1 + (1 / 3) * v + (2 / 15) * (v^2) + (17 / 315) * (v^3)
     end
     return y::Float64
 end
 
-function ydy_eval!(yp::Float64, dyp::Float64, v::Float64) #! put yp from second to first
-
-    # double r   = sqrt(abs(v))
-
+function ydy_eval(yp::Float64, dyp::Float64, v::Float64) #! put yp from second to first
     y = y_eval(v)
-    yp = y
-
+    yp = copy(y)
     if (abs(v) >= tol)
-        dyp = 0.5 * (y * y + (1 - y) / v)
+        dyp = 0.5 * (y^2 + (1 - y) / v)
     else
-        dyp = 0.5 * (y * y - 1 / 3 - (2 / 15) * v)
+        dyp = 0.5 * (y^2 - (1 / 3) - (2 / 15) * v)
     end
+    return yp, dyp
 end
 
-function f_eval(v::Float64, params::Vector{<:Real})
+function f_eval(v::Float64, params::Float64)
     return y_eval(v) - params[1]
 end
 
-function fdf_eval!(fp::Float64, dfp::Float64, v::Float64, params::Vector{<:Real})
-    ydy_eval!(fp, dfp, v)
-    fp -= params[1]
+function fdf_eval(fp::Float64, dfp::Float64, v::Float64, params::Float64)
+    fp, dfp = ydy_eval(fp, dfp, v)
+    fp -= params
+    return fp, dfp
 end
 
 function df_eval(v::Float64)
     f = 0.0
     df = 0.0
-    ydy_eval!(f, df, v)
+    f, df = ydy_eval(f, df, v)
     return df
 end
 
@@ -247,19 +246,18 @@ function v_eval(y::Float64, tol::Float64, max_iter::Int64)
     yupper = ygrid[grid_size]
 
     if (y < ylower)
-        return -1.0 / (y * y)
+        return - (1.0 / (y^2))
     elseif (y > yupper)
         v = atan(0.5 * y * IYPI)
-        return v * v
+        return v^2 
     elseif (y == 1)
         return 0.0
     end
 
     id = (_log_c(y) / _log_c(2.0) + 4.0) / 0.1
 
-    # C++ default is truncate decimal portion.
-    idlow = trunc(Int, id)
-    idhigh = idlow + 1
+    idlow = Int64(floor(id) + 1)
+    idhigh = Int64(min(idlow + 1, grid_size))
     vl = vgrid[idlow]  # lower bound
     vh = vgrid[idhigh] # upper bound
 
@@ -268,19 +266,19 @@ function v_eval(y::Float64, tol::Float64, max_iter::Int64)
     vnew = copy(vl)
     vold = copy(vl)
 
-    while (diff > tol && iter < max_iter)
+    while (diff > tol && iter <= max_iter)
         iter += 1
         vold = copy(vnew)
         f0 = zero(Float64)
         f1 = zero(Float64)
-        fdf_eval!(f0, f1, vold, [y])
+        f0, f1 = fdf_eval(f0, f1, vold, y)
         vnew = vold - f0 / f1
         vnew = vnew > vh ? vh : vnew
         vnew = vnew < vl ? vl : vnew
         diff = abs(vnew - vold)
     end
 
-    if (iter >= max_iter)
+    if (iter > max_iter)
         println("InvertY.cpp, v_eval: reached max_iter: ", iter)
     end
 

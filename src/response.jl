@@ -223,3 +223,20 @@ function get_responses(
         examinees,
     )
 end
+
+
+function get_items_idx_answered_by_examinee(
+    examinee::AbstractExaminee,
+    responses::Vector{<:AbstractResponse},
+)
+    resp_e = get_responses_by_examinee_id(examinee.id, responses)
+    return map(r -> r.item_idx, resp_e)
+end
+
+function get_examinees_idx_who_answered_item(
+    item::AbstractItem,
+    responses::Vector{<:AbstractResponse},
+)
+    resp_e = get_responses_by_item_id(item.id, responses)
+    return map(r -> r.examinee_idx, resp_e)
+end

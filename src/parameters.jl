@@ -21,7 +21,7 @@ mutable struct Parameters1PL <: AbstractParameters
     # Random Initializers
     function Parameters1PL(dist::Distributions.UnivariateDistribution, bounds_b)
         pars = truncate_rand(dist, bounds_b)
-        new(pars[1][1], bounds_b, dist, dist, Vector{Vector{Float64}}(undef, 0), 1.0)
+        new(pars[1][1], bounds_b, dist, dist, [pars[1]], 1.0)
     end
 
     function Parameters1PL()
@@ -58,7 +58,7 @@ mutable struct Parameters2PL <: AbstractParameters
             bounds_b,
             bivariate_dist,
             bivariate_dist,
-            Vector{Vector{Float64}}(undef, 0),
+            [pars[1]],
             [1.0 0.0; 0.0 1.0],
         )
     end
@@ -132,7 +132,7 @@ mutable struct Parameters3PL <: AbstractParameters
             bounds_c,
             trivariate_dist,
             trivariate_dist,
-            Vector{Vector{Float64}}(undef, 0),
+            [pars[1]],
             [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0],
         )
     end
@@ -180,7 +180,7 @@ mutable struct ParametersNPL <: AbstractParameters
             bounds[1],
             N_variate_dist,
             N_variate_dist,
-            [zeros(Float64, 0) for n = 1:N],
+            [pars[1]],
             LinearAlgebra.I(N),
         )
     end

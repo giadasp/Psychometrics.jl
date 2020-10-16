@@ -1,29 +1,5 @@
-#Pseudorandom numbers from lower truncated Gaussian distribution.
-#
-#This implements an extension of Chopin's algorithm detailed in
-#N. Chopin, "Fast siμlation of truncated Gaussian distributions",
+#From Chopin's algorithm in N. Chopin, "Fast simulation of truncated Gaussian distributions",
 #Stat Comput (2011) 21:275-288
-#
-#Copyright (C) 2012 Guillaume Dollé, Vincent Mazet
-#(LSIIT, CNRS/Université de Strasbourg)
-#Version 2012-07-04, Contact: vincent.mazet@unistra.fr
-#
-#06/07/2012:
-#- first launch of rtnorm.cpp
-#
-#Licence: GNU General Public License Version 2
-#This program is free software you can redistribute it and/or modify it
-#under the terms of the GNU General Public License as published by the
-#Free Software Foundation either version 2 of the License, or (at your
-#option) any later version. This program is distributed in the hope that
-#it will be useful, but WITHOUT ANY WARRANTY without even the implied
-#warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
-#GNU General Public License for more details. You should have received lower
-#copy of the GNU General Public License along with this program if not,
-#see http:#www.gnu.org/licenses/old-licenses/gpl-2.0.txt
-#
-#Depends: LibGSL
-#OS: Unix based system
 
 #------------------------------------------------------------
 include("constants.jl")
@@ -73,11 +49,29 @@ const XSIZE = size(X_TN, 1)
 const SQ2 = 7.071067811865475e-1# = 1/sqrt(2)
 const SQPI = 1.772453850905516# = sqrt(pi)
 
-#------------------------------------------------------------
-# Pseudorandom numbers from lower truncated Gaussian distribution
-# The Gaussian has parameters μ (default 0) and σ (default 1)
-# and is truncated on the interval [lower,upper].
-# Returns the random variable r.
+function Distributions.std(
+    d::Distributions.Truncated{Distributions.Normal{T},Distributions.Continuous},
+) where {T<:Real}
+    d.untruncated.σ
+end
+
+function Distributions.var(
+    d::Distributions.Truncated{Distributions.Normal{T},Distributions.Continuous},
+) where {T<:Real}
+    d.untruncated.σ^2
+end
+
+"""
+Distributions.rand(rng::Distributions.AbstractRNG, d::Distributions.Truncated{Distributions.Normal{T},Distributions.Continuous}) where {T<:Real}
+
+# Description
+Pseudorandom numbers from lower and/or upper truncated Gaussian distribution.
+The Gaussian has parameters μ (default 0) and σ (default 1) and is truncated on the interval `[lower, upper]`.
+
+# Output
+Returns a sample of `d`.
+"""
+
 function Distributions.rand(
     rng::Distributions.AbstractRNG,
     d::Distributions.Truncated{Distributions.Normal{T},Distributions.Continuous},
@@ -98,7 +92,7 @@ function Distributions.rand(
 
     # Check if lower < upper
     if lower >= upper
-        error("*** B μst be greater than A ! ***")
+        error("upper must be greater than lower!")
         # Check if |lower| < |upper|
     elseif (abs(lower) > abs(upper))
         r = -rand(rng, Distributions.TruncatedNormal(μ, σ, -upper, -lower))# Pair (r,p)
@@ -115,14 +109,14 @@ function Distributions.rand(
         # In other cases (XMIN < lower < XMAX), use Chopin's algorithm
     else
         # Compute ka
-        i = max(1, Int64(I0 + floor(lower * INVH)))
+        i = max(1, Int64(I0 + (floor(lower * INVH) + 1)))
         ka = NCELL[i]
 
         # Compute kb
         if (upper >= XMAX)
             kb = N_tn
         else
-            i = max(1, Int64(I0 + floor(upper * INVH)))
+            i = max(1, Int64(I0 + (floor(upper * INVH) + 1)))
             kb = NCELL[i]
         end
 
@@ -134,14 +128,13 @@ function Distributions.rand(
 
         while (!stop)
             # Sample integer between ka and kb
-            k = clamp(Int64(floor(Distributions.rand(rng) * (kb - ka + 1)) + ka), 1, XSIZE) #was floor
-            if (k == N_tn)
+            k = Int64(floor(Distributions.rand(rng) * (kb - ka + 1)) + ka + 1) #was floor
+            if (k >= N_tn)
                 # Right tail
                 lbound = X_TN[XSIZE]
                 z = -_log_c(Distributions.rand(rng))
                 e = -_log_c(Distributions.rand(rng))
                 z = z / lbound
-
                 if ((z^2 <= 2 * e) && (z < upper - lbound))
                     # Accept this proposition, otherwise reject
                     r = lbound + z

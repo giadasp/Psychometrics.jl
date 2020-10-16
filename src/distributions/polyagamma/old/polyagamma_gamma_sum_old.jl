@@ -1,13 +1,14 @@
-struct PolyaGammaGammaSumSampler <: Distributions.Sampleable{Distributions.Univariate,Distributions.Continuous}
- h::Float64
- z::Float64
+struct PolyaGammaGammaSumSamplerOld <:
+       Distributions.Sampleable{Distributions.Univariate,Distributions.Continuous}
+    h::Float64
+    z::Float64
 end
 
 
 const bvec = map(x -> (x - 0.5)^2 * pi^2 * 4, 1:_TERMS)
 
 ## draw sum of gammas
-function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaGammaSumSampler)
+function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaGammaSumSamplerOld)
     g = Distributions.rand(rng, Distributions.Gamma(s.h), _TERMS)
     # x = @distributed (+) for k in bvec
     # 2 * Distributions.rand(rng, g) / (s.z^2 + k)

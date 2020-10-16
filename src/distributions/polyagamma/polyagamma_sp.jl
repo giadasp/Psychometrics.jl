@@ -15,118 +15,105 @@
 # You should have received a copy of the GNU General Public License along with
 # BayesLogit.  If not, see <https:#www.gnu.org/licenses/>.
 
-
-
-#include "PolyaGammaApproxSP.h"
-#include "InvertY.h"
-#include <stdexcept>
-
-#------------------------------------------------------------------------------
-
-# double v_secant(double y, double vb, double va, double tol, int maxiter)
-# {
-#   double yb = y_func(vb)
-#   double ya = y_func(va)
-
-#   if (yb > ya) fprintf(stderr, "v_secant: yb(elow) > ya(above).\n")
-
-#   int iter = 0
-#   double ydiff = tol + 1.0
-#   double vstar, ystar
-
-#   while (abs(ydiff) > tol && iter < maxiter) {
-#     iter = iter + 1
-#     double m = (ya - yb) / (va - vb)
-#     vstar = (y - yb) / m + vb
-#     ystar = y_func(vstar)
-#     ydiff = y - ystar
-#     if (ystar < y) {
-#       vb = vstar
-#       yb = ystar
-#     end else {
-#       va = vstar
-#       ya = ystar
-#     end
-#     # printf("y, v, ydiff: %g, %g, %g\n", ystar, vstar, ydiff)
-#   end
-
-#   if (iter >= maxiter) fprintf(stderr, "v_secant: reached maxiter.\n")
-
-#   return vstar
-# end
-
-# double v_func(double y) {
-#   double lowerb = -100
-#   double upperb = 2.22
-
-#   double v = 0.0
-#   if (y < 0.1)
-#     v = -1.0 / (y*y)
-#   elseif (y > 8.285225) {
-#     v = atan(y * 0.5 * π)
-#     v = v * v
-#   end
-#   else
-#     v = v_secant(y, lowerb, upperb, 1e-8, 10000)
-#   return v
-# end
-
-
 mutable struct FD
     val::Float64
     der::Float64
     FD() = new(0.0, 0.0)
+    FD(val, der) = new(val, der)
 end
 
 mutable struct Line
     slope::Float64
     icept::Float64
     Line() = new(0.0, 0.0)
+    Line(slope, icept) = new(slope, icept)
 end
 
-struct PolyaGammaSPSampler <: Distributions.Sampleable{Distributions.Univariate,Distributions.Continuous}
+struct PolyaGammaSPSampler <:
+       Distributions.Sampleable{Distributions.Univariate,Distributions.Continuous}
     h::Float64
     z::Float64
     maxiter::Int64
+    PolyaGammaSPSampler(h, z) = new(h, z, 100)
+end
+function alphastar(left::Float64)
+    return 0.5 * (left + sqrt(left*left + 4))
+end
+function texpon_rate(left::Float64, rate::Float64)
+    if (rate < 0) 
+        println("texpon_rate: rate < 0, return 0", 0.0)
+        return 0.0
+    end
+    return Random.randexp(1/rate) + left
+end
+function tnorm_left_sp(rng::Distributions.AbstractRNG, left::Float64)
+    count = 1
+    if (left < 0) 
+            while (true) 
+                ppsl = Random.randn(rng)
+                if (ppsl > left) 
+                    return ppsl
+                end
+            end
+    else 
+        astar = alphastar(left)
+        while (true) 
+            ppsl = texpon_rate(left, astar)
+            rho  = exp( -0.5 * (ppsl - astar) * (ppsl - astar) )
+            if (Random.rand(rng) < rho) 
+                return ppsl
+            end
+
+        end
+    end
+end
+function rtinvchi2_sp(rng::Distributions.AbstractRNG, scale::Float64, trunc::Float64)
+    R = trunc / scale
+    E = tnorm_left_sp(rng, 1/sqrt(R))
+    X = scale / (E*E)
+    return X
+end
+function igauss_sp(rng::Distributions.AbstractRNG,mu::Float64, lambda::Float64)
+    mu2 = mu * mu
+    Y = (Random.randn(rng)^2)
+    W = mu + 0.5 * mu2 * Y / lambda
+    X = W - sqrt(W*W - mu2)
+    if (Random.rand(rng) > mu / (mu + X))
+        X = mu2 / X
+    end
+    return X
 end
 
-function rtigauss_sp(
-    rng::Distributions.AbstractRNG,
-    mu::Float64,
-    lambda::Float64,
-    trunc::Float64,
-)
-    # mu = abs(mu)
-    X = trunc + 1.00
-    if (trunc < mu) # mu > t
-        alpha = 0.0
-        while (Distributions.rand(rng)() > alpha)
-            X = rtinvchi2(rng, lambda, trunc)
-            alpha = _exp_c(-0.5 * lambda / (mu * mu) * X)
-        end
-        # printf("rtigauss, part i: %g\n", X)
-    else
-        while (X > trunc)
-            X = igauss(rng, mu, lambda)
-        end
-        # printf("rtigauss, part ii: %g\n", X)
+function rtigauss_sp(rng::Distributions.AbstractRNG, mu::Float64, lambda::Float64, trunc::Float64)
+ X = trunc + 1
+ if (trunc < mu)
+    alpha = 0.0
+    while Random.rand(rng) > alpha
+        X = rtinvchi2_sp(rng, lambda, trunc)
+        alpha = _exp_c(lambda /(2 * mu^2) * X)
     end
-    return X::Float64
+else
+    while trunc < X
+        X = igauss_sp(rng, mu, lambda)
+    end
+end
+return X
 end
 
-function y_func_sp(v::Float64)
-    tol = 1e-6
-    y = 0.0
-    r = sqrt(abs(v))
-    if (v > tol)
-        y = tan(r) / r
-    elseif (v < -1 * tol)
-        y = tanh(r) / r
-    else
-        y = 1 + (1 / 3) * v + (2 / 15) * v * v + (17 / 315) * v * v * v
-    end
-    return y
-end
+#y_eval
+# function y_func_sp(v::Float64)
+#     tol = 1e-6
+#     y = 0.0
+#     r = sqrt(abs(v))
+#     if (v > tol)
+#         y = tan(r) / r
+#     elseif (v < -1 * tol)
+#         y = tanh(r) / r
+#     else
+#         y = 1 + (1 / 3) * v + (2 / 15) * (v^2) + (17 / 315) * (v^3)
+#     end
+#     return y
+# end
 
 function cos_rt_sp(v::Float64)
     y = 0.0
@@ -139,50 +126,40 @@ function cos_rt_sp(v::Float64)
     return y
 end
 
-function delta_func_sp!(delta::FD, x::Float64, mid::Float64)
+function delta_func_sp(x::Float64, mid::Float64)
     if (x >= mid)
-        delta.val = _log_c(x) - _log_c(mid)
-        delta.der = 1.00 / x
+        return FD(_log_c(x) - _log_c(mid), 1.00 / x)
     else
-        delta.val = 0.5 * (1 - 1.00 / x) - 0.5 * (1 - 1.00 / mid)
-        delta.der = 0.5 / (x * x)
+        return FD(0.5 * (1 - 1 / x) - 0.5 * (1 - 1 / mid), 0.5 / (x^2))
     end
 end
 
-function phi_func_sp!(phi::FD, x::Float64, z::Float64)
-    # double v = yv.v_func(x)
-    v = (x)
+function phi_func_sp(x::Float64, z::Float64)
+    v = v_eval(x, 1e-9, 1000)
+    #println("v =", v)
     u = 0.5 * v
-    t = u + 0.5 * z * z
-
-    phi.val = _log_c(cosh(abs(z))) - _log_c(cos_rt_sp(v)) - t * x
-    phi.der = -1.00 * t
-
-    return v
+    t = u + 0.5 * z^2
+    return v, FD(_log_c(cosh(abs(z))) - _log_c(cos_rt_sp(v)) - t * x, -t)
 end
 
-function tangent_to_eta_sp!(tl::Line, x::Float64, z::Float64, mid::Float64)
+function tangent_to_eta_sp(x::Float64, z::Float64, mid::Float64)
     eta = FD()
     delta = FD()
     phi = FD()
 
-    v = phi_func_sp!(phi, x, z)
-    delta_func_sp!(delta, x, mid)
+    v, phi = phi_func_sp(x, z)
+    delta = delta_func_sp(x, mid)
 
     eta.val = phi.val - delta.val
     eta.der = phi.der - delta.der
 
-    tl.slope = eta.der
-    tl.icept = eta.val - eta.der * x
-
-    return v
+    return Line(eta.der, eta.val - eta.der * x)
 end
 
 function sp_approx_sp(x::Float64, n::Float64, z::Float64)
-    # double v  = yv.v_func(x)
-    v = (x)
+    v = v_eval(x, 1e-9, 1000)
     u = 0.5 * v
-    z2 = z * z
+    z2 = z^2
     t = u + 0.5 * z2
     # double m  = y_func(-1 * z2)
 
@@ -190,57 +167,93 @@ function sp_approx_sp(x::Float64, n::Float64, z::Float64)
 
     K2 = 0.0
     if (abs(v) >= 1e-6)
-        K2 = x * x + (1 - x) / v
+        K2 = (x^2) + (1 - x) / v
     else
-        K2 = x * x - 1 / 3 - (2 / 15) * v
+        K2 = (x^2) - 1 / 3 - (2 / 15) * v
     end
-    log_spa = 0.5 * _log_c(0.5 * n / π) - 0.5 * _log_c(K2) + n * phi
-    return _exp_c(log_spa)
+    spa = (n / (2 * π))^2 / K2^2 * _exp_c(phi)^n
+    #log_spa = 0.5 * _log_c(0.5 * n / π) - 0.5 * _log_c(K2) + n * phi
+    #return _exp_c(log_spa)
+    return spa
 end
 
+function ltgamma_sp(rng::Distributions.AbstractRNG, shape::Float64, rate::Float64, trunc::Float64)
+    a = shape
+    b = rate * trunc
+
+    if (trunc <=0) 
+	    return 0.0
+    end
+    if (shape < 1) 
+        return 0.0
+    end
+
+    if (shape ==1) 
+        return Random.randexp(rng) / rate + trunc
+    end
+
+    d1 = b-a
+    d3 = a-1
+    c0 = 0.5 * (d1 + sqrt(d1*d1 + 4 * b)) / b
+    x = 0.0
+    accept = false
+
+    while (!accept) 
+        x = b + Random.randexp(rng) / c0
+        u = Random.rand(rng)
+
+        l_rho = d3 * _log_c(x) - x * (1-c0)
+        l_M   = d3 * _log_c(d3 / (1-c0)) - d3
+
+        accept = _log_c(u) <= (l_rho - l_M)
+    end
+
+    return trunc * (x/b)
+end
+
+function p_igauss_sp(x::Float64, mu::Float64, lambda::Float64)
+    z = 1 / mu
+    b = sqrt(lambda / x) * (x * z - 1)
+    a = -sqrt(lambda / x) * (x * z + 1)
+    return Distributions.cdf(Distributions.Normal(),b) + exp(2 * lambda * z ) * Distributions.cdf(Distributions.Normal(),a)
+end
 
 ## draw with saddle point method
 function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaSPSampler)
-    #int PolyaGammaApproxSP::draw(double& d, double n, double z, int maxiter)
     n = s.h
     z = s.z
 
     if (n < 1)
-        println("PolyaGammaApproxSP::draw: n must be >= 1.0\n")
+        println("PolyaGammaSP::draw: n must be >= 1.0")
         return -1.0
     end
     z = 0.5 * abs(z)
 
-    xl = y_func_sp(-1 * z * z)    # Mode of phi - Left point.
-    md = xl * 1.01          # Mid point.
-    xr = xl * 1.02          # Right point.
+    xl = y_eval(-z^2)    # Mode of phi - Left point.
+    md = xl * 1.1          # Mid point.
+    xr = xl * 1.2          # Right point.
 
     # Inflation constants
     # double vmd  = yv.v_func(md)
-    vmd = v_eval(md)
+    vmd = v_eval(md, 1e-9, 1000)
     K2md = 0.0
+    m2 = md^2
 
     if (abs(vmd) >= 1e-6)
-        K2md = md * md + (1 - md) / vmd
+        K2md = m2 + (1 - md) / vmd
     else
-        K2md = md * md - 1 / 3 - (2 / 15) * vmd
+        K2md = m2 - (1 / 3) - (2 / 15) * vmd
     end
-    m2 = md * md
     al = m2 * md / K2md
     ar = m2 / K2md
 
     # Tangent lines info.
-    ll = Line()
-    lr = Line()
-
-
-    tangent_to_eta_sp!(ll, xl, z, md)
-    tangent_to_eta_sp!(lr, xr, z, md)
-
-    rl = -1.0 * ll.slope
-    rr = -1.0 * lr.slope
-    il = ll.icept
-    ir = lr.icept
+    ll = tangent_to_eta_sp(xl, z, md)
+    lr = tangent_to_eta_sp(xr, z, md)
+    rl = -ll.slope
+    rr = -lr.slope
+    il = copy(ll.icept)
+    ir = copy(lr.icept)
     lcn = 0.5 * _log_c(0.5 * n / π)
     rt2rl = sqrt(2 * rl)
     # # to cross-reference R script
@@ -252,7 +265,9 @@ function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaSPSampl
 
     wl =
         _exp_c(0.5 * _log_c(al) - n * rt2rl + n * il + 0.5 * n * 1.0 / md) *
-        p_igauss(md, 1.0 / rt2rl, n)
+        p_igauss_sp(1 / rt2rl, n, md)
+        #Distributions.cdf(Distributions.InverseGaussian(1.0 / rl, Float64(n)), md)
+    #Distributions.cdf(Distributions.InverseGaussian(1.0 / rt2rl, Float64(n)), md)
 
     # # to cross-reference R script
     # term1 = _exp_c((0.5 * _log_c(ar))
@@ -261,13 +276,12 @@ function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaSPSampl
     # term4 = _exp_c((loggamma(n))
     # term5 = (1.00 - p_gamma_rate(md, n, n*rr, false))
     # printf("r terms 1-5: %g, %g, %g, %g, %g\n", term1, term2, term3, term4, term5)
-
     wr =
         _exp_c(
             0.5 * _log_c(ar) +
             lcn +
             (-n * _log_c(n * rr) + n * ir - n * _log_c(md) + loggamma(n)),
-        ) * (1.00 - Distributions.cdf(Distributions.Gamma(n, 1 / (n * rr)), md))
+        ) * (1.00 - Distributions.cdf(Distributions.Gamma(n, (n * rr)), md))
     #(1.00 - Distributions.cdf(Distributions.Gamma(n, n*rr), md))
     # or
     #TODO p_gamma_rate problem rate/scale paramater
@@ -284,30 +298,34 @@ function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaSPSampl
     X = 2.0
     F = 0.0
 
-    while (go && iter < s.maxiter)
+    while (go && iter <= s.maxiter)
         # Put first so check on first pass. 
         #if (iter % 1000 == 0) R_CheckUserInterrupt() end
         iter += 1
-        if (Distributions.rand(rng)() < pl)
-            X = rtigauss(rng, 1.0 / rt2rl, n, md)
+        if (Distributions.rand(rng) < pl)
+            # X = Distributions.rand(
+            #     rng,
+            #     TruncatedInverseGaussian(1.0 / rl, Float64(n), 0.0, md),
+            # )
+            X = rtigauss_sp(rng, 1/rt2rl, n, md)
             phi_ev = n * (il - rl * X) + 0.5 * n * ((1.0 - 1.0 / X) - (1.0 - 1.0 / md))
             F = _exp_c(0.5 * _log_c(al) + lcn - 1.05 * _log_c(X) + phi_ev)
         else
-            X = Distributions.rand(rng, Distributions.TruncatedGamma(n, 1/(n * rr), md, Inf))
+            #X = Distributions.rand(rng, TruncatedGamma(n, 1 / (n * rr), md, Inf))
+            X = ltgamma_sp(rng, n, n*rr, md)
             phi_ev = n * (ir - rr * X) + n * (_log_c(X) - _log_c(md))
             F = _exp_c(0.5 * _log_c(ar) + lcn + phi_ev) / X
         end
 
         spa = sp_approx_sp(X, n, z)
 
-        if (F * Distributions.rand(rng)() < spa)
+        if (F * Random.rand(rng) < spa)
             go = false
         end
 
     end
 
-    # return n * 0.25 * X
-    d = n * 0.25 * X
-    return iter
+    return n * 0.25 * X
+    #d = n * 0.25 * X
+    #return iter
 end
-

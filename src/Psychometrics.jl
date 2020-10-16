@@ -15,6 +15,7 @@ include("probability.jl")
 include("likelihood.jl")
 include("information.jl")
 include("distributions/distributions.jl")
+include("bayesian.jl")
 
 
 export Latent1D,
@@ -48,6 +49,14 @@ export Latent1D,
     get_design_matrix,
     get_responses,
     get_examinee_by_id,
+    get_items_idx_answered_by_examinee,
+    get_examinees_idx_who_answered_item,
+    update_posterior!,
+    update_posterior!,
+    generate_w,
+    set_value_from_chain!,
+    set_value_from_posterior!,
+    chain_append!,
     get_latents,
     probability,
     log_likelihood,
@@ -58,6 +67,7 @@ export Latent1D,
     AbstractLatent,
     TruncatedInverseGaussian,
     PolyaGamma,
+    TruncatedGamma,
     truncate_rand,
     rand
 

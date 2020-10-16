@@ -70,7 +70,7 @@ function tnorm(rng::Distributions.AbstractRNG, left::Float64)
 
     if (left < 0)  # Accept/Reject Normal
         while (true)
-            ppsl = Distributions.rand(rng, Distributions.Normal())
+            ppsl = Random.randn(rng)
             if (ppsl > left)
                 return ppsl
             end
@@ -155,7 +155,7 @@ function tnorm(rng::Distributions.AbstractRNG, left::Float64, right::Float64)
             end
         else
             while (true)
-                ppsl = Distributions.rand(rng, Distributions.Normal())
+                ppsl = Random.randn(rng)
                 if (left < ppsl && ppsl < right)
                     return ppsl
                 end

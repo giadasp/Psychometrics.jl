@@ -42,11 +42,11 @@ mutable struct Latent1D <: AbstractLatent
         bounds = [-6.0, 6.0]
         dist = Distributions.Normal(0.0, 1.0)
         val = truncate_rand(dist, bounds)[1]
-        new(val, bounds, dist, dist, zeros(Float64, 0), 1.0)
+        new(val, bounds, dist, dist, [val], 1.0)
     end
-    function Latent1D(bounds, dist::Distributions.UnivariateDistribution)
+    function Latent1D(dist::Distributions.UnivariateDistribution, bounds::Vector{Float64})
         val = truncate_rand(dist, bounds)[1]
-        new(val, bounds, dist, dist, zeros(Float64, 0), 1.0)
+        new(val, bounds, dist, dist, [val], 1.0)
     end
 end
 
@@ -92,18 +92,13 @@ mutable struct LatentND <: AbstractLatent
 
     # Random Initializers
 
-    function LatentND(bounds, dist::Distributions.MultivariateDistribution)
+    function LatentND(
+        dist::Distributions.MultivariateDistribution,
+        bounds::Vector{Vector{Float64}},
+    )
         N = size(bounds, 1)
         val = truncate_rand(dist, bounds)
-        new(
-            string.("L_", collect(1:N)),
-            val,
-            bounds,
-            dist,
-            dist,
-            [zeros(Float64, 0) for n = 1:N],
-            LinearAlgebra.I(N),
-        )
+        new(string.("L_", collect(1:N)), val, bounds, dist, dist, [val], LinearAlgebra.I(N))
     end
 end
 
@@ -158,14 +153,6 @@ mutable struct Latent <: AbstractLatent
     )
         N = 1
         val = truncate_rand(dist, bounds)
-        new(
-            string.("L_", collect(1:N)),
-            val,
-            bounds,
-            dist,
-            dist,
-            [zeros(Float64, 0) for n = 1:N],
-            LinearAlgebra.I(N),
-        )
+        new(string.("L_", collect(1:N)), val, bounds, dist, dist, [val], LinearAlgebra.I(N))
     end
 end
