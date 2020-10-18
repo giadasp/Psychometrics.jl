@@ -83,31 +83,45 @@ function generate_response(latent::Latent1D, parameters::AbstractParameters)
     ))))::Float64
 end
 
-
 """
-    generate_response(examinee::Vector{<:AbstractExaminee}, item::Vector{<:AbstractItem})
+    generate_response(examinee::AbstractExaminee, item::AbstractItem)
 
 Randomly generate a response by `examinee` to `item`.
 """
 function generate_response(
-    examinees::Vector{<:AbstractExaminee},
+    examinee::AbstractExaminee,
+    item::AbstractItem,
+)
+        Response(
+                item.idx,
+                examinee.idx,
+                item.id,
+                examinee.id,
+                generate_response(examinee.latent, item.parameters),
+                Dates.now(),
+            )
+end
+
+"""
+    generate_response(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
+
+Randomly generate a response by `examinee` to `items`.
+"""
+function generate_response(
+    examinee::AbstractExaminee,
     items::Vector{<:AbstractItem},
 )
-    mapreduce(
-        e -> map(
+        map(
             i -> Response(
                 i.idx,
-                e.idx,
+                examinee.idx,
                 i.id,
-                e.id,
-                generate_response(e.latent, i.parameters),
+                examinee.id,
+                generate_response(examinee.latent, i.parameters),
                 Dates.now(),
             ),
             items,
-        ),
-        vcat,
-        examinees,
-    )
+        )
 end
 
 
@@ -119,7 +133,7 @@ Randomly generate a response by `examinee` to `item` under a `design` dictionary
 function generate_response(
     examinees::Vector{<:AbstractExaminee},
     items::Vector{<:AbstractItem},
-    design::Vector{Vector{Int64}},
+    #design::Vector{Vector{Int64}},
 )
     mapreduce(
         e -> map(

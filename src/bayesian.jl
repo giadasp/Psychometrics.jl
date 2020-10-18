@@ -72,13 +72,28 @@ function update_posterior!(
     examinee.latent.posterior = Distributions.Normal(mu, sqrt(sigma2))
 end
 
+
+function generate_w(items::Vector{<:AbstractItem}, examinee::AbstractExaminee)
+    return map(
+        i -> PolyaGammaSample(
+            i.idx,
+            examinee.idx,
+            Distributions.rand(PolyaGamma(
+                1,
+                i.parameters.a * (examinee.latent.val - i.parameters.b),
+            ))
+        ), 
+        items,
+    )
+end
+
 function generate_w(items::Vector{<:AbstractItem}, examinees_i::Vector{Vector{Examinee1D}})
     return mapreduce(
         i -> map(
             e -> PolyaGammaSample(
-                e.idx,
                 i.idx,
-                Distributions.rand(Psychometrics.PolyaGammaSPSampler(
+                e.idx,
+                Distributions.rand(Psychometrics.PolyaGamma(
                     1,
                     i.parameters.a * (e.latent.val - i.parameters.b),
                 )),
@@ -111,12 +126,41 @@ function set_value_from_chain!(examinee::Examinee1D)
     examinee.latent.val = examinee.latent.chain[end]
 end
 
-function chain_append!(item::Item2PL)
-    push!(item.parameters.chain, Distributions.rand(item.parameters.posterior))
+function chain_append!(item::Item2PL; sampling = false)
+    if (sampling && size(item.parameters.chain,1)>=1000)
+        item.parameters.chain[Random.rand(1:1000)] = Distributions.rand(item.parameters.posterior)
+    else
+        push!(item.parameters.chain, Distributions.rand(item.parameters.posterior))
+    end 
 end
 
-function chain_append!(examinee::Examinee1D)
-    push!(examinee.latent.chain, Distributions.rand(examinee.latent.posterior))
+function chain_append!(examinee::Examinee1D; sampling = false)
+    if (sampling && size(examinee.latent.chain,1)>=1000)
+        examinee.latent.chain[Random.rand(1:1000)] = Distributions.rand(examinee.latent.posterior)
+    else
+        push!(examinee.latent.chain, Distributions.rand(examinee.latent.posterior))
+    end 
 end
 
-#Jiang and Templin
+function mcmc_iter!(item::Item2PL, examinees::Vector{<:AbstractExaminee}, responses::Vector{<:Response}, W::Vector{Float64}; sampling = true)
+    update_posterior!(item, examinees, responses, W)
+    chain_append!(item; sampling = sampling)
+    set_value_from_chain!(item)
+end
+
+function mcmc_iter!(examinee::Examinee1D, items::Vector{<:AbstractItem}, responses::Vector{<:Response}, W::Vector{Float64}; sampling = true)
+    update_posterior!(examinee, items, responses, W)
+    chain_append!(examinee; sampling = sampling)
+    set_value_from_chain!(examinee)
+end
+
+function update_estimate!(examinee::Examinee1D)
+    examinee.latent.val = sum(examinee.latent.chain)/size(examinee.latent.chain,1)
+end
+
+function update_estimate!(item::Item2PL)
+    chain_matrix = hcat(item.parameters.chain...) 
+    vals = [sum(i)/size(item.parameters.chain,1) for i in eachrow(chain_matrix)]
+    item.parameters.a = vals[1]
+    item.parameters.b = vals[2]
+end

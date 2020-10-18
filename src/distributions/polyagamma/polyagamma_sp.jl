@@ -38,6 +38,28 @@ struct PolyaGammaSPSampler <:
     PolyaGammaSPSampler(h, z, maxiter) = new(h, z, maxiter)
 end
 
+
+function _rtigauss_sp(
+    rng::Distributions.AbstractRNG,
+    mu::Float64,
+    lambda::Float64,
+    trunc::Float64,
+)
+    X = trunc + 1
+    if (trunc < mu)
+        alpha = 0.0
+        while Random.rand(rng) > alpha
+            X = rtinvchi2_sp(rng, lambda, trunc)
+            alpha = _exp_c(lambda / (2 * mu^2) * X)
+        end
+    else
+        while X > trunc 
+            X = _igauss_sp(rng, mu, lambda)
+        end
+    end
+    return X
+end
+
 function alphastar(left::Float64)
     return 0.5 * (left + sqrt(left * left + 4))
 end
@@ -62,7 +84,7 @@ function _tnorm_left_sp(rng::Distributions.AbstractRNG, left::Float64)
         astar = alphastar(left)
         while (true)
             ppsl = _texpon_rate(left, astar)
-            rho = _exp_c(-0.5 * (ppsl - astar) * (ppsl - astar))
+            rho = _exp_c(-0.5 * (ppsl - astar)^2)
             if (Random.rand(rng) < rho)
                 return ppsl
             end
@@ -84,27 +106,6 @@ function _igauss_sp(rng::Distributions.AbstractRNG, mu::Float64, lambda::Float64
     X = W - sqrt(W * W - mu2)
     if (Random.rand(rng) > (mu / (mu + X)))
         X = mu2 / X
-    end
-    return X
-end
-
-function _rtigauss_sp(
-    rng::Distributions.AbstractRNG,
-    mu::Float64,
-    lambda::Float64,
-    trunc::Float64,
-)
-    X = trunc + 1
-    if (trunc < mu)
-        alpha = 0.0
-        while Random.rand(rng) > alpha
-            X = rtinvchi2_sp(rng, lambda, trunc)
-            alpha = _exp_c(lambda / (2 * mu^2) * X)
-        end
-    else
-        while trunc < X
-            X = _igauss_sp(rng, mu, lambda)
-        end
     end
     return X
 end
@@ -137,7 +138,7 @@ end
 
 function delta_func_sp(x::Float64, mid::Float64)
     if (x >= mid)
-        return FD(_log_c(x) - _log_c(mid), 1.00 / x)
+        return FD(_log_c(x) - _log_c(mid), 1 / x)
     else
         return FD(0.5 * (1 - 1 / x) - 0.5 * (1 - 1 / mid), 0.5 / (x^2))
     end
@@ -180,9 +181,9 @@ function sp_approx_sp(x::Float64, n::Float64, z::Float64)
     else
         K2 = (x^2) - 1 / 3 - (2 / 15) * v
     end
-    log_spa = 0.5 * _log_c(0.5 * n / π) - 0.5 * _log_c(K2) + n * phi
+    log_spa = 0.5 * _log_c(0.5 * n / __PI) - 0.5 * _log_c(K2) + n * phi
     return _exp_c(log_spa)
-    #spa = (n / (2 * π))^2 / K2^2 * _exp_c(phi)^n
+    #spa = sqrt(((n / (2 * __PI))/ K2) * _exp_c(phi*n)
     #return spa
 end
 
@@ -232,7 +233,13 @@ function p_igauss_sp(x::Float64, mu::Float64, lambda::Float64)
     return Distributions.cdf(Distributions.Normal(), b) +
            (_exp_c(2 * lambda * z) * Distributions.cdf(Distributions.Normal(), a))
 end
-
+function pgamma(X::Float64, SHAPE::Float64, RATE::Float64)
+    shape = SHAPE
+    rate = 1/RATE
+    x = X
+    y = RCall.rcopy(RCall.R" pgamma($x, shape = $shape, rate = $rate) ")
+    return y
+end
 ## draw with saddle point method
 function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaSPSampler)
     n = copy(s.h)
@@ -269,7 +276,7 @@ function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaSPSampl
     rr = -lr.slope
     il = copy(ll.icept)
     ir = copy(lr.icept)
-    lcn = 0.5 * _log_c(0.5 * n / π)
+    lcn = 0.5 * _log_c(0.5 * n / __PI)
     rt2rl = sqrt(2 * rl)
     # # to cross-reference R script
     # double term1, term2, term3, term4, term5
@@ -279,8 +286,8 @@ function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaSPSampl
     # printf("l terms 1-3: %g, %g, %g\n", term1, term2, term3)
 
     wl =
-        _exp_c(0.5 * _log_c(al) - n * rt2rl + n * il + 0.5 * n * 1.0 / md) *
-        p_igauss_sp(1 / rt2rl, n, md)
+        _exp_c(0.5 * _log_c(al) - n * rt2rl + n * il + 0.5 * n * 1 / md) *
+        p_igauss_sp(md, 1 / rt2rl, n)
     #Distributions.cdf(Distributions.InverseGaussian(1.0 / rl, Float64(n)), md)
     #Distributions.cdf(Distributions.InverseGaussian(1.0 / rt2rl, Float64(n)), md)
 
@@ -291,13 +298,15 @@ function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaSPSampl
     # term4 = _exp_c((loggamma(n))
     # term5 = (1.00 - p_gamma_rate(md, n, n*rr, false))
     # printf("r terms 1-5: %g, %g, %g, %g, %g\n", term1, term2, term3, term4, term5)
-    #wr = (sqrt(ar) * sqrt(n/(2*π)) * (_exp_c(ir) / (md*n*rr)^n * gamma(n))) * (1.00 - Distributions.cdf(Distributions.Gamma(n, 1/(n * rr)), md))
+    #wr = (sqrt(ar) * sqrt(n/(2*__PI)) * (_exp_c(ir) / (md*n*rr)^n * gamma(n))) * (1.00 - Distributions.cdf(Distributions.Gamma(n, 1/(n * rr)), md))
+    
     wr =
         _exp_c(
             0.5 * _log_c(ar) +
             lcn +
-            (-n * _log_c(n * rr) + n * ir - n * _log_c(md) + loggamma(n)),
-        ) * (1 - Distributions.cdf(Distributions.Gamma(n, 1 / (n * rr)), md))
+            (-n * _log_c(n * rr) + n * ir - n * _log_c(md) + loggamma(n))
+        #) * pgamma(md, n, 1/n*rr)
+        )* (1 - Distributions.cdf(Distributions.Gamma(n, 1/(n * rr)), md))
     #(1.00 - Distributions.cdf(Distributions.Gamma(n, n*rr), md))
     # or
     #TODO p_gamma_rate problem rate/scale paramater
@@ -324,8 +333,8 @@ function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaSPSampl
             #     TruncatedInverseGaussian(1.0 / rl, Float64(n), 0.0, md),
             # )
             X = _rtigauss_sp(rng, 1 / rt2rl, n, md)
-            phi_ev = n * (il - rl * X) + 0.5 * n * ((1.0 - 1.0 / X) - (1.0 - 1.0 / md))
-            F = _exp_c(0.5 * _log_c(al) + lcn - 1.05 * _log_c(X) + phi_ev)
+            phi_ev = n * (il - rl * X) + 0.5 * n * ((1 - 1 / X) - (1 - 1 / md))
+            F = _exp_c(0.5 * _log_c(al) + lcn - 1.5 * _log_c(X) + phi_ev)
         else
             #X = Distributions.rand(rng, TruncatedGamma(n, 1 / (n * rr), md, Inf))
             X = ltgamma_sp(rng, n, n * rr, md)

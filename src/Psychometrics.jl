@@ -3,6 +3,7 @@ module Psychometrics
 import Distributions
 import Dates
 import LinearAlgebra
+import RCall
 
 include("utils.jl")
 include("dist.jl")
@@ -57,6 +58,8 @@ export Latent1D,
     set_value_from_chain!,
     set_value_from_posterior!,
     chain_append!,
+    mcmc_iter!,
+    update_estimate!,
     get_latents,
     probability,
     log_likelihood,

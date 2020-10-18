@@ -110,15 +110,34 @@ function information_latent(latent::Latent1D, parameters::Parameters3PL)
 end
 
 """
-    information_latent(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
+    information_latent(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
 
 # Description
-An abstraction of `information_latent(latent::AbstractLatent, parameters::AbstractParameters)` on examinee and item.
+An abstraction of `information_latent(latent::AbstractLatent, parameters::AbstractParameters)` on an examinee and items.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
-- **`examinee::Vector{<:AbstractExaminee}`** : Required. 
-- **`item::AbstractItem`** : Required. 
+- **`examinee::AbstractExaminee`** : Required. 
+- **`items::Vector{<:AbstractItem}`** : Required. 
+
+"""
+function information_latent(
+    examinee::AbstractExaminee,
+    items::Vector{<:AbstractItem},
+)
+    [information_latent(examinee.latent, i.parameters) for i in items]
+end
+
+"""
+    information_latent(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
+
+# Description
+An abstraction of `information_latent(latent::AbstractLatent, parameters::AbstractParameters)` on examinees and items.
+It follows the parametrization \$a(θ - b)\$.
+
+# Arguments
+- **`examinees::Vector{<:AbstractExaminee}`** : Required. 
+- **`items::Vector{<:AbstractItem}`** : Required. 
 
 """
 function information_latent(

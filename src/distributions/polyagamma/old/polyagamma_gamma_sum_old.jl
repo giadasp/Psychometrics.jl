@@ -5,7 +5,7 @@ struct PolyaGammaGammaSumSamplerOld <:
 end
 
 
-const bvec = map(x -> (x - 0.5)^2 * pi^2 * 4, 1:_TERMS)
+const bvec = map(x -> (x - 0.5)^2 * __PI^2 * 4, 1:_TERMS)
 
 ## draw sum of gammas
 function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaGammaSumSamplerOld)

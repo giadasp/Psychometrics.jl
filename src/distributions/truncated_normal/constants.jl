@@ -4,7 +4,7 @@ const _XMAX = 3.48672170399                 # Right bound
 
 const _INVH = 1631.73284006                  # = 1/h, h being the minimal interval range
 const _I0 = 3272                             # = - floor(x(0)/h) +1, was 3271
-const _ALPHA = 1.837877066409345             # = log(2*pi)
+const _ALPHA = 1.837877066409345             # = log(2*__PI)
 
 const _N = 4002 # was 4001
 

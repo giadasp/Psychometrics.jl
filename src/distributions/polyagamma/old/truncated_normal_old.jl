@@ -44,10 +44,10 @@ const XMAX = 3.48672170399# Right bound
 const KMIN = 5# if kb-ka < kmin then use lower rejection algorithm
 const INVH = 1631.73284006# = 1/h, h being the minimal interval range
 const I0 = 3271# = - floor(X_TN(0)/h)
-const ALPHA = 1.837877066409345 # = _log_c(2*pi)
+const ALPHA = 1.837877066409345 # = _log_c(2*__PI)
 const XSIZE = size(X_TN, 1)
 const SQ2 = 7.071067811865475e-1# = 1/sqrt(2)
-const SQPI = 1.772453850905516# = sqrt(pi)
+const SQPI = 1.772453850905516# = sqrt(__PI)
 
 function Distributions.std(
     d::Distributions.Truncated{Distributions.Normal{T},Distributions.Continuous},

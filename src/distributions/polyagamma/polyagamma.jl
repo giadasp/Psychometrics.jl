@@ -1,9 +1,10 @@
+const __PI = 3.14159265358979323846264338327950288419716939937510582097494459230781640628
+
 include("invert_Y.jl")
 include("polyagamma_devroye.jl")
 include("polyagamma_sp.jl")
 include("polyagamma_alt.jl")
 include("polyagamma_normal.jl")
-
 
 struct PolyaGamma{T1<:Real,T2<:Real} <: Distributions.ContinuousUnivariateDistribution
     h::T1
@@ -42,9 +43,9 @@ var(d::PolyaGamma) = d.h / (4 * d.z^3) * (sinh(d.z) - d.z) * sech(d.z / 2)^2
 ##------------------------------------------------------------------------------
 function _a_coef(n, x)
     if (x > _TRUNC)
-        return pi * (n + 0.5) * _exp_c(-(n + 0.5)^2 * pi^2 * x / 2)
+        return __PI * (n + 0.5) * _exp_c(-(n + 0.5)^2 * __PI^2 * x / 2)
     else
-        return (2 / pi / x)^1.5 * pi * (n + 0.5) * _exp_c(-2 * (n + 0.5)^2 / x)
+        return (2 / __PI / x)^1.5 * __PI * (n + 0.5) * _exp_c(-2 * (n + 0.5)^2 / x)
     end
 end
 

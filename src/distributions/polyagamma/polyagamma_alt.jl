@@ -38,7 +38,7 @@
 #   return X
 # end
 
-const PISQ = π^2
+const PISQ = __PI^2
 
 const trunc_schedule = [
     0.64,
@@ -356,7 +356,7 @@ function a_coef(n::Int64, x::Float64, h::Float64)
     d_n = 2.0 * n + h
     log_out =
         h * _log_c(2.0) - loggamma(h) + loggamma(n + h) - loggamma(n + 1) + _log_c(d_n) -
-        0.5 * _log_c(2.0 * π * (x^3)) - 0.5 * d_n * d_n / x
+        0.5 * _log_c(2.0 * __PI * (x^3)) - 0.5 * d_n * d_n / x
     out = _exp_c(log_out)
     return out::Float64
 end
@@ -395,27 +395,27 @@ function w_right(x::Float64, h::Float64, z::Float64)
     if (z != 0)
         # p.13 r(x|h)
         lambda_z = (PISQ + 4 * (z^2)) / 8
-        return (π / (2 * lambda_z))^h *
+        return (__PI / (2 * lambda_z))^h *
                Distributions.pdf(Distributions.Gamma(h, 1 / lambda_z), x)
     else
         # p.11 r(x|h)
-        return (4 / π)^h * Distributions.pdf(Distributions.Gamma(h, 1 / (PISQ / 8)), x)
+        return (4 / __PI)^h * Distributions.pdf(Distributions.Gamma(h, 1 / (PISQ / 8)), x)
     end
-    #lambda_z = π^2 * 0.125 + 0.5 * z * z
-    #p = _exp_c(h * _log_c((π/2) / lambda_z)) * (1.0-p_gamma_rate(trunc, h, lambda_z, false))
+    #lambda_z = __PI^2 * 0.125 + 0.5 * z * z
+    #p = _exp_c(h * _log_c((__PI/2) / lambda_z)) * (1.0-p_gamma_rate(trunc, h, lambda_z, false))
 end
 
 
 function g_tilde(x::Float64, h::Float64, trunc::Float64)
     if (x > trunc)
         return _exp_c(
-            h * _log_c(0.5 * π) + (h - 1) * _log_c(x) - PISQ * 0.125 * x - loggamma(h),
+            h * _log_c(0.5 * __PI) + (h - 1) * _log_c(x) - PISQ * 0.125 * x - loggamma(h),
         )
     else
         return h *
-               _exp_c(h * _log_c(2.0) - 0.5 * _log_c(2.0 * π * x * x * x) - 0.5 * h * h / x)
+               _exp_c(h * _log_c(2.0) - 0.5 * _log_c(2.0 * __PI * x * x * x) - 0.5 * h * h / x)
     end
-    # out = h * pow(2, h) * pow(2 * π * pow(x,3), -0.5) * _exp_c(-0.5 * pow(h,2) / x)
+    # out = h * pow(2, h) * pow(2 * __PI * pow(x,3), -0.5) * _exp_c(-0.5 * pow(h,2) / x)
 end
 
 ########################################
@@ -448,7 +448,7 @@ function draw_abridged(
 
     # printf("prob_right: %g\n", prob_right)
 
-    coef1_h = _exp_c(h * _log_c(2.0) - 0.5 * _log_c(2.0 * π))
+    coef1_h = _exp_c(h * _log_c(2.0) - 0.5 * _log_c(2.0 * __PI))
     # double gamma_nh_over_n = RNG::Gamma(h)
     gnh_over_gn1_gh = 1.0 # Will fill in value on first call to a_coef_recursive.
 

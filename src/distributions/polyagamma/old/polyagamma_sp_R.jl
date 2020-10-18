@@ -47,21 +47,19 @@ function sp_approx_1(x::Float64, n::Float64, z::Float64)
     t = u + z^2 / 2
     m = y_eval(-z^2)
 
-    phi = cos_rt_sp(v) + _log_c(cosh(z)) - t * x
+    phi = _log_c(cosh(z)) - _log_c(cos_rt_sp(v)) - t * x
 
     K2 = x^2 + (1 - x) / (2 * u)
     if (u < 1e-5) && (u > -1e-5)
-        K2 = x^2 - 1 / 3 - 2 / 15 * (2 * u)
+        K2 = x^2 - (1 / 3) - (2 / 15) * (2 * u)
     end
-
-    spa = (0.5 * n / pi)^0.5 * K2^-0.5 * _exp_c(n * phi)
-
+    spa = sqrt((n / (2 * __PI))/ K2) * _exp_c(phi*n)
     return spa
 end
 
 function delta_func_sp(x::Float64, mid::Float64)
     if (x >= mid)
-        return FD(_log_c(x) - _log_c(mid), 1.00 / x)
+        return FD(_log_c(x) - _log_c(mid), 1 / x)
     else
         return FD(0.5 * (1 - 1 / x) - 0.5 * (1 - 1 / mid), 0.5 / (x^2))
     end
@@ -70,8 +68,8 @@ end
 function phi_func_sp(x::Float64, z::Float64)
     v = v_eval(x, 1e-9, 1000)
     #println("v =", v)
-    u = 0.5 * v
-    t = u + 0.5 * z^2
+    u = v / 2
+    t = u + (z^2 / 2)
     return FD(_log_c(cosh(abs(z))) - _log_c(cos_rt_sp(v)) - t * x, -t)
 end
 
@@ -132,7 +130,7 @@ function rrtigauss_1(
             X = rrtinvch2_1(rng, lambda, trnc)
             l_alpha = -0.5 * lambda / mu^2 * X
             accept = _log_c(Random.rand(rng)) < l_alpha
-        end
+        end   
         ## cat("rtigauss.ch, part i:", X, "\n");
     else  ## trnc >= mu
         while (X > trnc)
@@ -140,7 +138,7 @@ function rrtigauss_1(
             X =
                 mu + 0.5 * mu^2 / lambda * Y -
                 0.5 * mu / lambda * sqrt(4 * mu * lambda * Y + (mu * Y)^2)
-            if (Random.rand(rng) > mu / (mu + X))
+            if (Random.rand(rng) > (mu / (mu + X)))
                 X = mu^2 / X
             end
         end
@@ -179,15 +177,12 @@ function rltgamma_dagpunar_1(
 
         accept = _log_c(u) <= (l_rho - l_M)
     end
-
-    x = x / b
-    y = trnc * x
-    y
+    return trnc * x / b
 end
 function pigauss(x::Float64, Z::Float64, lambda::Float64)
 
     ## I believe this works when Z = 0
-    ## Z = 1/mu
+    ##Z = 1/mu
     b = sqrt(lambda / x) * (x * Z - 1)
     a = sqrt(lambda / x) * (x * Z + 1) * -1.0
     y =
@@ -223,12 +218,12 @@ function sp_sampler_1(
     wl =
         sqrt(al) *
         _exp_c(-n * sqrt(2 * rl) + n * il + 0.5 * n - 0.5 * n * (1 - 1 / mid)) *
-        pigauss(mid, 1 / sqrt(2 * rl), n)
+        pigauss(mid, sqrt(2 * rl), n)
     #Distributions.cdf(Distributions.InverseGaussian(sqrt(2*rl), n), mid)  
     wr =
-        sqrt(ar * n / (pi*2)) *
+        sqrt(ar * n / (__PI*2)) *
         _exp_c(-n * _log_c(n * rr) + n * ir - n * _log_c(mid) + loggamma(n)) *
-        (1 - Distributions.cdf(Distributions.Gamma(n, 1 / n * rr), mid))
+        (1 - Distributions.cdf(Distributions.Gamma(n, 1/(n * rr)), mid))
 
     wt = wl + wr
     pl = wl / wt
@@ -246,7 +241,7 @@ function sp_sampler_1(
             X = rrtigauss_1(rng, 1 / sqrt(2 * rl), n, mid)
             ## while (X > mid) X = rigauss.1(1/sqrt(2*rl), n)
             phi_ev = n * (-rl * X + il) + 0.5 * n * ((1 - 1 / X) - (1 - 1 / mid))
-            FX = sqrt(al*  n / (2*pi)) * X^(-1.5) * _exp_c(phi_ev)
+            FX = sqrt(al * n / (2*__PI)) * X^(-1.5) * _exp_c(phi_ev)
 
         else
             ## sample right
@@ -255,7 +250,7 @@ function sp_sampler_1(
             #X = Distributions.rand(rng, TruncatedGamma(n, 1 / (n * rr), mid, Inf))
 
             phi_ev = n * (-rr * X + ir) + n * (_log_c(X) - _log_c(mid))
-            FX = ar^0.5 * (0.5 * n / pi)^0.5 * _exp_c(phi_ev) / X
+            FX = sqrt(ar * 0.5 * n / __PI) * _exp_c(phi_ev) / X
         end
 
         spa = sp_approx_1(X, n, z)
