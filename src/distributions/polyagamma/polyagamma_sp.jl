@@ -233,13 +233,13 @@ function p_igauss_sp(x::Float64, mu::Float64, lambda::Float64)
     return Distributions.cdf(Distributions.Normal(), b) +
            (_exp_c(2 * lambda * z) * Distributions.cdf(Distributions.Normal(), a))
 end
-function pgamma(X::Float64, SHAPE::Float64, RATE::Float64)
-    shape = SHAPE
-    rate = 1/RATE
-    x = X
-    y = RCall.rcopy(RCall.R" pgamma($x, shape = $shape, rate = $rate) ")
-    return y
-end
+# function pgamma(X::Float64, SHAPE::Float64, RATE::Float64)
+#     shape = SHAPE
+#     rate = 1/RATE
+#     x = X
+#     y = RCall.rcopy(RCall.R" pgamma($x, shape = $shape, rate = $rate) ")
+#     return y
+# end
 ## draw with saddle point method
 function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaSPSampler)
     n = copy(s.h)
