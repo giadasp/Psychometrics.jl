@@ -111,12 +111,12 @@ function b_sampler(vec_theta, vec_a_id, mat_w_id, mat_k_id, b_prior_mu, b_prior_
     b_mu = b_variance * (((.-vec_a_id_vec)' * z_b) + (b_prior_mu / b_prior_var)) # ok
     return rand(Distributions.Normal(b_mu, sqrt(b_variance)))
 end
-using RCall
-R""" 
-rpg_sp <- function(x){
-BayesLogit::rpg(1,1,x)
-}
-"""
+# using RCall
+# R""" 
+# rpg_sp <- function(x){
+# BayesLogit::rpg(1,1,x)
+# }
+# """
 function w_sampler(vec_theta, vec_a, vec_b, N, I)
     #w_temp = [vec_a[i] * (vec_theta[p] - vec_b[i]) for p = 1:N, i = 1:I]
     #pg = rcopy(R"apply($w_temp, c(1,2), rpg_sp)")
