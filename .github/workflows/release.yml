@@ -52,10 +52,10 @@ jobs:
       - name: Upload Github Release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          repo_token: ${GITHUB_TOKEN}
-          automatic_release_tag: v${VERSION}
-          prerelease: ${IS_SNAPSHOT}
-          title: v${VERSION}
+          repo_token: ${{ env.GITHUB_TOKEN }}
+          automatic_release_tag: v${{ env.VERSION }}
+          prerelease: ${{ env.IS_SNAPSHOT }}
+          title: v${{ env.VERSION }}
           files: |
             src/*
             test/*
