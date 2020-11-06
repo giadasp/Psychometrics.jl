@@ -23,7 +23,7 @@ Item1PL(idx, id, content) = new(idx, id, content, Parameters1PL(), true)
 Randomly generates a new 1PL item with custom index, id, content features and default 1PL item parameters 
 (Look at (`Parameters1PL`)[#Psychometrics.Parameters1PL] for the defaults).
 """
-mutable struct Item1PL <: AbstractItem
+struct Item1PL <: AbstractItem
 idx::Int64
 id::String
 content::Vector{String}

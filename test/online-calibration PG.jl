@@ -6,13 +6,20 @@ using LinearAlgebra
 using Dates
 using Random
 
+import Base.copy
+
+function copy(examinee::Examinee1D) 
+    e = Examinee1D(examinee.idx, examinee.id, examinee.latent)
+    return e::Examinee1D
+end
+
 const I = 100
 I_to_calibrate = 20
 const N = 2_000
 test_length = 30
 field_test_items = 3
 true_items  = test_length - field_test_items
-iter_mcmc_latent = 4_000
+iter_mcmc_latent = 2_000
 iter_mcmc_item = 2_000
 #after how many responses update item parameter estimates
 required_responses = 500
@@ -49,7 +56,8 @@ responses_not_calibrated = Response[]
 
 latent_est_prior = Normal(0, 1);
 latent_est_bounds = [-6.0, 6.0];
-examinees_est = [Examinee1D(e, string("examinee_",e), Latent1D(latent_est_prior, latent_est_bounds)) for e = 1 : N]; 
+    examinees_est = [Examinee1D(e, string("examinee_",e), Latent1D(latent_est_prior, latent_est_bounds)) for e = 1 : N]; 
+
 #set starting value taking a random value in the interval -0.5:0.5
 map(e -> begin e.latent.val = Random.rand(-0.5:0.5) end, examinees_est)
 items_idx_per_examinee = Vector{Vector{Int64}}(undef, N);
@@ -57,40 +65,41 @@ examinees_est_theta = [[zero(Float64) for i=1:test_length] for n=1:N];
 #START ONLINE-CALIBRATION
 
 for n in 1:N
-    idx_n = examinees_est[n].idx
+    examinees_n = copy(examinees_est[n])
+    idx_n = examinees_n.idx
     items_idx_n = Int64[]
     responses_n = responses_per_examinee[n]
     println("n: ", n)
     #println("true: ", examinees[n].latent.val)
     available_items_idx = map(i -> i.idx, filter(i2 -> i2.calibrated, items_est))
     for i in 1:true_items
-        next_item_idx = find_best_item(examinees_est[n], items_est[available_items_idx]);
+        next_item_idx = find_best_item(examinees_n, items_est[available_items_idx]);
         push!(items_idx_n, next_item_idx);
         available_items_idx = setdiff(available_items_idx, next_item_idx)
         sort!(items_idx_n)
         resp_n = responses_n[items_idx_n]
         for iter in 1:iter_mcmc_latent
-            W = generate_w(items_est[items_idx_n], examinees_est[n])
-            mcmc_iter!(examinees_est[n], items_est[items_idx_n], responses_n[items_idx_n], map( w -> w.val, W); sampling = true)
+            W = generate_w(items_est[items_idx_n], examinees_n)
+            mcmc_iter!(examinees_n, items_est[items_idx_n], responses_n[items_idx_n], map( w -> w.val, W); sampling = true)
         end
-        update_estimate!(examinees_est[n])
-        examinees_est_theta[n][i] = examinees_est[n].latent.val
+        update_estimate!(examinees_n)
+        examinees_est_theta[n][i] = examinees_n.latent.val
         #println("est_BIAS: ", examinees_est[n].latent.val - examinees[n].latent.val)
     end
     available_items_idx = map(i -> i.idx, filter(i2 -> !i2.calibrated, items_est))
     if size(available_items_idx,1) > 0
         for i in 1:field_test_items
-            next_item_idx = find_best_item(examinees_est[n], items_est[available_items_idx]; method = "D-gain");
+            next_item_idx = find_best_item(examinees_n, items_est[available_items_idx]; method = "D-gain");
             push!(items_idx_n, next_item_idx);
             available_items_idx = setdiff(available_items_idx, next_item_idx)
             sort!(items_idx_n)
             resp_n = responses_n[items_idx_n]
             for iter in 1:iter_mcmc_latent
-                W = generate_w(items_est[items_idx_n], examinees_est[n])
-                mcmc_iter!(examinees_est[n], items_est[items_idx_n], responses_n[items_idx_n], map( w -> w.val, W); sampling = false)
+                W = generate_w(items_est[items_idx_n], examinees_n)
+                mcmc_iter!(examinees_n, items_est[items_idx_n], responses_n[items_idx_n], map( w -> w.val, W); sampling = false)
             end
-            update_estimate!(examinees_est[n])
-            examinees_est_theta[n][i+(true_items)] = examinees_est[n].latent.val
+            update_estimate!(examinees_n)
+            examinees_est_theta[n][i+(true_items)] = examinees_n.latent.val
             #println("est_BIAS: ", examinees_est[n].latent.val - examinees[n].latent.val)
             push!(responses_not_calibrated, responses_n[next_item_idx])
             resp_item = sort(filter(r -> r.item_idx == next_item_idx, responses_not_calibrated), by = r -> r.examinee_idx)
@@ -109,7 +118,8 @@ for n in 1:N
             end
         end
     end
-    examinees_est[n].latent.chain=Float64[]
+    examinees_n.latent.chain=Float64[]
+    examinees[n] = examinees_n
     items_idx_per_examinee[n] = copy(items_idx_n)
 end
 

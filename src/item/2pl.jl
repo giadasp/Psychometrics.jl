@@ -23,7 +23,7 @@ Item2PL(idx, id, content) = new(idx, id, content, Parameters2PL(), true)
 Randomly generates a new 2PL item with custom index, id, content features and default 2PL item parameters 
 (Look at (`Parameters2PL`)[#Psychometrics.Parameters2PL] for the defaults).
 """
-mutable struct Item2PL <: AbstractItem
+struct Item2PL <: AbstractItem
 idx::Int64
 id::String
 content::Vector{String}

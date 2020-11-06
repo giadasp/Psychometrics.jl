@@ -22,7 +22,7 @@ Creates a new Examinee with custom index, id and 1-dimensional latent variable.
 Randomly generates an Examinee with custom index and id and with a default 1-dimensional latent variable 
 (Look at (`Latent1D`)[#Psychometrics.Latent1D] for the defaults).
 """
-mutable struct Examinee1D <: AbstractExaminee
+struct Examinee1D <: AbstractExaminee
     idx::Int64
     id::String
     latent::Latent1D
@@ -56,7 +56,7 @@ Creates a new Examinee with custom index, id and a generic latent variable.
 Randomly generates an Examinee with custom index and id and with a default 1-dimensional latent variable 
 (Look at (`Latent1D`)[#Psychometrics.Latent1D] for the defaults).
 """
-mutable struct Examinee <: AbstractExaminee
+struct Examinee <: AbstractExaminee
     idx::Int64
     id::String
     latent::AbstractLatent

@@ -26,6 +26,7 @@ function _p1p(x::Float64)
     return x * (1 - x)::Float64
 end
 
+Base.copy(x::T) where T = T([getfield(x, k) for k ∈ fieldnames(T)]...)
 # log1pexp(x::Real) = x < 18.0 ? _log1p_c(_exp_c(x)) : x < 33.3 ? x + _exp_c(-x) : oftype(_exp_c(-x), x)
 
 # """
