@@ -49,6 +49,12 @@ jobs:
           REPO: ${{ env.REPO }}
           DEVBRANCH: ${{ env.DEVBRANCH }}
 
+      - name: Compress target directories
+        uses: thedoctor0/zip-release@master
+        with:
+          filename: "psychometrics.zip"
+          exclusions: "*.git* docs"
+
       - name: Upload Github Release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -57,8 +63,4 @@ jobs:
           prerelease: ${{ env.IS_SNAPSHOT }}
           title: v${{ env.VERSION }}
           files: |
-            src/*
-            test/*
-            Manifest.toml
-            Project.toml
-            LICENSE
+            psychometrics.zip
