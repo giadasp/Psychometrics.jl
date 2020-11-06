@@ -11,4 +11,4 @@ makedocs(
     doctest = true,
 )
 
-deploydocs(repo = "github.com/giadasp/Psychometrics.jl.git", devurl = "docs")
+deploydocs(repo = ENV["REPO"], devurl = "docs", devbranch = ENV["DEVBRANCH"])
