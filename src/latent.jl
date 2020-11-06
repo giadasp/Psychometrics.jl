@@ -23,7 +23,7 @@ Creates a new 1-dimensional latent variable with custom fields.
     Latent1D()
 
 Randomly generates a value for the 1-dimensional latent variable and assigns a default standardized Gaussian prior and posterior
-    Latent1D(bounds, posterior)
+    Latent1D(dist, bounds)
 
 Randomly generates a value for the 1-dimensional latent variable and assigns a custom univariate distribution to prior and posterior with specific bounds.
 """
@@ -73,7 +73,7 @@ Creates a new N-dimensional latent variable with custom fields.
     LatentND()
 
 Randomly generates a value for the N-dimensional latent variable and assigns a default standardized Gaussian prior and posterior
-    LatentND(bounds, posterior)
+    LatentND(dist, bounds)
 
 Randomly generates a value for the N-dimensional latent variable and assigns a custom multivariate distribution to prior and posterior with specific bounds.
 """
