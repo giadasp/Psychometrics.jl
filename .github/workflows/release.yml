@@ -7,7 +7,6 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  TERM: dumb
 
 jobs:
   build-and-release:
@@ -35,7 +34,7 @@ jobs:
 
       - name: Setup environment variables
         run: |
-          VERSION=`cat Project.toml | grep "version" | cut -d '=' -f2 | tr -d ' ' '"' '\''`
+          VERSION=`cat Project.toml | grep "version" | cut -d '=' -f2 | tr -d ' ' '"' \'`
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
           REPO=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git
           echo "REPO=${REPO}" >> $GITHUB_ENV
