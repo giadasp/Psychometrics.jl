@@ -1,9 +1,9 @@
+__precompile__(true)
 module Psychometrics
 
 import Distributions
 import Dates
 import LinearAlgebra
-import RCall
 
 include("utils.jl")
 include("dist.jl")
@@ -17,6 +17,7 @@ include("information.jl")
 include("distributions/distributions.jl")
 include("online/online.jl")
 include("bayesian.jl")
+include("calibration/PolyaGamma_MCMC.jl")
 
 
 export Latent1D,
@@ -75,5 +76,6 @@ export Latent1D,
     truncate_rand,
     rand,
     find_best_item,
-    find_best_examinee
+    find_best_examinee,
+    calibrate_item!
 end # module
