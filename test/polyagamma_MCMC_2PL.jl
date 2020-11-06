@@ -6,7 +6,7 @@
  using Dates
  using Random
 
-const I = 20
+const I = 1
 const N = 500
 
 # ITEM PARAMETERS AND LATENTS 
@@ -44,15 +44,17 @@ map( e -> chain_append!(e), examinees_est)
 map( i -> set_value_from_chain!(i), items_est)
 map( e -> set_value_from_chain!(e), examinees_est)
 
-
+examinees_est[1].latent.val = examinees[1].latent.val -0.2
 for iter = 1:Iter
-    if mod(iter,100)==0 
+    if mod(iter, 100) == 0 
         println(iter)
     end
-    W = generate_w(items, examinees_kkper_item)
-    map( i -> mcmc_iter!(i, examinees_per_item[i.idx], responses_per_item[i.idx], map( y -> y.val, sort(filter(w -> w.i_idx == i.idx, W), by= x -> x.e_idx));sampling=true), items_est)
-    map( e -> mcmc_iter!(e, items_per_examinee[e.idx], responses_per_examinee[e.idx], map( y -> y.val, sort(filter(w -> w.e_idx == e.idx, W), by= x -> x.i_idx));sampling=true), examinees_est)
+    W = generate_w(items, examinees_per_item)
+    map( i -> mcmc_iter!(i, examinees_per_item[i.idx], responses_per_item[i.idx], map( y -> y.val, sort(filter(w -> w.i_idx == i.idx, W), by= x -> x.e_idx));sampling = true), items_est)
+    #map( e -> mcmc_iter!(e, items_per_examinee[e.idx], responses_per_examinee[e.idx], map( y -> y.val, sort(filter(w -> w.e_idx == e.idx, W), by= x -> x.i_idx));sampling = false), examinees_est)
 end
+map( i -> update_estimate!(i), items_est)
+
 
 
 mean_a = map(i -> mean(hcat(i.parameters.chain...)[1,:]), items_est);

@@ -6,20 +6,13 @@ using LinearAlgebra
 using Dates
 using Random
 
-function calibrate_item!(item::AbstractItem, responses::Vector{Response}, examinees::Vector{<:AbstractExaminee}; mcmc_iter = 4_000)
-    for iter in 1:mcmc_iter 
-        W = generate_w(item, examinees)
-        mcmc_iter!(item, examinees, responses, map( y -> y.val, W); sampling = true)
-    end
-    update_estimate!(item)
-end
 const I = 100
 I_to_calibrate = 20
 const N = 2_000
 test_length = 30
 field_test_items = 3
 true_items  = test_length - field_test_items
-iter_mcmc_latent = 2_000
+iter_mcmc_latent = 4_000
 iter_mcmc_item = 2_000
 #after how many responses update item parameter estimates
 required_responses = 500
@@ -92,7 +85,7 @@ for n in 1:N
             available_items_idx = setdiff(available_items_idx, next_item_idx)
             sort!(items_idx_n)
             resp_n = responses_n[items_idx_n]
-            for iter in 1:iter_mcmc_item 
+            for iter in 1:iter_mcmc_latent
                 W = generate_w(items_est[items_idx_n], examinees_est[n])
                 mcmc_iter!(examinees_est[n], items_est[items_idx_n], responses_n[items_idx_n], map( w -> w.val, W); sampling = false)
             end
@@ -110,13 +103,13 @@ for n in 1:N
                 item = items_est[next_item_idx]
                 calibrate_item!(item, resp_item, examinees_est_item)
                 println("est pars ", item.parameters.a," ",item.parameters.b)
-
             end
             if size(resp_item, 1)>= maximum_required_responses
                 item.calibrated = true
             end
         end
     end
+    examinees_est[n].latent.chain=Float64[]
     items_idx_per_examinee[n] = copy(items_idx_n)
 end
 
