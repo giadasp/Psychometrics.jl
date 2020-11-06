@@ -20,7 +20,7 @@ A generic item struct.
   - **`calibrated::Bool`**: Tells if the item has been already calibrated.
 
 # Factories
-    Item(idx, id, content, parameters, calibrated) = new(idx, id, content, parameters, calibrated)
+    Item(idx, id, content, parameters) = new(idx, id, content, parameters)
 
 Creates a new generic item with custom index, id, content features and item parameters.
 
@@ -35,13 +35,12 @@ struct Item <: AbstractItem
     id::String
     content::Vector{String}
     parameters::AbstractParameters
-    calibrated::Bool
 
     # Factories
-    Item(idx, id, content, parameters, calibrated) = new(idx, id, content, parameters, calibrated)
+    Item(idx, id, content, parameters) = new(idx, id, content, parameters)
 
     # Random initilizers
-    Item(idx, id, content) = new(idx, id, content, Parameters1PL(), true)
+    Item(idx, id, content) = new(idx, id, content, Parameters1PL())
 end
 
 """

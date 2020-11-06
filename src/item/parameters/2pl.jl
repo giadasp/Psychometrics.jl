@@ -9,9 +9,10 @@ mutable struct Parameters2PL <: AbstractParameters
     posterior::Distributions.MultivariateDistribution
     chain::Vector{Vector{Float64}}
     expected_information::Matrix{Float64}
+    calibrated::Bool
 
-    Parameters2PL(a, bounds_a, b, bounds_b, prior, posterior, chain, expected_information) =
-        new(a, bounds_a, b, bounds_b, prior, posterior, chain, expected_information)
+    Parameters2PL(a, bounds_a, b, bounds_b, prior, posterior, chain, expected_information, calibrated) =
+        new(a, bounds_a, b, bounds_b, prior, posterior, chain, expected_information, calibrated)
 
     # Random Initializers
     function Parameters2PL(
@@ -20,7 +21,7 @@ mutable struct Parameters2PL <: AbstractParameters
         bounds_b,
     )
         pars = truncate_rand(bivariate_dist, [bounds_a, bounds_b])
-        new(
+        Parameters2PL(
             pars[1][1],
             bounds_a,
             pars[1][2],
@@ -29,6 +30,7 @@ mutable struct Parameters2PL <: AbstractParameters
             bivariate_dist,
             [pars[1]],
             [1.0 0.0; 0.0 1.0],
+            true,
         )
     end
 
@@ -40,7 +42,7 @@ mutable struct Parameters2PL <: AbstractParameters
             ]),
             [1e-5, 5.0],
             [-6.0, 6.0],
-        )
+            )
     end
 
 end

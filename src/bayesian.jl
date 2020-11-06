@@ -1,4 +1,4 @@
-mutable struct PolyaGammaSample
+struct PolyaGammaSample
     i_idx::Int64
     e_idx::Int64
     val::Float64
@@ -11,23 +11,25 @@ function update_posterior!(
     responses::Vector{<:AbstractResponse}, #only responses of item sorted by e.idx
     W::Vector{Float64}, #sorted by e.idx
 )
-
+    prior = item.parameters.prior.v
+    a =  item.parameters.a
+    b = item.parameters.b
     #W = map( e -> Distributions.rand(PolyaGammaDevRoye1Sampler(1.0, item.parameters.a *(e.latent.val - item.parameters.b))), examinees)
     sigma2 = mapreduce(
-        (e, w) -> [(e.latent.val - item.parameters.b)^2 * w, (item.parameters.a)^2 * w],
+        (e, w) -> [(e.latent.val - b)^2, a^2 ] .* w,
         +,
         examinees,
         W,
     )
-    sigma2 = 1 ./ (sigma2 + (1 ./ Distributions.var.(item.parameters.prior.v)))
+    sigma2 = 1 ./ (sigma2 + (1 ./ Distributions.var.(prior)))
     mu = mapreduce(
         (e, w, r) -> [
-            (e.latent.val - item.parameters.b) *
+            (e.latent.val - b) *
             (r.val - 0.5),
-            -item.parameters.a * (
+            -a * (
                 #(get_responses_by_examinee_id(e.id, responses)[1].val - 0.5) -
                 (r.val-0.5) -
-                (item.parameters.a * e.latent.val * w)
+                (a * e.latent.val * w)
             ),
         ],
         +,
@@ -38,8 +40,8 @@ function update_posterior!(
     mu =
         sigma2 .* (
             mu + (
-                Distributions.mean.(item.parameters.prior.v) ./
-                Distributions.var.(item.parameters.prior.v)
+                Distributions.mean.(prior) ./
+                Distributions.var.(prior)
             )
         )
 
@@ -55,8 +57,9 @@ function update_posterior!(
     responses_e::Vector{<:AbstractResponse}, #only responses of examinee sorted by i.idx
     W::Vector{Float64},
 )
+    prior = examinee.latent.prior
     sigma2 = mapreduce((i, w) -> (i.parameters.a^2) * w, +, items_e, W)
-    sigma2 = 1 / (sigma2 + (1 / Distributions.var(examinee.latent.prior)))
+    sigma2 = 1 / (sigma2 + (1 / Distributions.var(prior)))
     mu =
         sigma2 * (
             mapreduce(
@@ -70,7 +73,7 @@ function update_posterior!(
                 items_e,
                 W,
                 responses_e
-            ) + (examinee.latent.prior.μ / Distributions.var(examinee.latent.prior))
+            ) + (prior.μ / Distributions.var(prior))
         )
     examinee.latent.posterior = Distributions.Normal(mu, sqrt(sigma2))
 end

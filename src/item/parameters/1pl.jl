@@ -11,17 +11,18 @@ prior::Distributions.UnivariateDistribution
 posterior::Distributions.UnivariateDistribution
 chain::Vector{Float64}
 expected_information::Float64
+calibrated::Bool
 
-Parameters1PL(b, bounds_b, prior, posterior, chain, expected_information) =
-    new(b, bounds_b, prior, posterior, chain, expected_information)
+Parameters1PL(b, bounds_b, prior, posterior, chain, expected_information, calibrated) =
+    new(b, bounds_b, prior, posterior, chain, expected_information, calibrated)
 
 # Random Initializers
 function Parameters1PL(dist::Distributions.UnivariateDistribution, bounds_b)
     pars = truncate_rand(dist, bounds_b)
-    new(pars[1][1], bounds_b, dist, dist, [pars[1]], 1.0)
+    new(pars[1][1], bounds_b, dist, dist, [pars[1]], 1.0, true)
 end
 
 function Parameters1PL()
-    Parameters1PL(Distributions.Normal(0, 1), [-6.0, 6.0])
+    Parameters1PL(Distributions.Normal(0, 1), [-6.0, 6.0], true)
 end
 end

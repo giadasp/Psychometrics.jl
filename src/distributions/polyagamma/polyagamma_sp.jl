@@ -15,14 +15,14 @@
 # You should have received a copy of the GNU General Public License along with
 # BayesLogit.  If not, see <https:#www.gnu.org/licenses/>.
 
-mutable struct FD
+struct FD
     val::Float64
     der::Float64
     FD() = new(0.0, 0.0)
     FD(val, der) = new(val, der)
 end
 
-mutable struct Line
+struct Line
     slope::Float64
     icept::Float64
     Line() = new(0.0, 0.0)

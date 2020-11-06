@@ -10,9 +10,10 @@ mutable struct ParametersNPL <: AbstractParameters
     posterior::Distributions.MultivariateDistribution
     chain::Vector{Vector{Float64}}
     expected_information::Matrix{Float64}
+    calibrated::Bool
 
-    ParametersNPL(a, bounds_a, b, bounds_b, prior, posterior, chain, expected_information) =
-        new(a, bounds_a, b, bounds_b, prior, posterior, chain, expected_information)
+    ParametersNPL(a, bounds_a, b, bounds_b, prior, posterior, chain, expected_information, calibrated) =
+        new(a, bounds_a, b, bounds_b, prior, posterior, chain, expected_information, calibrated)
 
     # Random Initializers
 
@@ -32,6 +33,7 @@ mutable struct ParametersNPL <: AbstractParameters
             N_variate_dist,
             [pars[1]],
             LinearAlgebra.I(N),
+            true
         )
     end
 

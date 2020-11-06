@@ -10,10 +10,9 @@ Item struct under the 3-parameter logistic model.
 - **`id::String`**: A string that identifies the item.
 - **`content::Vector{String}`**: A string vector containing the content features of an item.
 - **`parameters::Parameters2PL`**: A `Parameters3PL` object.
-- **`calibrated::Bool`**: Tells if the item has been already calibrated.
 
 # Factories
-Item3PL(idx, id, content, parameters, calibrated) = new(idx, id, content, parameters, calibrated)
+Item3PL(idx, id, content, parameters) = new(idx, id, content, parameters)
 
 Creates a new 3PL item with custom index, id, content features and item parameters.
 
@@ -28,13 +27,12 @@ idx::Int64
 id::String
 content::Vector{String}
 parameters::Parameters3PL
-calibrated::Bool
 
 # Factories
-Item3PL(idx, id, content, parameters, calibrated) = new(idx, id, content, parameters, calibrated)
+Item3PL(idx, id, content, parameters) = new(idx, id, content, parameters)
 
 # Random initilizers
-Item3PL(idx, id, content) = new(idx, id, content, Parameters3PL(), true)
+Item3PL(idx, id, content) = new(idx, id, content, Parameters3PL())
 end
 
 """

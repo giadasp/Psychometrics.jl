@@ -11,6 +11,7 @@ mutable struct Parameters3PL <: AbstractParameters
     posterior::Distributions.MultivariateDistribution
     chain::Vector{Vector{Float64}}
     expected_information::Matrix{Float64}
+    calibrated::Bool
 
     Parameters3PL(
         a,
@@ -23,6 +24,7 @@ mutable struct Parameters3PL <: AbstractParameters
         posterior,
         chain,
         expected_information,
+        calibrated,
     ) = new(
         a,
         bounds_a,
@@ -34,6 +36,7 @@ mutable struct Parameters3PL <: AbstractParameters
         posterior,
         chain,
         expected_information,
+        calibrated,
     )
 
     # Random Initializers
@@ -56,6 +59,7 @@ mutable struct Parameters3PL <: AbstractParameters
             trivariate_dist,
             [pars[1]],
             [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0],
+            true,
         )
     end
 
@@ -68,7 +72,7 @@ mutable struct Parameters3PL <: AbstractParameters
             ]),
             [1e-5, 5.0],
             [-6.0, 6.0],
-            [1e-5, 1.0 - 1e-5],
-        )
+            [1e-5, 1.0 - 1e-5]
+            )
     end
 end
