@@ -7,6 +7,7 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  TERM: dumb
 
 jobs:
   build-and-release:
@@ -35,7 +36,7 @@ jobs:
       - name: Build, deploy and upload docs
         run: julia --project=docs --color=yes docs/make.jl
         env:
-          REPO: ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git
+          REPO: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git
 
       - name: Fetch project version
         run: |
