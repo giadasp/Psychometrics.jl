@@ -39,6 +39,7 @@ jobs:
           REPO=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git
           echo "REPO=${REPO}" >> $GITHUB_ENV
           DEVBRANCH=release
+          echo "DEVBRANCH=${DEVBRANCH}" >> $GITHUB_ENV
 
       - name: Build, deploy and upload docs
         run: julia --project=docs --color=yes docs/make.jl
@@ -46,7 +47,16 @@ jobs:
           REPO: ${{ env.REPO }}
           DEVBRANCH: ${{ env.DEVBRANCH }}
 
-      - name: Fetch project version
-        run: |
-          echo $VERSION
-      #- name: Create a new Github Release
+      - name: Upload Github Release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${GITHUB_TOKEN}"
+          automatic_release_tag: "${VERSION}"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            src/*
+            test/*
+            Manifest.toml
+            Project.toml
+            LICENSE
