@@ -11,4 +11,4 @@ makedocs(
     doctest = true,
 )
 
-deploydocs(repo = ENV["REPO"], devurl = "docs")
+deploydocs(repo = ENV["REPO"], devurl = "docs", devbranch = ENV["DEVBRANCH"])
