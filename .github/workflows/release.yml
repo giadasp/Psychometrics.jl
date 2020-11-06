@@ -39,6 +39,6 @@ jobs:
 
       - name: Fetch project version
         run: |
-          VERSION = `cat Project.toml | grep "version" | cut -d '=' -f2 | tr -d ' ' `
+          VERSION=`cat Project.toml | grep "version" | cut -d '=' -f2 | tr -d ' ' `
           echo $VERSION
       #- name: Create a new Github Release
