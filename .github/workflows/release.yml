@@ -40,6 +40,8 @@ jobs:
           echo "REPO=${REPO}" >> $GITHUB_ENV
           DEVBRANCH=release
           echo "DEVBRANCH=${DEVBRANCH}" >> $GITHUB_ENV
+          IS_SNAPSHOT=`if [[ "${VERSION}" == 0.* ]] ; then echo "true" ; else echo "false" ; fi`
+          echo "IS_SNAPSHOT=${IS_SNAPSHOT}" >> $GITHUB_ENV
 
       - name: Build, deploy and upload docs
         run: julia --project=docs --color=yes docs/make.jl
@@ -50,10 +52,10 @@ jobs:
       - name: Upload Github Release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          repo_token: "${GITHUB_TOKEN}"
-          automatic_release_tag: "${VERSION}"
-          prerelease: true
-          title: "Development Build"
+          repo_token: ${GITHUB_TOKEN}
+          automatic_release_tag: v${VERSION}
+          prerelease: ${IS_SNAPSHOT}
+          title: v${VERSION}
           files: |
             src/*
             test/*
