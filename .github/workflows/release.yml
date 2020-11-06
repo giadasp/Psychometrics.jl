@@ -35,10 +35,10 @@ jobs:
       - name: Build, deploy and upload docs
         run: julia --project=docs --color=yes docs/make.jl
         env:
-          REPO: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git
+          REPO: ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git
 
       - name: Fetch project version
         run: |
-          VERSION=`cat Project.toml | grep "version" | cut -d '=' -f2 | tr -d ' ' `
+          VERSION=`cat Project.toml | grep "version" | cut -d '=' -f2 | tr -d ' ' \" \'' `
           echo $VERSION
       #- name: Create a new Github Release
