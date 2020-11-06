@@ -8,14 +8,14 @@ import RCall
 include("utils.jl")
 include("dist.jl")
 include("latent.jl")
-include("parameters.jl")
 include("examinee.jl")
-include("item.jl")
+include("item/item.jl")
 include("response.jl")
 include("probability.jl")
 include("likelihood.jl")
 include("information.jl")
 include("distributions/distributions.jl")
+include("online/online.jl")
 include("bayesian.jl")
 
 
@@ -73,6 +73,7 @@ export Latent1D,
     PolyaGamma,
     TruncatedGamma,
     truncate_rand,
-    rand
-
+    rand,
+    find_best_item,
+    find_best_examinee
 end # module

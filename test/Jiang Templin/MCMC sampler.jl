@@ -22,7 +22,7 @@ responses = generate_response(examinees, items);
 response_matrix = get_response_matrix(responses, I, N);
 
 #Set Seeds for Random Generation
-Random.seed!()
+#Random.seed!()
 
 # function tr_norm_gen(number, mu, v)
 #     temp_u = Distributions.rand(Distributions.Uniform(zero(Float64),one(Float64)), number)
@@ -191,10 +191,10 @@ for iter = 2:Iter
     sav_b[iter, :] .= copy(sav_b_iter)
 end
 
-
-mean_a = [median(sav_a[Iter-100:Iter, i]) for i = 1:I];
-mean_b = [mean(sav_b[Iter-100:Iter, i]) for i = 1:I];
-mean_theta = [mean(sav_theta[Iter-100:Iter, i]) for i = 1:N];
+sampled = sample(1000:4000,1000)
+mean_a = [mean(sav_a[sampled, i]) for i = 1:I];
+mean_b = [mean(sav_b[sampled, i]) for i = 1:I];
+mean_theta = [mean(sav_theta[sampled, i]) for i = 1:N];
 
 # hcat(map(i -> i.parameters.a, items), mean_a)
 # hcat(map(i -> i.parameters.b, items), mean_b)
