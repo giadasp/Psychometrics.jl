@@ -30,7 +30,7 @@ jobs:
           version: ${{ matrix.julia-version }}
 
       - name: Install dependencies
-        run: --project=docs -e 'using Pkg; Pkg.instantiate()'
+        run: julia --project=docs -e 'using Pkg; Pkg.instantiate()'
 
       - name: Build, deploy and upload docs
         run: julia --project=docs --color=yes docs/make.jl
