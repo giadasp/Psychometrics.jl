@@ -1,6 +1,6 @@
 abstract type AbstractResponse end
 
-mutable struct Response <: AbstractResponse
+struct Response <: AbstractResponse
     item_idx::Int64
     examinee_idx::Int64
     item_id::String
