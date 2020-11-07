@@ -50,10 +50,8 @@ jobs:
           DEVBRANCH: ${{ env.DEVBRANCH }}
 
       - name: Compress target directories
-        uses: thedoctor0/zip-release@master
-        with:
-          filename: "psychometrics.zip"
-          exclusions: "*.git* docs/**\\*"
+        run: |
+          zip -r psychometrics.zip src/ test/ LICENSE *.toml
 
       - name: Upload Github Release
         uses: "marvinpinto/action-automatic-releases@latest"
