@@ -26,8 +26,8 @@ true_items  = test_length - field_test_items
 iter_mcmc_latent = 2_000
 iter_mcmc_item = 2_000
 #after how many responses update item parameter estimates
-required_responses = 500
-maximum_required_responses = 500
+required_responses = 100
+maximum_required_responses = 100
 
 # ITEM PARAMETERS AND LATENTS 
 
@@ -112,6 +112,7 @@ for n in 1:N
             end
             examinees_n.latent.chain = chain_n
             update_estimate!(examinees_n)
+            examinees_est[n] = copy(examinees_n)
             #examinees_n.latent.chain=Float64[]
             examinees_est_theta[n][i+(true_items)] = examinees_n.latent.val
             #println("est_BIAS: ", examinees_est[n].latent.val - examinees[n].latent.val)
@@ -122,10 +123,10 @@ for n in 1:N
                 println("# responses: ", size(resp_item, 1))
                 println("calibrate item ", next_item_idx)
                 println("true pars ", items[next_item_idx].parameters.a," ", items[next_item_idx].parameters.b)
+                println(map( r -> r.examinee_idx, resp_item))
                 examinees_est_item = examinees_est[map( r -> r.examinee_idx, resp_item)]
-                item = items_est[next_item_idx]
-                calibrate_item!(item, resp_item, examinees_est_item)
-                println("est pars ", item.parameters.a," ",item.parameters.b)
+                calibrate_item!(items_est[next_item_idx], resp_item, examinees_est_item)
+                println("est pars ", items_est[next_item_idx].parameters.a," ",items_est[next_item_idx].parameters.b)
             end
             if size(resp_item, 1)>= maximum_required_responses
                 item.parameters.calibrated = true
@@ -133,13 +134,12 @@ for n in 1:N
         end
     end
     println("est_BIAS: ", examinees_n.latent.val - examinees[n].latent.val)
-    examinees_est[n] = copy(examinees_n)
     items_idx_per_examinee[n] = copy(items_idx_n)
 end
 
 
-println( "avg RMSE a = ", sqrt(mean(map( (i, i_est)-> (i.parameters.a - i_est.parameters.a)^2, items, items_est))))
-println( "avg RMSE b = ", sqrt(mean(map( (i, i_est)-> (i.parameters.b - i_est.parameters.b)^2, items, items_est))))
+println( "avg RMSE a = ", sqrt(mean(map( (i, i_est)-> (i.parameters.a - i_est.parameters.a)^2, items, items_est[(I-I_to_calibrate):I]))))
+println( "avg RMSE b = ", sqrt(mean(map( (i, i_est)-> (i.parameters.b - i_est.parameters.b)^2, items, items_est[(I-I_to_calibrate):I]))))
 println( "avg RMSE tehta = ", sqrt(mean(map( (e, e_est)-> (e.latent.val- e_est.latent.val)^2, examinees, examinees_est))))
 
 rmse_theta = fill(Float64[],9)

@@ -117,7 +117,7 @@ end
 # BayesLogit::rpg(1,1,x)
 # }
 # """
-function w_sampler(vec_theta, vec_a, vec_b, N, I)
+function w_sampler(vec_theta, vec_a, vec_b, N, I) 
     #w_temp = [vec_a[i] * (vec_theta[p] - vec_b[i]) for p = 1:N, i = 1:I]
     #pg = rcopy(R"apply($w_temp, c(1,2), rpg_sp)")
     pg =[rand(PolyaGamma(1.0, vec_a[i] * (vec_theta[p] - vec_b[i]))) for p = 1:N, i = 1:I]
