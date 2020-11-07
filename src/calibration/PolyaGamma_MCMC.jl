@@ -1,5 +1,5 @@
 function calibrate_item!(item::AbstractItem, responses::Vector{Response}, examinees::Vector{<:AbstractExaminee}; mcmc_iter = 4_000)
-    chain = zeros(Float64, mcmc_iter)
+    chain = Vector{Vector{Float64}}(undef, mcmc_iter)
     for iter in 1:mcmc_iter
         W = generate_w(item, examinees)
         chain[iter] = rand(posterior(item, examinees, responses, map( y -> y.val, W)))
