@@ -5,7 +5,7 @@ struct PolyaGammaSample
     PolyaGammaSample(i_idx, e_idx, val) = new(i_idx, e_idx, val)
 end
 
-function update_posterior!(
+function posterior(
     item::Item2PL, 
     examinees::Vector{<:AbstractExaminee}, #must be sorted by e.idx
     responses::Vector{<:AbstractResponse}, #only responses of item sorted by e.idx
@@ -44,14 +44,22 @@ function update_posterior!(
                 Distributions.var.(prior)
             )
         )
-
-    item.parameters.posterior = Distributions.Product([
+    return Distributions.Product([
         Distributions.TruncatedNormal(mu[1], sqrt(sigma2[1]), 0.0, Inf),
         Distributions.Normal(mu[2], sqrt(sigma2[2])),
     ])
 end
 
 function update_posterior!(
+    item::Item2PL, 
+    examinees::Vector{<:AbstractExaminee}, #must be sorted by e.idx
+    responses::Vector{<:AbstractResponse}, #only responses of item sorted by e.idx
+    W::Vector{Float64}, #sorted by e.idx
+)
+       item.parameters.posterior = posterior(item, examinees, responses, W)
+end
+
+function posterior(
     examinee::Examinee1D,
     items_e::Vector{<:AbstractItem}, #only items answered by examinee sorted by i.idx
     responses_e::Vector{<:AbstractResponse}, #only responses of examinee sorted by i.idx
@@ -75,7 +83,15 @@ function update_posterior!(
                 responses_e
             ) + (prior.μ / Distributions.var(prior))
         )
-    examinee.latent.posterior = Distributions.Normal(mu, sqrt(sigma2))
+    return Distributions.Normal(mu, sqrt(sigma2))::Distributions.ContinuousDistribution
+end
+function update_posterior!(
+    examinee::Examinee1D,
+    items_e::Vector{<:AbstractItem}, #only items answered by examinee sorted by i.idx
+    responses_e::Vector{<:AbstractResponse}, #only responses of examinee sorted by i.idx
+    W::Vector{Float64},
+)
+    examinee.latent.posterior = posterior(examinee, items_e, responses_e, W)
 end
 
 function posterior(item::Item2PL, examinee::Examinee1D, w::PolyaGammaSample, r::Response)

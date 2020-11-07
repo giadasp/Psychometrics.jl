@@ -1,12 +1,14 @@
-@everywhere begin
-using Pkg
-Pkg.activate(".")
-using Psychometrics
-using Distributions
-using LinearAlgebra
-using Dates
-using Random
-end
+    @everywhere using Pkg
+    @everywhere Pkg.instantiate()
+    @everywhere Pkg.activate(".")
+    @everywhere using Psychometrics
+    @everywhere using Distributions
+    @everywhere using LinearAlgebra
+    @everywhere using Dates
+    @everywhere using Random
+    @everywhere using SharedArrays
+
+
 
 import Base.copy
 
@@ -21,7 +23,7 @@ const N = 2_000
 test_length = 30
 field_test_items = 3
 true_items  = test_length - field_test_items
-iter_mcmc_latent = 4_000
+iter_mcmc_latent = 2_000
 iter_mcmc_item = 2_000
 #after how many responses update item parameter estimates
 required_responses = 500
@@ -52,7 +54,7 @@ b_est_bounds = [-6.0, 6.0];
 #first I-I_to_calibrate items have true values of parameters (very well estimated)
 items_est_calibrated = items[1:(I-I_to_calibrate)];
 items_est_not_calibrated = [Item2PL(i+(I-I_to_calibrate), string("item_", i+(I-I_to_calibrate)), ["math"], Parameters2PL(Product([a_est_prior, b_est_prior]), a_est_bounds, b_est_bounds)) for i = 1 : I_to_calibrate];
-map( i -> i.parameters.calibrated .= false, items_est_not_calibrated)
+map( i -> i.parameters.calibrated = false, items_est_not_calibrated)
 items_est = vcat(items_est_calibrated, items_est_not_calibrated)
 #responses vectors for not calibrated items
 responses_not_calibrated = Response[]
@@ -81,12 +83,16 @@ for n in 1:N
         available_items_idx = setdiff(available_items_idx, next_item_idx)
         sort!(items_idx_n)
         resp_n = responses_n[items_idx_n]
+        items_est_n = items_est[items_idx_n]
+        chain_n = SharedArray{Float64}(iter_mcmc_latent)
         @sync @distributed for iter in 1:iter_mcmc_latent
             W = generate_w(items_est[items_idx_n], examinees_n)
-            mcmc_iter!(examinees_n, items_est[items_idx_n], resp_n, map(w -> w.val, W); sampling = false)
+            chain_n[iter] = rand(posterior(examinees_n, items_est_n, resp_n, map(w -> w.val, W)))
+            #mcmc_iter!(examinees_n, items_est[items_idx_n], resp_n, map(w -> w.val, W); sampling = false)
         end
+        examinees_n.latent.chain = chain_n
         update_estimate!(examinees_n)
-        examinees_n.latent.chain=Float64[]
+        #examinees_n.latent.chain=Float64[]
         examinees_est_theta[n][i] = examinees_n.latent.val
     end
     available_items_idx = map(i -> i.idx, filter(i2 -> !i2.parameters.calibrated, items_est))
@@ -97,12 +103,16 @@ for n in 1:N
             available_items_idx = setdiff(available_items_idx, next_item_idx)
             sort!(items_idx_n)
             resp_n = responses_n[items_idx_n]
-            @sync @distributed for iter in 1:iter_mcmc_latent
+            chain_n = SharedArray{Float64}(iter_mcmc_latent)
+            items_est_n = items_est[items_idx_n]
+            for iter in 1:iter_mcmc_latent
                 W = generate_w(items_est[items_idx_n], examinees_n)
-                mcmc_iter!(examinees_n, items_est[items_idx_n], resp_n, map(w -> w.val, W); sampling = false)
+                chain_n[iter] = rand(posterior(examinees_n, items_est_n, resp_n, map(w -> w.val, W)))
+                #mcmc_iter!(examinees_n, items_est_n, resp_n, map(w -> w.val, W); sampling = false)
             end
+            examinees_n.latent.chain = chain_n
             update_estimate!(examinees_n)
-            examinees_n.latent.chain=Float64[]
+            #examinees_n.latent.chain=Float64[]
             examinees_est_theta[n][i+(true_items)] = examinees_n.latent.val
             #println("est_BIAS: ", examinees_est[n].latent.val - examinees[n].latent.val)
             push!(responses_not_calibrated, responses_n[next_item_idx])
