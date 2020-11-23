@@ -9,14 +9,14 @@ function posterior(
     item::Item2PL, 
     examinees::Vector{<:AbstractExaminee}, #must be sorted by e.idx
     responses::Vector{<:AbstractResponse}, #only responses of item sorted by e.idx
-    W::Vector{Float64}, #sorted by e.idx
+    W::Vector{PolyaGammaSample}, #sorted by e.idx
 )
     prior = item.parameters.prior.v
     a =  item.parameters.a
     b = item.parameters.b
     #W = map( e -> Distributions.rand(PolyaGammaDevRoye1Sampler(1.0, item.parameters.a *(e.latent.val - item.parameters.b))), examinees)
     sigma2 = mapreduce(
-        (e, w) -> [(e.latent.val - b)^2, a^2 ] .* w,
+        (e, w) -> [(e.latent.val - b)^2, a^2 ] .* w.val,
         +,
         examinees,
         W,
@@ -29,7 +29,7 @@ function posterior(
             -a * (
                 #(get_responses_by_examinee_id(e.id, responses)[1].val - 0.5) -
                 (r.val-0.5) -
-                (a * e.latent.val * w)
+                (a * e.latent.val * w.val)
             ),
         ],
         +,
@@ -54,7 +54,7 @@ function update_posterior!(
     item::Item2PL, 
     examinees::Vector{<:AbstractExaminee}, #must be sorted by e.idx
     responses::Vector{<:AbstractResponse}, #only responses of item sorted by e.idx
-    W::Vector{Float64}, #sorted by e.idx
+    W::Vector{PolyaGammaSample}, #sorted by e.idx
 )
        item.parameters.posterior = posterior(item, examinees, responses, W)
 end
@@ -63,17 +63,17 @@ function posterior(
     examinee::Examinee1D,
     items_e::Vector{<:AbstractItem}, #only items answered by examinee sorted by i.idx
     responses_e::Vector{<:AbstractResponse}, #only responses of examinee sorted by i.idx
-    W::Vector{Float64},
+    W::Vector{PolyaGammaSample},
 )
     prior = examinee.latent.prior
-    sigma2 = mapreduce((i, w) -> (i.parameters.a^2) * w, +, items_e, W)
+    sigma2 = mapreduce((i, w) -> (i.parameters.a^2) * w.val, +, items_e, W)
     sigma2 = 1 / (sigma2 + (1 / Distributions.var(prior)))
     mu =
         sigma2 * (
             mapreduce(
                 (i, w, r) ->
                     i.parameters.a * (
-                        i.parameters.a * i.parameters.b * w +
+                        i.parameters.a * i.parameters.b * w.val +
                         #(get_responses_by_item_id(i.id, responses_e)[1].val - 0.5)
                         (r.val - 0.5)
                     ),
@@ -89,7 +89,7 @@ function update_posterior!(
     examinee::Examinee1D,
     items_e::Vector{<:AbstractItem}, #only items answered by examinee sorted by i.idx
     responses_e::Vector{<:AbstractResponse}, #only responses of examinee sorted by i.idx
-    W::Vector{Float64},
+    W::Vector{PolyaGammaSample},
 )
     examinee.latent.posterior = posterior(examinee, items_e, responses_e, W)
 end
@@ -195,7 +195,7 @@ function set_value_from_chain!(examinee::Examinee1D)
 end
 
 #extract a value from the posterior and append it to the chain
-function chain_append!(item::Item2PL; sampling = false)
+function chain_append!(item::Union{Item2PL, Item3PL}; sampling = false)
     val = Distributions.rand(item.parameters.posterior)
     if (sampling && size(item.parameters.chain,1)>=1000)
         item.parameters.chain[Random.rand(1:1000)] = val
@@ -217,17 +217,17 @@ end
 
 
 #update the posterior, append sample to chain and set the value as a sample from the posterior
-function mcmc_iter!(item::Item2PL, examinees::Vector{<:AbstractExaminee}, responses::Vector{<:Response}, W::Vector{Float64}; sampling = true)
+function mcmc_iter!(item::Item2PL, examinees::Vector{<:AbstractExaminee}, responses::Vector{<:Response}, W::Vector{PolyaGammaSample}; sampling = true)
     update_posterior!(item, examinees, responses, W)
     #set_value_from_chain!(item)
     set_value_from_posterior!(item; sampling = sampling)
 end
 
-function mcmc_iter!(examinee::Examinee1D, items::Vector{<:AbstractItem}, responses::Vector{<:Response}, W::Vector{Float64}; sampling = true)
+function mcmc_iter!(examinee::Examinee1D, items::Vector{<:AbstractItem}, responses::Vector{<:Response}, W::Vector{PolyaGammaSample}; sampling = true)
     update_posterior!(examinee, items, responses, W)
     #chain_append!(examinee; sampling = sampling)
-    #set_value_from_chain!(examinee)
     set_value_from_posterior!(examinee; sampling = sampling)
+    #set_value_from_chain!(examinee)
 end
 
 #update the estimate as the mean of the chain values
