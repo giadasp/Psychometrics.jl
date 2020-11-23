@@ -25,6 +25,9 @@ Creates a new 1-dimensional latent variable with custom fields.
 Randomly generates a value for the 1-dimensional latent variable and assigns a default standardized Gaussian prior and posterior
     Latent1D(dist, bounds)
 
+Same as `Latent1D(dist, bounds)` but with value equal to `val`
+    Latent1D(val)
+
 Randomly generates a value for the 1-dimensional latent variable and assigns a custom univariate distribution to prior and posterior with specific bounds.
 """
 mutable struct Latent1D <: AbstractLatent
@@ -43,6 +46,11 @@ mutable struct Latent1D <: AbstractLatent
         dist = Distributions.Normal(0.0, 1.0)
         val = truncate_rand(dist, bounds)[1]
         new(val, bounds, dist, dist, [val], 1.0)
+    end
+    function Latent1D(val::Float64)
+        latent = Latent1D()
+        latent.val = val
+        return latent
     end
     function Latent1D(dist::Distributions.UnivariateDistribution, bounds::Vector{Float64})
         val = truncate_rand(dist, bounds)[1]
