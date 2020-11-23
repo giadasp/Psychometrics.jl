@@ -79,7 +79,6 @@ function theta_sampler(
     theta_mu = theta_variance * ((vec_a' * z_theta) + (theta_prior_mu / theta_prior_var))
     rand(Distributions.Normal(theta_mu, sqrt(theta_variance)))
 end
-
 function a_sampler(
     vec_theta, # N x 1
     vec_b_id, # I x 1
@@ -110,6 +109,41 @@ function b_sampler(vec_theta, vec_a_id, mat_w_id, mat_k_id, b_prior_mu, b_prior_
     z_b = mat_k_id .- (vec_a_id .* vec_theta .* mat_w_id) # N x 1 # times w_i
     b_mu = b_variance * (((.-vec_a_id_vec)' * z_b) + (b_prior_mu / b_prior_var)) # ok
     return rand(Distributions.Normal(b_mu, sqrt(b_variance)))
+end
+function i_sampler(vec_theta, vec_a_id, vec_b_id, mat_w_id, mat_k_id, a_prior_mu, a_prior_var, b_prior_mu, b_prior_var)
+    sigma2 = mapreduce(
+        (e, w) -> [(e - vec_b_id)^2, vec_a_id^2 ] .* w,
+        +,
+        vec_theta,
+        mat_w_id,
+    )
+    sigma2 = 1 ./ (sigma2 + (1 ./ [a_prior_var, b_prior_var]))
+    mu = mapreduce(
+        (e, w, r) -> [
+            (e - vec_b_id) *
+            (r),
+            -vec_a_id * (
+                #(get_responses_by_examinee_id(e.id, responses)[1].val - 0.5) -
+                (r) -
+                (vec_a_id * e * w)
+            ),
+        ],
+        +,
+        vec_theta,
+        mat_w_id,
+        mat_k_id
+    )
+    mu =
+        sigma2 .* (
+            mu + (
+                [a_prior_mu, b_prior_mu] ./
+                [a_prior_var, b_prior_var]
+            )
+        )
+    return rand(Distributions.Product([
+        Distributions.TruncatedNormal(mu[1], sqrt(sigma2[1]), 0.0, Inf),
+        Distributions.Normal(mu[2], sqrt(sigma2[2])),
+    ]))
 end
 # using RCall
 # R""" 
@@ -163,29 +197,46 @@ for iter = 2:Iter
     ),
     1:N
     )
-    sav_a_iter = map(
-        i -> a_sampler(
+    res_iter = map(
+        i -> i_sampler(
             sav_theta_iter,
+            sav_a[iter-1, i],
             sav_b[iter-1, i],
             sav_w[:, i],
             K[:, i],
             a_prior_mu,
             a_prior_var,
-        ),
-        1:I,
-    )
-    sav_b_iter = map(
-        i -> b_sampler(
-            sav_theta_iter,
-            sav_a_iter[i],
-            sav_w[:, i],
-            K[:, i],
             b_prior_mu,
-            b_prior_var,
-            N,
+            b_prior_var
         ),
         1:I,
     )
+    sav_a_iter = map( r -> r[1], res_iter)
+    sav_b_iter = map( r -> r[2], res_iter)
+
+    # sav_a_iter = map(
+    #     i -> a_sampler(
+    #         sav_theta_iter,
+    #         sav_b[iter-1, i],
+    #         sav_w[:, i],
+    #         K[:, i],
+    #         a_prior_mu,
+    #         a_prior_var,
+    #     ),
+    #     1:I,
+    # )
+    # sav_b_iter = map(
+    #     i -> b_sampler(
+    #         sav_theta_iter,
+    #         sav_a_iter[i],
+    #         sav_w[:, i],
+    #         K[:, i],
+    #         b_prior_mu,
+    #         b_prior_var,
+    #         N,
+    #     ),
+    #     1:I,
+    # )
     sav_theta[iter, :] .= copy(sav_theta_iter)
     sav_a[iter, :] .= copy(sav_a_iter)
     sav_b[iter, :] .= copy(sav_b_iter)
