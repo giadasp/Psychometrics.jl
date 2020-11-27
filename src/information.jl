@@ -121,10 +121,7 @@ It follows the parametrization \$a(θ - b)\$.
 - **`items::Vector{<:AbstractItem}`** : Required. 
 
 """
-function information_latent(
-    examinee::AbstractExaminee,
-    items::Vector{<:AbstractItem},
-)
+function information_latent(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
     [information_latent(examinee.latent, i.parameters) for i in items]
 end
 
@@ -235,7 +232,9 @@ function expected_information_item(
     items::Vector{<:AbstractItem},
     examinees::Vector{<:AbstractExaminee},
 )
-    [expected_information_item(i.parameters, e.latent) for i in items, e in examinees]::Matrix{Matrix{Float64}}
+    [
+        expected_information_item(i.parameters, e.latent) for i in items, e in examinees
+    ]::Matrix{Matrix{Float64}}
 end
 
 ## Item Observed Informations

@@ -15,7 +15,7 @@ It returns a `Float64` scalar.
 __Yinhong He & Ping Chen, 2020. "Optimal Online Calibration Designs for Item Replenishment in Adaptive Testing," Psychometrika, Springer;The Psychometric Society, vol. 85(1), pages 35-55, March.__
 """
 function D_inv_gain_method(item::Item1PL, examinee::AbstractExaminee)
-    return 1/expected_information_item(item.parameters, examinee.latent)
+    return 1 / expected_information_item(item.parameters, examinee.latent)
 end
 
 """
@@ -34,7 +34,10 @@ It returns a `Float64` scalar.
 # References
 __Yinhong He & Ping Chen, 2020. "Optimal Online Calibration Designs for Item Replenishment in Adaptive Testing," Psychometrika, Springer;The Psychometric Society, vol. 85(1), pages 35-55, March.__
 """
-function D_inv_gain_method(item::Union{Item2PL, Item3PL}, examinee::AbstractExaminee)
+function D_inv_gain_method(item::Union{Item2PL,Item3PL}, examinee::AbstractExaminee)
     old_exp_info = copy(item.parameters.expected_information)
-    return  LinearAlgebra.det(LinearAlgebra.inv(old_exp_info)) - LinearAlgebra.det(LinearAlgebra.inv(old_exp_info + expected_information_item(item.parameters, examinee.latent)))
+    return LinearAlgebra.det(LinearAlgebra.inv(old_exp_info)) -
+           LinearAlgebra.det(LinearAlgebra.inv(
+        old_exp_info + expected_information_item(item.parameters, examinee.latent),
+    ))
 end

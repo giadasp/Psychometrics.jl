@@ -12,7 +12,7 @@ Computes the trace of the inverse of the expected information matrix for a 1PL i
 It returns a `Float64` scalar.
 """
 function A_inv_gain_method(item::Item1PL, examinee::AbstractExaminee)
-return expected_information_item(item.parameters, examinee.latent)
+    return expected_information_item(item.parameters, examinee.latent)
 end
 
 """
@@ -28,7 +28,11 @@ Computes the trace of the inverse of the expected information matrix for a 2PL o
 # Output
 It returns a `Float64` scalar.
 """
-function A_inv_gain_method(item::Union{Item2PL, Item3PL}, examinee::AbstractExaminee)
-old_exp_info = copy(item.parameters.expected_information)
-return LinearAlgebra.tr(LinearAlgebra.inv(old_exp_info + expected_information_item(item.parameters, examinee.latent)) - LinearAlgebra.inv(old_exp_info))
+function A_inv_gain_method(item::Union{Item2PL,Item3PL}, examinee::AbstractExaminee)
+    old_exp_info = copy(item.parameters.expected_information)
+    return LinearAlgebra.tr(
+        LinearAlgebra.inv(
+            old_exp_info + expected_information_item(item.parameters, examinee.latent),
+        ) - LinearAlgebra.inv(old_exp_info),
+    )
 end

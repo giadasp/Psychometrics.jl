@@ -11,8 +11,27 @@ mutable struct Parameters2PL <: AbstractParameters
     expected_information::Matrix{Float64}
     calibrated::Bool
 
-    Parameters2PL(a, bounds_a, b, bounds_b, prior, posterior, chain, expected_information, calibrated) =
-        new(a, bounds_a, b, bounds_b, prior, posterior, chain, expected_information, calibrated)
+    Parameters2PL(
+        a,
+        bounds_a,
+        b,
+        bounds_b,
+        prior,
+        posterior,
+        chain,
+        expected_information,
+        calibrated,
+    ) = new(
+        a,
+        bounds_a,
+        b,
+        bounds_b,
+        prior,
+        posterior,
+        chain,
+        expected_information,
+        calibrated,
+    )
 
     # Random Initializers
     function Parameters2PL(
@@ -42,7 +61,7 @@ mutable struct Parameters2PL <: AbstractParameters
             ]),
             [1e-5, 5.0],
             [-6.0, 6.0],
-            )
+        )
     end
 
 end

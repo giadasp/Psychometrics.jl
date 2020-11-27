@@ -53,7 +53,7 @@ function sp_approx_1(x::Float64, n::Float64, z::Float64)
     if (u < 1e-5) && (u > -1e-5)
         K2 = x^2 - (1 / 3) - (2 / 15) * (2 * u)
     end
-    spa = sqrt((n / (2 * __PI))/ K2) * _exp_c(phi*n)
+    spa = sqrt((n / (2 * __PI)) / K2) * _exp_c(phi * n)
     return spa
 end
 
@@ -130,7 +130,7 @@ function rrtigauss_1(
             X = rrtinvch2_1(rng, lambda, trnc)
             l_alpha = -0.5 * lambda / mu^2 * X
             accept = _log_c(Random.rand(rng)) < l_alpha
-        end   
+        end
         ## cat("rtigauss.ch, part i:", X, "\n");
     else  ## trnc >= mu
         while (X > trnc)
@@ -221,9 +221,9 @@ function sp_sampler_1(
         pigauss(mid, sqrt(2 * rl), n)
     #Distributions.cdf(Distributions.InverseGaussian(sqrt(2*rl), n), mid)  
     wr =
-        sqrt(ar * n / (__PI*2)) *
+        sqrt(ar * n / (__PI * 2)) *
         _exp_c(-n * _log_c(n * rr) + n * ir - n * _log_c(mid) + loggamma(n)) *
-        (1 - Distributions.cdf(Distributions.Gamma(n, 1/(n * rr)), mid))
+        (1 - Distributions.cdf(Distributions.Gamma(n, 1 / (n * rr)), mid))
 
     wt = wl + wr
     pl = wl / wt
@@ -241,7 +241,7 @@ function sp_sampler_1(
             X = rrtigauss_1(rng, 1 / sqrt(2 * rl), n, mid)
             ## while (X > mid) X = rigauss.1(1/sqrt(2*rl), n)
             phi_ev = n * (-rl * X + il) + 0.5 * n * ((1 - 1 / X) - (1 - 1 / mid))
-            FX = sqrt(al * n / (2*__PI)) * X^(-1.5) * _exp_c(phi_ev)
+            FX = sqrt(al * n / (2 * __PI)) * X^(-1.5) * _exp_c(phi_ev)
 
         else
             ## sample right

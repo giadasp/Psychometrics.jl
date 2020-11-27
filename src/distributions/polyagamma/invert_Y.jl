@@ -240,7 +240,7 @@ function v_eval(y::Float64, tol::Float64, max_iter::Int64)
     yupper = ygrid[grid_size]
 
     if (y < ylower)
-        return -(1/ (y^2))
+        return -(1 / (y^2))
     elseif (y > yupper)
         v = atan(0.5 * y * __PI)
         return v^2

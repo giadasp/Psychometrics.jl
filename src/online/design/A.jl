@@ -13,7 +13,7 @@ It calls the function `expected_information_item` and returns its result.
 It returns a `Float64` scalar.
 """
 function A_method(item::Item1PL, examinee::AbstractExaminee)
-return expected_information_item(item.parameters, examinee.latent)
+    return expected_information_item(item.parameters, examinee.latent)
 end
 
 """
@@ -29,7 +29,6 @@ Computes the trace of the expected information matrix for a 2PL or 3PL item and 
 # Output
 It returns a `Float64` scalar.
 """
-function A_method(item::Union{Item2PL, Item3PL}, examinee::AbstractExaminee)
-return LinearAlgebra.tr(expected_information_item(item.parameters, examinee.latent))
+function A_method(item::Union{Item2PL,Item3PL}, examinee::AbstractExaminee)
+    return LinearAlgebra.tr(expected_information_item(item.parameters, examinee.latent))
 end
-

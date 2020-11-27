@@ -412,8 +412,9 @@ function g_tilde(x::Float64, h::Float64, trunc::Float64)
             h * _log_c(0.5 * __PI) + (h - 1) * _log_c(x) - PISQ * 0.125 * x - loggamma(h),
         )
     else
-        return h *
-               _exp_c(h * _log_c(2.0) - 0.5 * _log_c(2.0 * __PI * x * x * x) - 0.5 * h * h / x)
+        return h * _exp_c(
+            h * _log_c(2.0) - 0.5 * _log_c(2.0 * __PI * x * x * x) - 0.5 * h * h / x,
+        )
     end
     # out = h * pow(2, h) * pow(2 * __PI * pow(x,3), -0.5) * _exp_c(-0.5 * pow(h,2) / x)
 end

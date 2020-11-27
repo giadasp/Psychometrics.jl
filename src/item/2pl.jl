@@ -23,16 +23,16 @@ Randomly generates a new 2PL item with custom index, id, content features and de
 (Look at (`Parameters2PL`)[#Psychometrics.Parameters2PL] for the defaults).
 """
 struct Item2PL <: AbstractItem
-idx::Int64
-id::String
-content::Vector{String}
-parameters::Parameters2PL
+    idx::Int64
+    id::String
+    content::Vector{String}
+    parameters::Parameters2PL
 
-# Factories
-Item2PL(idx, id, content, parameters) = new(idx, id, content, parameters)
+    # Factories
+    Item2PL(idx, id, content, parameters) = new(idx, id, content, parameters)
 
-# Random initilizers
-Item2PL(idx, id, content) = new(idx, id, content, Parameters2PL())
+    # Random initilizers
+    Item2PL(idx, id, content) = new(idx, id, content, Parameters2PL())
 end
 
 

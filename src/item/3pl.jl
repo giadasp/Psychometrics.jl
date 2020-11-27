@@ -23,16 +23,16 @@ Randomly generates a new 3PL item with custom index, id, content features and de
 (Look at (`Parameters3PL`)[#Psychometrics.Parameters3PL] for the defaults).
 """
 struct Item3PL <: AbstractItem
-idx::Int64
-id::String
-content::Vector{String}
-parameters::Parameters3PL
+    idx::Int64
+    id::String
+    content::Vector{String}
+    parameters::Parameters3PL
 
-# Factories
-Item3PL(idx, id, content, parameters) = new(idx, id, content, parameters)
+    # Factories
+    Item3PL(idx, id, content, parameters) = new(idx, id, content, parameters)
 
-# Random initilizers
-Item3PL(idx, id, content) = new(idx, id, content, Parameters3PL())
+    # Random initilizers
+    Item3PL(idx, id, content) = new(idx, id, content, Parameters3PL())
 end
 
 """

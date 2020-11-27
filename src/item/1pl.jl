@@ -24,17 +24,18 @@ Randomly generates a new 1PL item with custom index, id, content features and de
 (Look at (`Parameters1PL`)[#Psychometrics.Parameters1PL] for the defaults).
 """
 struct Item1PL <: AbstractItem
-idx::Int64
-id::String
-content::Vector{String}
-parameters::Parameters1PL
-calibrated::Bool
+    idx::Int64
+    id::String
+    content::Vector{String}
+    parameters::Parameters1PL
+    calibrated::Bool
 
-# Factories
-Item1PL(idx, id, content, parameters, calibrated) = new(idx, id, content, parameters, calibrated)
+    # Factories
+    Item1PL(idx, id, content, parameters, calibrated) =
+        new(idx, id, content, parameters, calibrated)
 
-# Random initilizers
-Item1PL(idx, id, content) = new(idx, id, content, Parameters1PL(), true)
+    # Random initilizers
+    Item1PL(idx, id, content) = new(idx, id, content, Parameters1PL(), true)
 end
 
 

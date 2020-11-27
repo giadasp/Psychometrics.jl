@@ -72,7 +72,7 @@ mutable struct Parameters3PL <: AbstractParameters
             ]),
             [1e-5, 5.0],
             [-6.0, 6.0],
-            [1e-5, 1.0 - 1e-5]
-            )
+            [1e-5, 1.0 - 1e-5],
+        )
     end
 end

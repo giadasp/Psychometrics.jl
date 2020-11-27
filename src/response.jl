@@ -84,53 +84,47 @@ function generate_response(latent::Latent1D, parameters::AbstractParameters)
 end
 
 """
-    generate_response(examinee::AbstractExaminee, item::AbstractItem)
+    answer(examinee::AbstractExaminee, item::AbstractItem)
 
 Randomly generate a response by `examinee` to `item`.
 """
-function generate_response(
-    examinee::AbstractExaminee,
-    item::AbstractItem,
-)
-        Response(
-                item.idx,
-                examinee.idx,
-                item.id,
-                examinee.id,
-                generate_response(examinee.latent, item.parameters),
-                Dates.now(),
-            )
+function answer(examinee::AbstractExaminee, item::AbstractItem)
+    Response(
+        item.idx,
+        examinee.idx,
+        item.id,
+        examinee.id,
+        generate_response(examinee.latent, item.parameters),
+        Dates.now(),
+    )
 end
 
 """
-    generate_response(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
+    answer(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
 
 Randomly generate a response by `examinee` to `items`.
 """
-function generate_response(
-    examinee::AbstractExaminee,
-    items::Vector{<:AbstractItem},
-)
-        map(
-            i -> Response(
-                i.idx,
-                examinee.idx,
-                i.id,
-                examinee.id,
-                generate_response(examinee.latent, i.parameters),
-                Dates.now(),
-            ),
-            items,
-        )
+function answer(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
+    map(
+        i -> Response(
+            i.idx,
+            examinee.idx,
+            i.id,
+            examinee.id,
+            generate_response(examinee.latent, i.parameters),
+            Dates.now(),
+        ),
+        items,
+    )
 end
 
 
 """
-    generate_response(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem}, design::Vector{Vector{Int64}})
+    answer(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem}, design::Vector{Vector{Int64}})
 
 Randomly generate a response by `examinee` to `item` under a `design` dictionary of the same size of examinees with indices of items which must be answered by each examinee.
 """
-function generate_response(
+function answer(
     examinees::Vector{<:AbstractExaminee},
     items::Vector{<:AbstractItem},
     #design::Vector{Vector{Int64}},
@@ -150,16 +144,6 @@ function generate_response(
         vcat,
         examinees,
     )
-end
-
-
-"""
-    answer(Examinee::AbstractExaminee, item::AbstractParameters)
-
-Randomly generate a response by `Examinee` to `item`.
-"""
-function answer(Examinee::AbstractExaminee, item::AbstractParameters)
-    generate_response(Examinee.latent, item.parameters)
 end
 
 """

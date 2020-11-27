@@ -23,7 +23,7 @@ function _a(n::Int64, x::Float64)
     if (x > __TRUNC)
         y = K * _exp_c(-K * K * x / 2)
     elseif (x > 0)
-        expnt = -1.5 * (_log_c(0.5 * __PI)  + _log_c(x)) + _log_c(K) - 2.0 * (n+0.5)^2 / x
+        expnt = -1.5 * (_log_c(0.5 * __PI) + _log_c(x)) + _log_c(K) - 2.0 * (n + 0.5)^2 / x
         y = _exp_c(expnt)
         #y = 1 / (__PI * x / 2)^(1.5) * K * 1 /(_exp_c((n + 0.5)^2 / x)^2)
     end
@@ -33,7 +33,7 @@ end
 function _mass_texpon(z::Float64)
     fz = __PI^2 / 8 + z^2 / 2
     b = sqrt(1.0 / __TRUNC) * (__TRUNC * z - 1)
-    a = -sqrt(1.0 / __TRUNC) * (__TRUNC * z + 1) 
+    a = -sqrt(1.0 / __TRUNC) * (__TRUNC * z + 1)
 
     x0 = _log_c(fz) + fz * __TRUNC
     xb = x0 - z + _log_c(Distributions.cdf(Distributions.Normal(), b))
@@ -72,7 +72,7 @@ function rtigauss_dr(rng::Distributions.AbstractRNG, Z::Float64)
         mu = 1 / Z
         while (X > t)
             Y = (Random.randn(rng)^2)
-            half_mu = mu/2
+            half_mu = mu / 2
             mu_Y = mu * Y
             X = mu + half_mu * mu_Y - half_mu * sqrt(4 * mu_Y + mu_Y^2)
             if (Random.rand(rng) > (mu / (mu + X)))
@@ -87,7 +87,7 @@ end
 function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaDevRoye1Sampler)
     Z = abs(s.z) * 0.5
     ## PG(1,z) = 1/4 J*(1,Z/2)
-    fz = (__PI^2 /8) + (0.5 * Z^2)
+    fz = (__PI^2 / 8) + (0.5 * Z^2)
     X = 0.0
     while true
         #num.trials = num.trials + 1
@@ -105,7 +105,7 @@ function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaDevRoye
         cont = true
         while cont
             n += 1
-        if (mod(n, 2) == 1)
+            if (mod(n, 2) == 1)
                 S = S - _a(n, X)
                 if (Y <= S)
                     return 0.25 * X
@@ -120,7 +120,7 @@ function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaDevRoye
         # if (Y <= S)
         #     return 0.25 * X
         # end
-    end 
+    end
 end
 
 ## Sample from PG(h, z) using Devroye-like method.
