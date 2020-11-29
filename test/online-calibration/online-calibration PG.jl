@@ -20,8 +20,8 @@ end
 
 I = 1020
 I_to_calibrate = 20
-N = 20_000
-test_length = 30
+N = 2_000
+test_length = 35
 field_items = 5
 oper_items  = test_length - field_items
 iter_mcmc_latent = 2_000
@@ -36,27 +36,33 @@ N_T = 200
 
 ## ITEMS
 
-a_dist = LogNormal(0.3, 0.2);
-a_bounds = [1e-5,Inf];
-b_dist = Normal(0, 1);
-b_bounds = [-6, 6];
-items = [Item2PL(i, string("item_", i), ["math"], Parameters2PL(Product([a_dist, b_dist]), a_bounds, b_bounds)) for i = 1:I];
+# log_a_dist = Normal(0.4, sqrt(0.1)); # mu= exp(0.4 + (0.5*0.1^2)), sigma^2= exp(0.4 + 0.1^2)*(exp(0.1^2) - 1)
+# a_bounds = [1e-5,Inf];
+# b_dist = Normal(0, 1);
+# b_bounds = [-6, 6];
+# items = [Item2PL(i, string("item_", i), ["math"], Parameters2PL(Product([log_a_dist, b_dist]), a_bounds, b_bounds)) for i = 1:I];
+# map(i ->
+#     begin 
+#         i.parameters.a = exp(i.parameters.a)
+#     end,
+# items)
 
-@save "test/online-calibration/true_items.jld2" items
-
+# @save "test/online-calibration/true_items.jld2" items
+@load "test/online-calibration/true_items.jld2" items
 ## EXAMINEES
 
-latent_dist = Normal(0, 1)
-latent_bounds = [-Inf, Inf]
-examinees = Examinee1D[]
-global n=1
-for n in 1:N
-    push!(examinees,  Examinee1D(n, string("examinee_", n), Latent1D(latent_dist, latent_bounds))) 
-end
+# latent_dist = Normal(0, 1)
+# latent_bounds = [-Inf, Inf]
+# examinees = Examinee1D[]
+# global n=1
+# for n in 1:N
+#     push!(examinees,  Examinee1D(n, string("examinee_", n), Latent1D(latent_dist, latent_bounds))) 
+# end
 
-@save "test/online-calibration/true_examinees.jld2" examinees
+# @save "test/online-calibration/true_examinees.jld2" examinees
+@load "test/online-calibration - batch5 NT200 Dgain/true_examinees.jld2" examinees
 
-for rep=1:20
+for rep = 1:100
 
 retired_items = 0
 retired_items_vector= fill(0, N)
@@ -70,6 +76,7 @@ responses_per_examinee = [Response[] for e in examinees];
 ## ITEMS
 
 a_est_prior = TruncatedNormal(mean(map(i -> i.parameters.a, items)), std(map(i -> i.parameters.a, items)), 0,  Inf);
+println(params(a_est_prior))
 a_est_bounds = [1e-5, 5.0];
 b_est_prior = Normal(mean(map(i -> i.parameters.b, items)), std(map(i -> i.parameters.b, items)));
 b_est_bounds = [-6.0, 6.0];
@@ -115,9 +122,11 @@ examinees_est_theta = [[zero(Float64) for i=1:test_length] for n=1:N];
 global n=1
 while retired_items < I_to_calibrate #size(filter(i -> i.parameters.calibrated == false, items_est),1) > 0   
     examinee = copy(examinees_est[n])
+    examinee_true = copy(examinees[n])
     idx_n = examinee.idx
     items_idx_n = Int64[]
     responses_n = Response[]
+    items_est_n = AbstractItem[]
     println("n: ", n)
     #println("true: ", examinees[n].latent.val)
     available_items_idx = map(i -> i.idx, filter(i2 -> i2.parameters.calibrated, items_est))
@@ -130,7 +139,7 @@ while retired_items < I_to_calibrate #size(filter(i -> i.parameters.calibrated =
         items_est_n = items_est[items_idx_n]
 
         # answer to the item
-        resp = answer(examinee, items_est[next_item_idx])
+        resp = answer(examinee_true, items[next_item_idx])
         push!(responses_n, resp)
         # sort responses by item_idx
         sort!(responses_n, by = r -> r.item_idx)
@@ -161,7 +170,7 @@ while retired_items < I_to_calibrate #size(filter(i -> i.parameters.calibrated =
             items_est_n = items_est[items_idx_n]
 
             # answer to the item
-            resp = answer(examinee, items_est[next_item_idx])
+            resp = answer(examinee_true, items[next_item_idx])
             push!(responses_n, resp)
             # sort responses by item_idx
             sort!(responses_n, by = r -> r.item_idx)
@@ -178,12 +187,13 @@ while retired_items < I_to_calibrate #size(filter(i -> i.parameters.calibrated =
             update_estimate!(examinee)
             # set the theta prior as theta posterior
             examinee.latent.prior = examinee.latent.posterior
+            examinees_est[n] = copy(examinee)
             # store theta estimate
             examinees_est_theta[n][i+(oper_items)] = examinee.latent.val
             #println("est_BIAS: ", examinees_est[n].latent.val - examinees[n].latent.val)
             push!(responses_not_calibrated, resp)
-            #resp_item = sort(filter(r -> r.item_idx == next_item_idx, responses_not_calibrated), by = r -> r.examinee_idx)
             resp_item = filter(r -> r.item_idx == next_item_idx, responses_not_calibrated)
+            sort!(resp_item, by = r -> r.examinee_idx)
             if mod(size(resp_item, 1), batch_size) == 0
                 #println("item idx: ", next_item_idx)
                 #println("# responses: ", size(resp_item, 1))
@@ -221,8 +231,6 @@ global n-=1
 @save string("test/online-calibration/items_est_rep_",rep,".jld2") items_est
 @save string("test/online-calibration/examinees_est_rep_",rep,".jld2") examinees_est
 
-
-
 rmse_a =  sqrt(mean(map( (i, i_est)-> (i.parameters.a - i_est.parameters.a)^2, items[(I-I_to_calibrate):I], items_est[(I-I_to_calibrate):I]))) 
 rmse_b = sqrt(mean(map( (i, i_est)-> (i.parameters.b - i_est.parameters.b)^2, items[(I-I_to_calibrate):I], items_est[(I-I_to_calibrate):I])))
 rmse_theta = sqrt(mean(map( (e, e_est)-> (e.latent.val- e_est.latent.val)^2, examinees[1:(n-1)], examinees_est[1:(n-1)])))
@@ -247,21 +255,22 @@ for t in 1:size(theta_sets,1)
         end
 end
 plot(theta_sets, rmse_theta)
-a_s = zeros(1000,10)
-b_s = zeros(1000,10)
-for rep = 1:10
-    @load string("test/online-calibration/rep_", rep, "_items_est.jld2") items_est
+a_s = zeros(1020,100)
+b_s = zeros(1020,100)
+for rep = 1:100
+    @load string("test/online-calibration - batch5 NT200 Dgain/rep_", rep, "_items_est.jld2") items_est
     a = map(i -> i.parameters.a, items_est)
-    a_s[:, rep] = a
+    a_s[:, rep] = copy(a)
     b = map(i -> i.parameters.b, items_est)
-    b_s[:, rep] = b
+    b_s[:, rep] = copy(b)
 end
 
 a_true = map(i -> i.parameters.a, items)
-a_true = hcat([a_true for rep=1:10]...)
+a_true = hcat([a_true for rep=1:100]...)
 b_true = map(i -> i.parameters.b, items)
-b_true = hcat([b_true for rep=1:10]...)
-diff_a = (a_s[981:1000] - a_true[981:1000]).^2
-diff_b = (b_s[981:1000] - b_true[981:1000]).^2
+b_true = hcat([b_true for rep=1:100]...)
+diff_a = (a_s[1001:1020,:] - a_true[1001:1020,:]).^2
+diff_b = (b_s[1001:1020,:] - b_true[1001:1020,:]).^2
 
-sum(diff_a)/10/20
+sqrt(sum(diff_a)/20/100)
+sqrt(sum(diff_b)/20/100)
