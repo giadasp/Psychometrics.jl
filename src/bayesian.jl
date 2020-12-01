@@ -124,7 +124,7 @@ function posterior(
     return Distributions.Normal(mu, sqrt(sigma2))
 end
 
-function generate_w(items::Vector{<:AbstractItem}, examinee::AbstractExaminee)
+function generate_w(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
     return map(
         i -> PolyaGammaSample(
             i.idx,

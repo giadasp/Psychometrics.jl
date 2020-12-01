@@ -2,6 +2,8 @@ __precompile__(true)
 module Psychometrics
 
 import Distributions
+import Distributed
+import SharedArrays
 import Dates
 import LinearAlgebra
 
@@ -77,5 +79,6 @@ export Latent1D,
     rand,
     find_best_item,
     find_best_examinee,
-    calibrate_item!
+    calibrate_item!,
+    estimate_ability!
 end # module
