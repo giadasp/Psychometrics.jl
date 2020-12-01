@@ -109,3 +109,10 @@ function get_latents(examinees::Vector{<:AbstractExaminee})
     end
     return reduce(hcat, ret)
 end
+
+"""
+    empty_chain!(examinee::Examinee1D)
+"""
+function empty_chain!(examinee::Examinee1D)
+    examinee.latent.chain = Float64[]
+end

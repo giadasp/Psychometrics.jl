@@ -44,3 +44,12 @@ end
 function get_parameters(item::Item2PL)
     [item.parameters.b, item.parameters.a]
 end
+
+
+"""
+    empty_chain!(item::Item2PL)
+
+"""
+function empty_chain!(item::Item2PL)
+    item.parameters.chain = Vector{Vector{Float64}}(undef,0)
+end
