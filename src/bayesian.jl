@@ -241,12 +241,14 @@ end
 
 #update the estimate as the mean of the chain values
 function update_estimate!(examinee::Examinee1D)
-    examinee.latent.val = sum(examinee.latent.chain) / size(examinee.latent.chain, 1)
+    chain_size = min( size(examinee.latent.chain, 1) , 1000)
+    examinee.latent.val = sum(examinee.latent.chain[(chain_size - min(999, chain_size - 1)) : chain_size]) / chain_size
 end
 
 function update_estimate!(item::Item2PL)
-    chain_matrix = hcat(item.parameters.chain...)
-    vals = [sum(i) / size(item.parameters.chain, 1) for i in eachrow(chain_matrix)]
+    chain_size = min( size(item.parameters.chain, 1) , 1000)
+    chain_matrix = hcat(item.parameters.chain[(chain_size - min(999, chain_size - 1)) : chain_size]...)
+    vals = [sum(i) / 1000 for i in eachrow(chain_matrix)]
     item.parameters.a = vals[1]
     item.parameters.b = vals[2]
 end
