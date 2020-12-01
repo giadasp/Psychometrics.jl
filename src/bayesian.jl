@@ -240,15 +240,24 @@ function mcmc_iter!(
 end
 
 #update the estimate as the mean of the chain values
-function update_estimate!(examinee::Examinee1D)
-    chain_size = min( size(examinee.latent.chain, 1) , 1000)
-    examinee.latent.val = sum(examinee.latent.chain[(chain_size - min(999, chain_size - 1)) : chain_size]) / chain_size
+function update_estimate!(examinee::Examinee1D; sampling = true)
+    chain_size = size(examinee.latent.chain, 1)
+    if sampling
+        examinee.latent.val = sum(examinee.latent.chain[(chain_size - min(999, chain_size - 1)) : end]) / min(1000, chain_size)
+    else
+        examinee.latent.val = sum(examinee.latent.chain) / chain_size
+    end
 end
 
-function update_estimate!(item::Item2PL)
-    chain_size = min( size(item.parameters.chain, 1) , 1000)
-    chain_matrix = hcat(item.parameters.chain[(chain_size - min(999, chain_size - 1)) : chain_size]...)
-    vals = [sum(i) / 1000 for i in eachrow(chain_matrix)]
+function update_estimate!(item::Item2PL; sampling = true)
+    chain_size = size(item.parameters.chain, 1)
+    if sampling 
+        chain_matrix = hcat(item.parameters.chain[(chain_size - min(999, chain_size - 1)) : end]...)
+        vals = [sum(i) / min(1000, chain_size) for i in eachrow(chain_matrix)]
+    else
+        chain_matrix = hcat(item.parameters.chain...)
+        vals = [sum(i) / chain_size for i in eachrow(chain_matrix)]   
+    end
     item.parameters.a = vals[1]
     item.parameters.b = vals[2]
 end
