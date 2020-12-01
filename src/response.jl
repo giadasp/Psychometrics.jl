@@ -118,34 +118,6 @@ function answer(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
     )
 end
 
-
-"""
-    answer(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem}, design::Vector{Vector{Int64}})
-
-Randomly generate a response by `examinee` to `item` under a `design` dictionary of the same size of examinees with indices of items which must be answered by each examinee.
-"""
-function answer(
-    examinees::Vector{<:AbstractExaminee},
-    items::Vector{<:AbstractItem},
-    #design::Vector{Vector{Int64}},
-)
-    mapreduce(
-        e -> map(
-            i -> Response(
-                i.idx,
-                e.idx,
-                i.id,
-                e.id,
-                generate_response(e.latent, i.parameters),
-                Dates.now(),
-            ),
-            items,
-        ),
-        vcat,
-        examinees,
-    )
-end
-
 """
     answer(examinee_id::String, item_id::String, examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
 
@@ -161,7 +133,7 @@ function answer(
 end
 
 """
-    answer(examinees:AbstractExaminee}, items::Vector{<:AbstractItem})
+    answer(examinees:Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
 
 Randomly generate responses by all the examinees in `examinees` to items in `items`.
 """
