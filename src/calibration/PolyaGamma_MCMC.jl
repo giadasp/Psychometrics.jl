@@ -3,13 +3,19 @@ function calibrate_item!(
     responses::Vector{Response},
     examinees::Vector{<:AbstractExaminee};
     mcmc_iter = 4_000,
+    sampling = true,
 )
-    chain = Vector{Vector{Float64}}(undef, mcmc_iter)
+    empty_chain!(item)
     for iter = 1:mcmc_iter
         W = generate_w(item, examinees)
-        chain[iter] = rand(posterior(item, examinees, responses, map(y -> y.val, W)))
-        #mcmc_iter!(examinees_n, items_est[items_idx_n], resp_n, map(w -> w.val, W); sampling = false)
+        mcmc_iter!(item, examinees, responses, W; sampling = sampling)
     end
-    item.parameters.chain = chain
-    update_estimate!(item)
+    # chain = Vector{Vector{Float64}}(undef, mcmc_iter)
+    # for iter = 1:mcmc_iter
+    #     W = generate_w(item, examinees)
+    #     chain[iter] = rand(posterior(item, examinees, responses, map(y -> y.val, W)))
+    #     #mcmc_iter!(examinees_n, items_est[items_idx_n], resp_n, map(w -> w.val, W); sampling = false)
+    # end
+    #item.parameters.chain = chain
+    update_estimate!(item; sampling = sampling)
 end
