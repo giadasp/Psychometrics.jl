@@ -34,6 +34,6 @@ jobs:
           julia --project=docs -e 'using Pkg; Pkg.instantiate()'
           julia --project=docs --color=yes docs/make.jl
         env:
-          REPO: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git
+          REPO: ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git
           DEVBRANCH: master
 
