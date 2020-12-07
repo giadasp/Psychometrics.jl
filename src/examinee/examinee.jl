@@ -1,8 +1,8 @@
 
 abstract type AbstractExaminee end
-
-include("latent/1D.jl")
 include("latent/latent.jl")
+include("1D.jl")
+
 
 """
     Examinee <: AbstractExaminee
