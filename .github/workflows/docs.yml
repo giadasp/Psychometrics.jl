@@ -29,9 +29,6 @@ jobs:
         with:
           version: ${{ matrix.julia-version }}
 
-      - name: Install dependencies
-        run: julia --project=docs -e 'using Pkg; Pkg.instantiate()'
-
       - name: Setup environment variables
         run: |
           VERSION=`cat Project.toml | grep "version" | cut -d '=' -f2 | tr -d ' ' | tr -d '"' | tr -d \'`
@@ -44,7 +41,9 @@ jobs:
           echo "IS_SNAPSHOT=${IS_SNAPSHOT}" >> $GITHUB_ENV
 
       - name: Build, deploy and upload docs
-        run: julia --project=docs --color=yes docs/make.jl
+        run: | 
+          julia --project=docs -e 'using Pkg; Pkg.instantiate()'
+          julia --project=docs --color=yes docs/make.jl
         env:
           REPO: ${{ env.REPO }}
           DEVBRANCH: ${{ env.DEVBRANCH }}
