@@ -29,25 +29,12 @@ jobs:
         with:
           version: ${{ matrix.julia-version }}
 
-      - name: Install dependencies
-        run: julia --project=docs -e 'using Pkg; Pkg.instantiate()'
-
       - name: Setup environment variables
         run: |
           VERSION=`cat Project.toml | grep "version" | cut -d '=' -f2 | tr -d ' ' | tr -d '"' | tr -d \'`
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
-          REPO=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git
-          echo "REPO=${REPO}" >> $GITHUB_ENV
-          DEVBRANCH=release
-          echo "DEVBRANCH=${DEVBRANCH}" >> $GITHUB_ENV
           IS_SNAPSHOT=`if [[ "${VERSION}" == 0.* ]] ; then echo "true" ; else echo "false" ; fi`
           echo "IS_SNAPSHOT=${IS_SNAPSHOT}" >> $GITHUB_ENV
-
-      - name: Build, deploy and upload docs
-        run: julia --project=docs --color=yes docs/make.jl
-        env:
-          REPO: ${{ env.REPO }}
-          DEVBRANCH: ${{ env.DEVBRANCH }}
 
       - name: Compress target directories
         run: |
