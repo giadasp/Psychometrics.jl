@@ -12,7 +12,6 @@ A package for psychometric data analysis.
 
 ```@contents
 Pages = ["index.md",
-"parameter.md",
 "item.md",
 "latent.md",
 "examinee.md",
