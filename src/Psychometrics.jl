@@ -9,8 +9,7 @@ import LinearAlgebra
 
 include("utils.jl")
 include("dist.jl")
-include("latent.jl")
-include("examinee.jl")
+include("examinee/examinee.jl")
 include("item/item.jl")
 include("response.jl")
 include("probability.jl")
