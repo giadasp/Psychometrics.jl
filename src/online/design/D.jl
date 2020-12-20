@@ -1,34 +1,31 @@
 
 """
-D_method(item::Item1PL, examinee::AbstractExaminee)
-
-# Description
-It calls the function `expected_information_item` and returns its result.
-
-# Arguments
-- **`item::Item1PL`**: The 1PL item.
-- **`examinee::AbstractExaminee`**: The examinee at which computing the information.
-
-# Output
-It returns a `Float64` scalar.
+    D_method(parameters::Parameters1PL, latent::Latent1D)
 """
-function D_method(item::Item1PL, examinee::AbstractExaminee)
-    return expected_information_item(item.parameters, examinee.latent)
+function D_method(parameters::Parameters1PL, latent::Latent1D)
+return expected_information_item(parameters, latent)
 end
 
 """
-D_method(item::Union{Item2PL, Item3PL}, examinee::AbstractExaminee)
+    D_method(parameters::Parameters2PL, latent::Latent1D)
+"""
+function D_method(parameters::Parameters2PL, latent::Latent1D)
+return LinearAlgebra.det(expected_information_item(parameters, latent))
+end
+
+"""
+    D_method(item::AbstractItem, examinee::AbstractExaminee)
 
 # Description
-Computes the determinant of the expected information matrix for a 2PL or 3PL item and a generic type examinee.
+Computes the determinant of the expected information matrix for an item and an examinee.
 
 # Arguments
-- **`item::Union{Item2PL, Item3PL},`**: The 2PL or 3PL item.
+- **`item::AbstractItem`**: The item.
 - **`examinee::AbstractExaminee`**: The examinee at which computing the information.
 
 # Output
 It returns a `Float64` scalar.
 """
-function D_method(item::Union{Item2PL,Item3PL}, examinee::AbstractExaminee)
-    return LinearAlgebra.det(expected_information_item(item.parameters, examinee.latent))
+function D_method(item::AbstractItem, examinee::AbstractExaminee)
+    return D_method(item.parameters, examinee.latent)
 end

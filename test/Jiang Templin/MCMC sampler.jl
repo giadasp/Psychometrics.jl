@@ -11,8 +11,8 @@ const I = 20
 const N = 500
 
 # ITEM PARAMETERS AND LATENTS 
-items = [Item2PL(i, string("item_",i), ["math"], Parameters2PL(Product([LogNormal(0.3, 0.2), Normal(0,1)]), [1e-5,5.0], [-6.0, 6.0])) for i = 1 : I];
-examinees = [Examinee1D(e, string("examinee_",e), Latent1D(Normal(0,1), [-6.0, 6.0])) for e = 1 : N]; 
+items = [Item(i, string("item_",i), ["math"], Parameters2PL(Product([LogNormal(0.3, 0.2), Normal(0,1)]), [1e-5,5.0], [-6.0, 6.0])) for i = 1 : I];
+examinees = [Examinee(e, string("examinee_",e), Latent1D(Normal(0,1), [-6.0, 6.0])) for e = 1 : N]; 
 
 # RESPONSES
 

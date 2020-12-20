@@ -1,8 +1,6 @@
 
 abstract type AbstractExaminee end
 include("latent/latent.jl")
-include("1D.jl")
-
 
 """
     Examinee <: AbstractExaminee
@@ -16,12 +14,12 @@ Examinee struct with a generic latent variable.
   - **`latent::Latent`**: A generic latent variable associated with the Examinee.
 
 # Factories
-    Examinee1D(idx, id, latent) = new(idx, id, latent)
+    Examinee(idx, id, latent) = new(idx, id, latent)
 
 Creates a new Examinee with custom index, id and a generic latent variable.
 
 # Random initializers
-    Examinee(idx, id) = Examinee1D(idx, id)
+    Examinee(idx, id) = new(idx, id, Latent1D())
 
 Randomly generates an Examinee with custom index and id and with a default 1-dimensional latent variable 
 (Look at (`Latent1D`)[#Psychometrics.Latent1D] for the defaults).
@@ -35,7 +33,7 @@ struct Examinee <: AbstractExaminee
     Examinee(idx, id, latent) = new(idx, id, latent)
 
     # Random initializers
-    Examinee(id) = Examinee1D(id)
+    Examinee(id) = new(idx, id, Latent1D())
 end
 
 """
@@ -73,3 +71,10 @@ function get_latents(examinees::Vector{<:AbstractExaminee})
     return reduce(hcat, ret)
 end
 
+
+"""
+    empty_chain!(examinee::AbstractExaminee)
+"""
+function empty_chain!(examinee::AbstractExaminee)
+    empty_chain!(examinee.latent)
+end

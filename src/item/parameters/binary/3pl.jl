@@ -80,3 +80,11 @@ mutable struct Parameters3PL <: AbstractParametersBinary
         )
     end
 end
+
+"""
+    empty_chain!(parameters::Parameters3PL)
+
+"""
+function empty_chain!(parameters::Parameters3PL)
+    parameters.chain = Vector{Vector{Float64}}(undef,0)
+end

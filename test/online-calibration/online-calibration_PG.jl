@@ -1,7 +1,6 @@
      @everywhere using Pkg
-     #@everywhere Pkg.instantiate()
-     #@everywhere Pkg.activate(".")
-
+     @everywhere Pkg.instantiate()
+     @everywhere Pkg.activate(".")
      @everywhere using Psychometrics
      @everywhere using Distributions
      @everywhere using LinearAlgebra
@@ -17,14 +16,10 @@
 
 import Base.copy
 
-function copy(examinee::Examinee1D) 
-    e = Examinee1D(examinee.idx, examinee.id, examinee.latent)
-    return e::Examinee1D
+function copy(examinee::Examinee) 
+    e = Examinee(examinee.idx, examinee.id, examinee.latent)
+    return e::Examinee
 end
-
-
-
-@sync @distributed for rep = 1:20
 
     
 I_operational = 1000
@@ -48,54 +43,58 @@ N_T = 200
 
     ### operational items
 
-    # log_a_dist = Normal(0.4, sqrt(0.1)); # mu= exp(0.4 + (0.5*0.1^2)), sigma^2= exp(0.4 + 0.1^2)*(exp(0.1^2) - 1)
-    # a_bounds = [1e-5,Inf];
-    # b_dist = Normal(0, 1);
-    # b_bounds = [-6, 6];
-    # items_operational = [Item2PL(i, string("item_", i), ["math"], Parameters2PL(Product([log_a_dist, b_dist]), a_bounds, b_bounds)) for i = 1:I_operational];
-    # map(i ->
-    #     begin 
-    #         i.parameters.a = exp(i.parameters.a)
-    #     end,
-    # items_operational)
+    log_a_dist = Normal(0.4, sqrt(0.1)); # mu= exp(0.4 + (0.5*0.1^2)), sigma^2= exp(0.4 + 0.1^2)*(exp(0.1^2) - 1)
+    a_bounds = [1e-5,Inf];
+    b_dist = Normal(0, 1);
+    b_bounds = [-6, 6];
+    items_operational = [Item(i, string("item_", i), ["math"], Parameters2PL(Product([log_a_dist, b_dist]), a_bounds, b_bounds)) for i = 1:I_operational];
+    map(i ->
+        begin 
+            i.parameters.a = exp(i.parameters.a)
+        end,
+    items_operational)
 
-    # ### field items
-    # quantiles_a = quantile(map(i -> i.parameters.a, items_operational), [0.25,0.5,0.75])
-    # quantiles_b = quantile(map(i -> i.parameters.b, items_operational), [0.2, 0.35, 0.5, 0.65, 0.8] )
-    # a_field = vcat([fill(q,5) for q in quantiles_a]...)
-    # b_field = vcat([quantiles_b for q in quantiles_a]...)
+    ### field items
+    quantiles_a = quantile(map(i -> i.parameters.a, items_operational), [0.25,0.5,0.75])
+    quantiles_b = quantile(map(i -> i.parameters.b, items_operational), [0.2, 0.35, 0.5, 0.65, 0.8] )
+    a_field = vcat([fill(q,5) for q in quantiles_a]...)
+    b_field = vcat([quantiles_b for q in quantiles_a]...)
 
-    # items_field = [Item2PL(i, string("item_", i), ["math"], Parameters2PL(Product([log_a_dist, b_dist]), a_bounds, b_bounds)) for i = (I_operational + 1) : I_total];
-    # map((i, a, b) ->
-    #     begin
-    #         i.parameters.a = a
-    #         i.parameters.b = b
-    #     end,
-    #     items_field,
-    #     a_field,
-    #     b_field
-    # )
-    # items = vcat(items_operational, items_field)
+    items_field = [Item(i, string("item_", i), ["math"], Parameters2PL(Product([log_a_dist, b_dist]), a_bounds, b_bounds)) for i = (I_operational + 1) : I_total];
+    map((i, a, b) ->
+        begin
+            i.parameters.a = a
+            i.parameters.b = b
+        end,
+        items_field,
+        a_field,
+        b_field
+    )
+    items = vcat(items_operational, items_field)
 
-    # @save "test/online-calibration/true values/true_items_1.jld2" items
+    @save "test/online-calibration/true values/true_items.jld2" items
 
-    #@save "test/online-calibration/settings.jld2" I_total  I_field N test_length test_field test_operational iter_mcmc_latent iter_mcmc_item batch_size N_T
-    items = load(string("test/online-calibration/true values/true_items_1.jld2"), "items")
+    @save "test/online-calibration/settings.jld2" I_total  I_field N test_length test_field test_operational iter_mcmc_latent iter_mcmc_item batch_size N_T
+    items = load(string("test/online-calibration/true values/true_items.jld2"), "items")
 
     
 
     ## EXAMINEES
     
-    # latent_dist = Normal(0, 1)
-    # latent_bounds = [-Inf, Inf]
-    # examinees = Examinee1D[]
-    # global n=1
-    # for n in 1:N
-    #     push!(examinees,  Examinee1D(n, string("examinee_", n), Latent1D(latent_dist, latent_bounds))) 
-    # end
+    latent_dist = Normal(0, 1)
+    latent_bounds = [-Inf, Inf]
+    examinees = Examinee[]
+    global n=1
+    for n in 1:N
+        push!(examinees,  Examinee(n, string("examinee_", n), Latent1D(latent_dist, latent_bounds))) 
+    end
     
-    # @save "test/online-calibration/true_examinees.jld2" examinees
-    examinees = load(string("test/online-calibration/true values/true_examinees_1.jld2"), "examinees")
+    @save "test/online-calibration/true values/true_examinees.jld2" examinees
+    examinees = load(string("test/online-calibration/true values/true_examinees.jld2"), "examinees")
+
+
+
+@sync @distributed for rep = 1:20
 retired_items = 0
 retired_items_vector= fill(0, N)
 
@@ -117,7 +116,7 @@ a_est_bounds = [1e-5, 5.0];
 b_est_prior = Normal(mean(b_operational), std(b_operational));
 b_est_bounds = [-6.0, 6.0];
 
-items_est_field = [Item2PL(i+I_operational, string("item_", i+I_operational), ["math"], Parameters2PL(Product([a_est_prior, b_est_prior]), a_est_bounds, b_est_bounds)) for i = 1 : I_field];
+items_est_field = [Item(i+I_operational, string("item_", i+I_operational), ["math"], Parameters2PL(Product([a_est_prior, b_est_prior]), a_est_bounds, b_est_bounds)) for i = 1 : I_field];
 map( i -> begin 
     i.parameters.calibrated = false
 end, items_est_field);
@@ -141,7 +140,7 @@ responses_not_calibrated = ResponseBinary[]
 
 latent_est_prior = Normal(0, 3);
 latent_est_bounds = [-6.0, 6.0];
-examinees_est = [Examinee1D(e, string("examinee_",e), Latent1D(latent_est_prior, latent_est_bounds)) for e = 1 : N]; 
+examinees_est = [Examinee(e, string("examinee_",e), Latent1D(latent_est_prior, latent_est_bounds)) for e = 1 : N]; 
 
 #set starting value taking a random value in the interval -0.5:0.5
 map(e ->
@@ -152,8 +151,8 @@ examinees_est)
 items_idx_per_examinee = Vector{Vector{Int64}}(undef, N);
 examinees_est_theta = [[zero(Float64) for i=1:test_length] for n=1:N];
 items_est_parameters = [[[0.0, 0.0] for n=1:ceil(N_T/batch_size)] for i=1:I_field]
-# @save string("test/online-calibration/priors",myid(),".jld2") a_est_prior b_est_prior latent_est_prior 
-# @save string("test/online-calibration/bounds_",myid(),".jld2") a_est_bounds b_est_bounds latent_est_bounds 
+@save string("test/online-calibration/priors",myid(),".jld2") a_est_prior b_est_prior latent_est_prior 
+@save string("test/online-calibration/bounds_",myid(),".jld2") a_est_bounds b_est_bounds latent_est_bounds 
 
 # START ONLINE-CALIBRATION
 
@@ -177,7 +176,7 @@ while retired_items < I_field #size(filter(i -> i.parameters.calibrated == false
         items_est_n = items_est[items_idx_n]
 
         # answer to the item
-        resp = answer(examinee_true, items[next_item_idx])
+        resp = answer_binary(examinee_true, items[next_item_idx])
         push!(responses_n, resp)
         # sort responses by item_idx
         sort!(responses_n, by = r -> r.item_idx)
@@ -199,7 +198,7 @@ while retired_items < I_field #size(filter(i -> i.parameters.calibrated == false
             items_est_n = items_est[items_idx_n]
 
             # answer to the item
-            resp = answer(examinee_true, items[next_item_idx])
+            resp = answer_binary(examinee_true, items[next_item_idx])
             push!(responses_n, resp)
             # sort responses by item_idx
             sort!(responses_n, by = r -> r.item_idx)

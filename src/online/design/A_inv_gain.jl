@@ -1,38 +1,35 @@
 """
-A_inv_gain_method(item::Item1PL, examinee::AbstractExaminee)
-
-# Description
-Computes the trace of the inverse of the expected information matrix for a 1PL item.
-
-# Arguments
-- **`item::Item1PL`**: The 1PL item.
-- **`examinee::AbstractExaminee`**: The examinee at which computing the information.
-
-# Output
-It returns a `Float64` scalar.
+    A_inv_gain_method(parameters::Parameters1PL, latent::Latent1D)
 """
-function A_inv_gain_method(item::Item1PL, examinee::AbstractExaminee)
-    return expected_information_item(item.parameters, examinee.latent)
+function A_inv_gain_method(parameters::Parameters1PL, latent::Latent1D)
+    return expected_information_item(parameters, latent)
 end
 
 """
-A_inv_gain_method(item::Union{Item2PL, Item3PL}, examinee::AbstractExaminee)
+    A_inv_gain_method(parameters::Parameters2PL, latent::Latent1D)
+"""
+function A_inv_gain_method(parameters::Parameters2PL, latent::Latent1D)
+    old_exp_info = copy(parameters.expected_information)
+    return LinearAlgebra.tr(
+        LinearAlgebra.inv(
+            old_exp_info + expected_information_item(parameters, latent),
+        ) - LinearAlgebra.inv(old_exp_info),
+    )
+end
+
+"""
+    A_inv_gain_method(item::AbstractItem, examinee::AbstractExaminee)
 
 # Description
-Computes the trace of the inverse of the expected information matrix for a 2PL or 3PL item.
+Computes the gain in the trace of the inverse of the expected information matrix for an item.
 
 # Arguments
-- **`item::Union{Item2PL, Item3PL}`**: The 2PL or 3PL item.
+- **`item::AbstractItem`**: The  item.
 - **`examinee::AbstractExaminee`**: The examinee at which computing the information.
 
 # Output
 It returns a `Float64` scalar.
 """
-function A_inv_gain_method(item::Union{Item2PL,Item3PL}, examinee::AbstractExaminee)
-    old_exp_info = copy(item.parameters.expected_information)
-    return LinearAlgebra.tr(
-        LinearAlgebra.inv(
-            old_exp_info + expected_information_item(item.parameters, examinee.latent),
-        ) - LinearAlgebra.inv(old_exp_info),
-    )
+function A_inv_gain_method(item::AbstractItem, examinee::AbstractExaminee)
+    return A_inv_gain_method(item.parameters, examinee.latent)
 end

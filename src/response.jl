@@ -101,11 +101,11 @@ function generate_response(latent::Latent1D, parameters::AbstractParametersBinar
 end
 
 """
-    answer(examinee::AbstractExaminee, item::AbstractItemBinary)
+    answer_binary(examinee::AbstractExaminee, item::AbstractItem)
 
 Randomly generate a dichotomous (binary) response by `examinee` to a dichotomous (binary) `item`.
 """
-function answer(examinee::AbstractExaminee, item::AbstractItem)
+function answer_binary(examinee::AbstractExaminee, item::AbstractItem)
     ResponseBinary(
         item.idx,
         examinee.idx,
@@ -117,12 +117,13 @@ function answer(examinee::AbstractExaminee, item::AbstractItem)
     )
 end
 
+
 """
-    answer(examinee::AbstractExaminee, items::Vector{<:AbstractItemBinary})
+    answer_binary(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
 
 Randomly generate a dichotomous (binary) response by `examinee` to dichotomous (binary) `items`.
 """
-function answer(examinee::AbstractExaminee, items::Vector{<:AbstractItemBinary})
+function answer_binary(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
     map(
         i -> ResponseBinary(
             i.idx,
@@ -137,26 +138,26 @@ function answer(examinee::AbstractExaminee, items::Vector{<:AbstractItemBinary})
 end
 
 """
-    answer(examinee_id::String, item_id::String, examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItemBinary})
+    answer_binary(examinee_id::String, item_id::String, examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
 
 Randomly generate a dichotomous (binary) response by `Examinee` with index `examinee_id` to a dichotomous (binary) `item` with index `item_id`.
 """
-function answer(
+function answer_binary(
     examinee_id::String,
     item_id::String,
     examinees::Vector{<:AbstractExaminee},
-    items::Vector{<:AbstractItemBinary},
+    items::Vector{<:AbstractItem},
 )
-    answer(get_examinee_by_id(examinee_id, examinees), get_item_by_id(item_id, items))
+    answer_binary(get_examinee_by_id(examinee_id, examinees), get_item_by_id(item_id, items))
 end
 
 """
-    answer(examinees:Vector{<:AbstractExaminee}, items::Vector{<:AbstractItemBinary})
+    answer_binary(examinees:Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
 
 Randomly generate dichotomous (binary) responses by all the examinees in `examinees` to dichotomous (binary) items in `items`.
 """
-function answer(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItemBinary})
-    mapreduce(e -> map(i -> answer(e, i), items), vcat, examinees)
+function answer_binary(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
+    mapreduce(e -> map(i -> answer_binary(e, i), items), vcat, examinees)
 end
 
 """

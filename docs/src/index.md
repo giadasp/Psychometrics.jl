@@ -16,9 +16,12 @@ Pages = ["index.md",
 "latent.md",
 "examinee.md",
 "response.md",
+"distributions.md",
 "probability.md",
 "information.md",
-"likelihood.md"]
+"likelihood.md",
+"bayesian.md"]
+]
 Depth = 3
 ```
 

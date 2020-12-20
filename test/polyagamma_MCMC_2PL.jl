@@ -12,7 +12,7 @@ const N = 500
 # ITEM PARAMETERS AND LATENTS 
 
 items = [
-    Item2PL(
+    Item(
         i,
         string("item_", i),
         ["math"],
@@ -23,7 +23,7 @@ items = [
         ),
     ) for i = 1:I
 ];
-examinees = [Examinee1D(e, string("examinee_", e), Latent1D()) for e = 1:N];
+examinees = [Examinee(e, string("examinee_", e), Latent1D()) for e = 1:N];
 
 # RESPONSES
 
@@ -40,7 +40,7 @@ responses = generate_response(examinees, items);
 
 #Initial Values, need to make sure that all Variance needs to be positive
 items_est = [
-    Item2PL(
+    Item(
         i,
         string("item_", i),
         ["math"],
@@ -57,7 +57,7 @@ map(i -> i.parameters.b = 0.0, items_est);
 
 
 examinees_est =
-    [Examinee1D(e, string("examinee_", e), Latent1D(Normal(0, 1), [-6.0, 6.0])) for e = 1:N];
+    [Examinee(e, string("examinee_", e), Latent1D(Normal(0, 1), [-6.0, 6.0])) for e = 1:N];
 for n = 1:N
     # examinees_est[n].latent.val = examinees[n].latent.val + rand(Normal(0.0,0.3))
     examinees_est[n].latent.val = 0.0
@@ -86,7 +86,7 @@ examinees_idx_per_item = map(
 
 # map( i -> chain_append!(i), items_est)
 # map( e -> chain_append!(e), examinees_est)
-# map( i -> set_value_from_chain!(i), items_est)
+# map( i -> set_val_from_chain!(i), items_est)
 # map( e -> set_value_from_chain!(e), examinees_est)
 map(
     i -> begin

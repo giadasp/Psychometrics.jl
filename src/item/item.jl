@@ -3,8 +3,6 @@ include("parameters/parameters.jl")
 
 abstract type AbstractItem end
 
-include("binary/binary.jl")
-
 """
     Item <: AbstractItem
 
@@ -15,7 +13,7 @@ A generic item struct.
   - **`idx::Int64`**: An integer that identifies the item in this session.
   - **`id::String`**: A string that identifies the examinee.
   - **`content::Vector{String}`**: A string vector containing the content features of an item.
-  - **`parameters::AbstractParametersBinary`**: A generic item parameters object.
+  - **`parameters::AbstractParameters`**: A generic item parameters object.
   - **`calibrated::Bool`**: Tells if the item has been already calibrated.
 
 # Factories
@@ -33,13 +31,21 @@ struct Item <: AbstractItem
     idx::Int64
     id::String
     content::Vector{String}
-    parameters::AbstractParametersBinary
+    parameters::AbstractParameters
 
     # Factories
     Item(idx, id, content, parameters) = new(idx, id, content, parameters)
 
     # Random initilizers
     Item(idx, id, content) = new(idx, id, content, Parameters1PL())
+end
+
+"""
+    get_parameters(item::AbstractItem)
+
+"""
+function get_parameters(item::AbstractItem)
+    item.parameters
 end
 
 """
@@ -75,4 +81,12 @@ function get_parameters(items::Vector{<:AbstractItem})
         end
     end
     return permutedims(reduce(hcat, ret))
+end
+
+"""
+    empty_chain!(item::AbstractItem)
+
+"""
+function empty_chain!(item::AbstractItem)
+    empty_chain!(item.parameters)
 end

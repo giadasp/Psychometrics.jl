@@ -134,7 +134,7 @@ It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
 - **`examinees::Vector{<:AbstractExaminee}`** : Required. 
-- **`items::Vector{<:AbstractItemBinary}`** : Required. 
+- **`items::Vector{<:AbstractItem}`** : Required. 
 
 """
 function information_latent(

@@ -26,3 +26,11 @@ mutable struct Parameters1PL <: AbstractParametersBinary
         Parameters1PL(Distributions.Normal(0, 1), [-6.0, 6.0], true)
     end
 end
+
+"""
+    empty_chain!(parameters::Parameters1PL)
+
+"""
+function empty_chain!(parameters::Parameters1PL)
+    parameters.chain = Vector{Float64}(undef,0)
+end

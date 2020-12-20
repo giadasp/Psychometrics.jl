@@ -1,36 +1,34 @@
 """
-    A_gain_method(item::Item1PL, examinee::AbstractExaminee)
+    A_gain_method(parameters::Parameters1PL, latent::Latent1D)
+"""
+function A_gain_method(parameters::Parameters1PL, latent::Latent1D)
+return expected_information_item(parameters, latent)
+end
+
+"""
+    A_gain_method(parameters::Parameters2PL, latent::Latent1D)
+"""
+function A_gain_method(parameters::Parameters2PL, latent::Latent1D)
+old_exp_info = copy(parameters.expected_information)
+return LinearAlgebra.tr(
+    old_exp_info + expected_information_item(parameters, latent),
+) - LinearAlgebra.tr(old_exp_info)
+end
+
+"""
+    A_gain_method(item::AbstractItem, examinee::AbstractExaminee)
 
 # Description
-Computes the trace of the inverse of the expected information matrix for a 1PL item.
+Computes the gain in the trace of the expected information matrix for an item.
 
 # Arguments
-- **`item::Item1PL`**: The 1PL item.
+- **`item::AbstractItem`**: The  item.
 - **`examinee::AbstractExaminee`**: The examinee at which computing the information.
 
 # Output
 It returns a `Float64` scalar.
 """
-function A_gain_method(item::Item1PL, examinee::AbstractExaminee)
-    return expected_information_item(item.parameters, examinee.latent)
+function A_gain_method(item::AbstractItem, examinee::AbstractExaminee)
+    return A_gain_method(item.parameters, examinee.latent)
 end
 
-"""
-    A_gain_method(item::Union{Item2PL, Item3PL}, examinee::AbstractExaminee)
-
-# Description
-Computes the trace of the inverse of the expected information matrix for a 2PL or 3PL item.
-
-# Arguments
-- **`item::Union{Item2PL, Item3PL}`**: The 2PL or 3PL item.
-- **`examinee::AbstractExaminee`**: The examinee at which computing the information.
-
-# Output
-It returns a `Float64` scalar.
-"""
-function A_gain_method(item::Union{Item2PL,Item3PL}, examinee::AbstractExaminee)
-    old_exp_info = copy(item.parameters.expected_information)
-    return LinearAlgebra.tr(
-        old_exp_info + expected_information_item(item.parameters, examinee.latent),
-    ) - LinearAlgebra.tr(old_exp_info)
-end

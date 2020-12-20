@@ -11,8 +11,8 @@ const N = 500
 
 # ITEM PARAMETERS AND LATENTS 
 
-items = [Item2PL(i, string("item_",i), ["math"], Parameters2PL()) for i = 1 : I];
-examinees = [Examinee1D(e, string("examinee_",e), Latent1D()) for e = 1 : N];   
+items = [Item(i, string("item_",i), ["math"], Parameters2PL()) for i = 1 : I];
+examinees = [Examinee(e, string("examinee_",e), Latent1D()) for e = 1 : N];   
 
 # Put parameters and latents in matrix  
 parameters_matrix = get_parameters(items)
@@ -72,7 +72,7 @@ expected_information_item_val = expected_information_item(examinees, items);
 
 ## Estimation
 
-items_est = [Item2PL(string("item_",i), ["math"], Parameters2PL(1.0, [1e-5,5.0], 0.0, [-6.0, 6.0], Product([LogNormal(0, 0.25), Normal(0,1)]),  Product([LogNormal(0, 0.25), Normal(0,1)]), Vector{Vector{Float64}}(undef,2), LinearAlgebra.I(2) )) for i = 1 : I];
-examinees_est = [Examinee1D(string("examinee_",e), Latent1D(0.0, [-6.0, 6.0], Normal(0,1), Normal(0,1), zeros(0), 1.0)) for e = 1 : N]; 
+items_est = [Item(string("item_",i), ["math"], Parameters2PL(1.0, [1e-5,5.0], 0.0, [-6.0, 6.0], Product([LogNormal(0, 0.25), Normal(0,1)]),  Product([LogNormal(0, 0.25), Normal(0,1)]), Vector{Vector{Float64}}(undef,2), LinearAlgebra.I(2) )) for i = 1 : I];
+examinees_est = [Examinee(string("examinee_",e), Latent1D(0.0, [-6.0, 6.0], Normal(0,1), Normal(0,1), zeros(0), 1.0)) for e = 1 : N]; 
 
 map responses

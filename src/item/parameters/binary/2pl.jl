@@ -69,3 +69,43 @@ mutable struct Parameters2PL <: AbstractParametersBinary
     end
 
 end
+
+"""
+    empty_chain!(parameters::Parameters2PL)
+
+"""
+function empty_chain!(parameters::Parameters2PL)
+    parameters.chain = Vector{Vector{Float64}}(undef,0)
+end
+
+"""
+    set_val!(parameters::Parameters2PL, vals::Vector{Float64})
+"""
+function set_val!(parameters::Parameters2PL, vals::Vector{Float64})
+    parameters.a = vals[1]
+    parameters.b = vals[2]
+end
+
+"""
+    set_val_from_chain!(parameters::Parameters2PL)
+"""
+function set_val_from_chain!(parameters::Parameters2PL)
+    parameters.a = parameters.chain[end][1]
+    parameters.b = parameters.chain[end][2]
+end
+
+"""
+    update_estimate!(parameters::Parameters2PL; sampling = true)
+"""
+function update_estimate!(parameters::Parameters2PL; sampling = true)
+    chain_size = size(parameters.chain, 1)
+    if sampling 
+        chain_matrix = hcat(parameters.chain[(chain_size - min(999, chain_size - 1)) : end]...)
+        vals = [sum(i) / min(1000, chain_size) for i in eachrow(chain_matrix)]
+    else
+        chain_matrix = hcat(parameters.chain...)
+        vals = [sum(i) / chain_size for i in eachrow(chain_matrix)]   
+    end
+    parameters.a = vals[1]
+    parameters.b = vals[2]
+end

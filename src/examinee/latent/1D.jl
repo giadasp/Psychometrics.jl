@@ -54,3 +54,36 @@ mutable struct Latent1D <: AbstractLatent
         new(val, bounds, dist, dist, [val], 1.0)
     end
 end
+
+"""
+    empty_chain!(latent::Latent1D)
+"""
+function empty_chain!(latent::Latent1D)
+    latent.chain = Float64[]
+end
+
+"""
+    set_val!(latent::Latent1D, val::Float64)
+"""
+function set_val!(latent::Latent1D, val::Float64)
+    latent.val = copy(val)
+end
+
+"""
+    set_val_from_chain!(latent::Latent1D)
+"""
+function set_val_from_chain!(latent::Latent1D)
+    latent.val = latent.chain[end]
+end
+
+"""
+    update_estimate!(latent::Latent1D; sampling = true)
+"""
+function update_estimate!(latent::Latent1D; sampling = true)
+    chain_size = size(latent.chain, 1)
+    if sampling
+        latent.val = sum(latent.chain[(chain_size - min(999, chain_size - 1)) : end]) / min(1000, chain_size)
+    else
+        latent.val = sum(latent.chain) / chain_size
+    end
+end

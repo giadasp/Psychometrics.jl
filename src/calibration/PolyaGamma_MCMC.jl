@@ -22,7 +22,7 @@ function calibrate_item!(
 end
 
 function estimate_ability!(
-    examinee::Examinee1D,
+    examinee::AbstractExaminee,
     items::Vector{<:AbstractItem},
     responses::Vector{ResponseBinary};
     mcmc_iter = 2_000,

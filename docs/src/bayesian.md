@@ -1,6 +1,6 @@
-# Latent Variables
+# Bayesian IRT
 
 ```@autodocs
 Modules = [Psychometrics]
-Pages   = ["latent.jl"]
+Pages   = ["bayesian.jl"]
 ```
