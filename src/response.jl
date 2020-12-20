@@ -101,48 +101,30 @@ function generate_response(latent::Latent1D, parameters::AbstractParametersBinar
 end
 
 """
-<<<<<<< HEAD
-    answer(examinee::AbstractExaminee, item::AbstractItem)
-=======
     answer(examinee::AbstractExaminee, item::AbstractItemBinary)
->>>>>>> release
 
 Randomly generate a dichotomous (binary) response by `examinee` to a dichotomous (binary) `item`.
 """
-<<<<<<< HEAD
 function answer(examinee::AbstractExaminee, item::AbstractItem)
-    Response(
-=======
-function answer(examinee::AbstractExaminee, item::AbstractItemBinary)
     ResponseBinary(
->>>>>>> release
         item.idx,
         examinee.idx,
         item.id,
         examinee.id,
         generate_response(examinee.latent, item.parameters),
         Dates.now(),
+        Dates.now(),
     )
 end
 
 """
-<<<<<<< HEAD
-    answer(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
-=======
     answer(examinee::AbstractExaminee, items::Vector{<:AbstractItemBinary})
->>>>>>> release
 
 Randomly generate a dichotomous (binary) response by `examinee` to dichotomous (binary) `items`.
 """
-<<<<<<< HEAD
-function answer(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
-    map(
-        i -> Response(
-=======
 function answer(examinee::AbstractExaminee, items::Vector{<:AbstractItemBinary})
     map(
         i -> ResponseBinary(
->>>>>>> release
             i.idx,
             examinee.idx,
             i.id,
@@ -155,15 +137,9 @@ function answer(examinee::AbstractExaminee, items::Vector{<:AbstractItemBinary})
 end
 
 """
-<<<<<<< HEAD
-    answer(examinee_id::String, item_id::String, examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
-
-Randomly generate a response by `Examinee` with index `examinee_id` to `item` with index `item_id`.
-=======
     answer(examinee_id::String, item_id::String, examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItemBinary})
 
 Randomly generate a dichotomous (binary) response by `Examinee` with index `examinee_id` to a dichotomous (binary) `item` with index `item_id`.
->>>>>>> release
 """
 function answer(
     examinee_id::String,
@@ -175,11 +151,7 @@ function answer(
 end
 
 """
-<<<<<<< HEAD
-    answer(examinees:Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
-=======
     answer(examinees:Vector{<:AbstractExaminee}, items::Vector{<:AbstractItemBinary})
->>>>>>> release
 
 Randomly generate dichotomous (binary) responses by all the examinees in `examinees` to dichotomous (binary) items in `items`.
 """
