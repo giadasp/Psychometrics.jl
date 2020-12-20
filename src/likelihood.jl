@@ -7,35 +7,35 @@ It computes the log likelihood for a matrix of latent values, item parameters, r
 function log_likelihood(
     response_val::Float64,
     latent_val::Float64,
-    parameters::AbstractParameters,
+    parameters::AbstractParametersBinary,
 )
     p = probability(latent_val, parameters)
     return response_val * log(p) + (1 - response_val) * log(1 - p)
 end
 
 """
-    likelihood(response_val::Float64, latent_val::Float64, parameters::AbstractParameters)
+    likelihood(response_val::Float64, latent_val::Float64, parameters::AbstractParametersBinary)
 
 It computes the log likelihood for a latent value and item parameters `parameters` with answer `response_val`.
 """
 function likelihood(
     response_val::Float64,
     latent_val::Float64,
-    parameters::AbstractParameters,
+    parameters::AbstractParametersBinary,
 )
     p = probability(latent_val, parameters)
     return p^response_val * (1 - p)^(1 - response_val)
 end
 
 """
-    log_likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParameters)
+    log_likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParametersBinary)
 
 It computes the log likelihood for a 1-dimensional latent variable and item parameters `parameters` with answer `response_val`.
 """
 function log_likelihood(
     response_val::Float64,
     latent::Latent1D,
-    parameters::AbstractParameters,
+    parameters::AbstractParametersBinary,
 )
     p = probability(latent, parameters)
     return response_val * log(p) + (1 - response_val) * log(1 - p)
@@ -43,7 +43,7 @@ end
 
 
 """
-    log_likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParameters, g_item::Vector{Float64}, g_latent::Vector{Float64})
+    log_likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParametersBinary, g_item::Vector{Float64}, g_latent::Vector{Float64})
 
 It computes the log likelihood for a 1-dimensional latent variable and item parameters `parameters` with answer `response_val`. 
 It updates also the gradient vectors.
@@ -51,7 +51,7 @@ It updates also the gradient vectors.
 function log_likelihood(
     response_val::Float64,
     latent::Latent1D,
-    parameters::AbstractParameters,
+    parameters::AbstractParametersBinary,
     g_item::Vector{Float64},
     g_latent::Vector{Float64},
 )
@@ -143,11 +143,11 @@ end
 
 
 """
-    likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParameters)
+    likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParametersBinary)
 
 It computes the likelihood for a 1-dimensional latent variable and item parameters `parameters` with answer `response_val`.
 """
-function likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParameters)
+function likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParametersBinary)
     return likelihood(response_val, latent.val, parameters)
 end
 

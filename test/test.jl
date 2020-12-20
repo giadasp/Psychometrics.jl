@@ -30,7 +30,7 @@ design_matrix = get_design(responses, I, N)
 # Get response matrix (zeros are for wrong answers and for missing answers)
 response_matrix = get_response_matrix(responses, I, N)
 
-# Go back to a vector of `Response`s (starting and ending time of response is Dates.now())
+# Go back to a vector of `AbstractResponse`s (starting and ending time of response is Dates.now())
 responses2 = get_responses(response_matrix, design_matrix, items, examinees)
 
 
