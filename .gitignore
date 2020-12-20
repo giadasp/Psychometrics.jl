@@ -1,0 +1,4 @@
+.vscode/
+*.jld2
+*.csv
+test/simulation/

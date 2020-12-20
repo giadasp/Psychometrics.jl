@@ -53,7 +53,7 @@ function _rtigauss_sp(
             alpha = _exp_c(lambda / (2 * mu^2) * X)
         end
     else
-        while X > trunc 
+        while X > trunc
             X = _igauss_sp(rng, mu, lambda)
         end
     end
@@ -299,14 +299,14 @@ function Distributions.rand(rng::Distributions.AbstractRNG, s::PolyaGammaSPSampl
     # term5 = (1.00 - p_gamma_rate(md, n, n*rr, false))
     # printf("r terms 1-5: %g, %g, %g, %g, %g\n", term1, term2, term3, term4, term5)
     #wr = (sqrt(ar) * sqrt(n/(2*__PI)) * (_exp_c(ir) / (md*n*rr)^n * gamma(n))) * (1.00 - Distributions.cdf(Distributions.Gamma(n, 1/(n * rr)), md))
-    
+
     wr =
         _exp_c(
             0.5 * _log_c(ar) +
             lcn +
-            (-n * _log_c(n * rr) + n * ir - n * _log_c(md) + loggamma(n))
-        #) * pgamma(md, n, 1/n*rr)
-        )* (1 - Distributions.cdf(Distributions.Gamma(n, 1/(n * rr)), md))
+            (-n * _log_c(n * rr) + n * ir - n * _log_c(md) + loggamma(n)),
+            #) * pgamma(md, n, 1/n*rr)
+        ) * (1 - Distributions.cdf(Distributions.Gamma(n, 1 / (n * rr)), md))
     #(1.00 - Distributions.cdf(Distributions.Gamma(n, n*rr), md))
     # or
     #TODO p_gamma_rate problem rate/scale paramater

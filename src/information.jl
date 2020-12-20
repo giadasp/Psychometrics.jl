@@ -113,7 +113,7 @@ end
     information_latent(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
 
 # Description
-An abstraction of `information_latent(latent::AbstractLatent, parameters::AbstractParameters)` on an examinee and items.
+An abstraction of `information_latent(latent::AbstractLatent, parameters::AbstractParametersBinary)` on an examinee and items.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
@@ -121,10 +121,7 @@ It follows the parametrization \$a(θ - b)\$.
 - **`items::Vector{<:AbstractItem}`** : Required. 
 
 """
-function information_latent(
-    examinee::AbstractExaminee,
-    items::Vector{<:AbstractItem},
-)
+function information_latent(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
     [information_latent(examinee.latent, i.parameters) for i in items]
 end
 
@@ -132,12 +129,12 @@ end
     information_latent(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
 
 # Description
-An abstraction of `information_latent(latent::AbstractLatent, parameters::AbstractParameters)` on examinees and items.
+An abstraction of `information_latent(latent::AbstractLatent, parameters::AbstractParametersBinary)` on examinees and items.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
 - **`examinees::Vector{<:AbstractExaminee}`** : Required. 
-- **`items::Vector{<:AbstractItem}`** : Required. 
+- **`items::Vector{<:AbstractItemBinary}`** : Required. 
 
 """
 function information_latent(
@@ -235,7 +232,9 @@ function expected_information_item(
     items::Vector{<:AbstractItem},
     examinees::Vector{<:AbstractExaminee},
 )
-    [expected_information_item(i.parameters, e.latent) for i in items, e in examinees]::Matrix{Matrix{Float64}}
+    [
+        expected_information_item(i.parameters, e.latent) for i in items, e in examinees
+    ]::Matrix{Matrix{Float64}}
 end
 
 ## Item Observed Informations
@@ -297,162 +296,4 @@ function observed_information_item(
             get_item_by_id(r.item_id, items),
         )
     end
-end
-
-"""
-    D_method(item::Item1PL, examinee::AbstractExaminee)
-
-# Description
-It calls the function `expected_information_item` and returns its result.
-
-# Arguments
-  - **`item::Item1PL`**: The 1PL item.
-  - **`examinee::AbstractExaminee`**: The examinee at which computing the information.
-
-# Output
-It returns a `Float64` scalar.
-"""
-function D_method(item::Item1PL, examinee::AbstractExaminee)
-    return expected_information_item(item.parameters, examinee.latent)
-end
-
-"""
-    D_method(item::Item2PL, examinee::AbstractExaminee)
-
-# Description
-Computes the determinant of the expected information matrix for a 2PL item and a generic type examinee.
-
-# Arguments
-  - **`item::Item2PL`**: The 2PL item.
-  - **`examinee::AbstractExaminee`**: The examinee at which computing the information.
-
-# Output
-It returns a `Float64` scalar.
-"""
-function D_method(item::Item2PL, examinee::AbstractExaminee)
-    return LinearAlgebra.det(expected_information_item(item.parameters, examinee.latent))
-end
-
-"""
-    D_method(item::Item3PL, examinee::AbstractExaminee)
-
-# Description
-Computes the determinant of the expected information matrix for a 3PL item and a generic type examinee.
-
-# Arguments
-  - **`item::Item3PL`**: The 3PL item.
-  - **`examinee::AbstractExaminee`**: The examinee at which computing the information.
-
-# Output
-It returns a `Float64` scalar.
-"""
-function D_method(item::Item3PL, examinee::AbstractExaminee)
-    return LinearAlgebra.det(expected_information_item(item.parameters, examinee.latent))
-end
-
-
-"""
-    A_method(item::Item1PL, examinee::AbstractExaminee)
-
-# Description
-It calls the function `expected_information_item` and returns its result.
-
-# Arguments
-  - **`item::Item1PL`**: The 1PL item.
-  - **`examinee::AbstractExaminee`**: The examinee at which computing the information.
-
-# Output
-It returns a `Float64` scalar.
-"""
-function A_method(item::Item1PL, examinee::AbstractExaminee)
-    return expected_information_item(item.parameters, examinee.latent)
-end
-
-"""
-    A_method(item::Item2PL, examinee::AbstractExaminee)
-
-# Description
-Computes the trace of the expected information matrix for a 2PL item and a generic type examinee.
-
-# Arguments
-  - **`item::Item2PL`**: The 2PL item.
-  - **`examinee::AbstractExaminee`**: The examinee at which computing the information.
-
-# Output
-It returns a `Float64` scalar.
-"""
-function A_method(item::Item2PL, examinee::AbstractExaminee)
-    return LinearAlgebra.tr(expected_information_item(item.parameters, examinee.latent))
-end
-
-"""
-    A_method(item::Item3PL, examinee::AbstractExaminee)
-
-# Description
-Computes the trace of the expected information matrix for a 3PL item and a generic type examinee.
-
-# Arguments
-  - **`item::Item3PL`**: The 3PL item.
-  - **`examinee::AbstractExaminee`**: The examinee at which computing the information.
-
-# Output
-It returns a `Float64` scalar.
-"""
-function A_method(item::Item3PL, examinee::AbstractExaminee)
-    return LinearAlgebra.det(expected_information_item(item.parameters, examinee.latent))
-end
-
-
-"""
-    D_gain_method(item::Item1PL, examinee::AbstractExaminee)
-
-# Description
-It calls the function `expected_information_item` and returns its result.
-
-# Arguments
-  - **`item::Item1PL`**: The 1PL item.
-  - **`examinee::AbstractExaminee`**: The examinee at which computing the information.
-
-# Output
-It returns a `Float64` scalar.
-"""
-function D_gain_method(item::Item1PL, examinee::AbstractExaminee)
-    old_exp_info = copy(item.parameters.expected_information)
-    return expected_information_item(item.parameters, examinee.latent)
-end
-
-"""
-    D_gain_method(item::Item2PL, examinee::AbstractExaminee)
-
-# Description
-Computes the trace of the expected information matrix for a 2PL item and a generic type examinee.
-
-# Arguments
-  - **`item::Item2PL`**: The 2PL item.
-  - **`examinee::AbstractExaminee`**: The examinee at which computing the information.
-
-# Output
-It returns a `Float64` scalar.
-"""
-function D_gain_method(item::Item2PL, examinee::AbstractExaminee)
-    old_exp_info = copy(item.parameters.expected_information)
-    return LinearAlgebra.det(old_exp_info + expected_information_item(item.parameters, examinee.latent)) - LinearAlgebra.det(old_exp_info)
-end
-
-"""
-    D_gain_method(item::Item3PL, examinee::AbstractExaminee)
-
-# Description
-Computes the trace of the expected information matrix for a 3PL item and a generic type examinee.
-
-# Arguments
-  - **`item::Item3PL`**: The 3PL item.
-  - **`examinee::AbstractExaminee`**: The examinee at which computing the information.
-
-# Output
-It returns a `Float64` scalar.
-"""
-function D_gain_method(item::Item3PL, examinee::AbstractExaminee)
-    old_exp_info = copy(item.parameters.expected_information)
-    return LinearAlgebra.det(old_exp_info + expected_information_item(item.parameters, examinee.latent)) - LinearAlgebra.det(old_exp_info)
 end

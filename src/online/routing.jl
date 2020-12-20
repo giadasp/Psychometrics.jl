@@ -9,20 +9,24 @@ Finds the best item for the `examinee` among the vector `items` using maximum in
   - **`items:::Vector{<:AbstractItem}`**: Set of items in which searching for the best.
   - **`method`**: Optional. "max-info" | "D-gain". 
   max-info takes the item with the maximum latent information,
-  D-gain takes the item with the maximum gain in the determinant of the expected information matrix if examinee would answer to the item (Ren, van der Linden, Diao, 2017). 
-
-__Ren H, van der Linden WJ, Diao Q. Continuous online item calibration: Parameter recovery and item calibration. Psychometrika. 2017;82:498–522. doi: 10.1007/s11336-017-9553-1.__
+  D-gain takes the item with the maximum gain in the determinant of the expected information matrix if examinee would answer to the item (D-VC in __Ren, van der Linden, Diao, 2017__). 
 
 # Output
 It returns an item of generic type.
 
+# References
+__Ren H, van der Linden WJ, Diao Q. Continuous online item calibration: Parameter recovery and item calibration. Psychometrika. 2017;82:498–522. doi: 10.1007/s11336-017-9553-1.__
 """
-function find_best_item(examinee::AbstractExaminee, items::Vector{<:AbstractItem}; method = "max-info")
+function find_best_item(
+    examinee::AbstractExaminee,
+    items::Vector{<:AbstractItem};
+    method = "max-info",
+)
     if method in ["max-info", "D-gain"]
         if method == "max-info"
             infos = information_latent(examinee, items)
         elseif method == "D-gain"
-            infos = map( i -> D_gain_method(i, examinee), items)
+            infos = map(i -> D_gain_method(i, examinee), items)
         end
         return items[findmax(infos)[2]].idx::Int64
     else
@@ -47,12 +51,16 @@ Finds the best examinee among the `examinees` vector, for the `item` using maxim
 It returns the idx of the best examinee.
 
 """
-function find_best_examinee(item::AbstractItem, examinees::Vector{<:AbstractExaminee}; method = "D")
+function find_best_examinee(
+    item::AbstractItem,
+    examinees::Vector{<:AbstractExaminee};
+    method = "D",
+)
     if method in ["D", "A"]
         if method == "D"
-            infos = map( e -> D_method(item, e), examinees)
+            infos = map(e -> D_method(item, e), examinees)
         elseif method == "A"
-            infos = map( e -> A_method(item, e), examinees)
+            infos = map(e -> A_method(item, e), examinees)
         end
         return examinees[findmax(infos)[2]].idx::Int64
     else

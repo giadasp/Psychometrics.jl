@@ -1,10 +1,9 @@
-abstract type AbstractItem end
 
 include("parameters/parameters.jl")
 
-include("1pl.jl")
-include("2pl.jl")
-include("3pl.jl")
+abstract type AbstractItem end
+
+include("binary/binary.jl")
 
 """
     Item <: AbstractItem
@@ -16,7 +15,7 @@ A generic item struct.
   - **`idx::Int64`**: An integer that identifies the item in this session.
   - **`id::String`**: A string that identifies the examinee.
   - **`content::Vector{String}`**: A string vector containing the content features of an item.
-  - **`parameters::AbstractParameters`**: A generic item parameters object.
+  - **`parameters::AbstractParametersBinary`**: A generic item parameters object.
   - **`calibrated::Bool`**: Tells if the item has been already calibrated.
 
 # Factories
@@ -34,7 +33,7 @@ struct Item <: AbstractItem
     idx::Int64
     id::String
     content::Vector{String}
-    parameters::AbstractParameters
+    parameters::AbstractParametersBinary
 
     # Factories
     Item(idx, id, content, parameters) = new(idx, id, content, parameters)

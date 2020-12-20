@@ -2,13 +2,14 @@ __precompile__(true)
 module Psychometrics
 
 import Distributions
+import Distributed
+import SharedArrays
 import Dates
 import LinearAlgebra
 
 include("utils.jl")
 include("dist.jl")
-include("latent.jl")
-include("examinee.jl")
+include("examinee/examinee.jl")
 include("item/item.jl")
 include("response.jl")
 include("probability.jl")
@@ -23,29 +24,32 @@ include("calibration/PolyaGamma_MCMC.jl")
 export Latent1D,
     LatentND,
     Latent,
-    AbstractParameters,
+    AbstractParametersBinary,
     Parameters1PL,
     Parameters2PL,
     Parameters3PL,
     ParametersNPL,
+    AbstractItem,
+    AbstractItemBinary,
+    Item,
     Item1PL,
     Item2PL,
     Item3PL,
-    Item,
-    AbstractItem,
     Examinee,
     Examinee1D,
     AbstractExaminee,
-    Response,
+    ResponseBinary,
     AbstractResponse,
     add_prior!,
     add_posterior!,
     get_item_by_id,
     get_parameters,
+    empty_chain!,
     generate_response,
     add_response!,
     answer,
     get_responses_by_item_id,
+    get_responses_by_item_idx,
     get_responses_by_examinee_id,
     get_response_matrix,
     get_design_matrix,
@@ -76,5 +80,6 @@ export Latent1D,
     rand,
     find_best_item,
     find_best_examinee,
-    calibrate_item!
+    calibrate_item!,
+    estimate_ability!
 end # module

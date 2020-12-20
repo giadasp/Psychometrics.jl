@@ -6,42 +6,100 @@ struct PolyaGammaSample
 end
 
 function posterior(
-    item::Item2PL, 
+    item::Item2PL,
     examinees::Vector{<:AbstractExaminee}, #must be sorted by e.idx
-    responses::Vector{<:AbstractResponse}, #only responses of item sorted by e.idx
-    W::Vector{Float64}, #sorted by e.idx
+    responses::Vector{ResponseBinary}, #only responses of item sorted by e.idx
+    W::Vector{PolyaGammaSample}, #sorted by e.idx
 )
     prior = item.parameters.prior.v
-    a =  item.parameters.a
+    a = item.parameters.a
     b = item.parameters.b
     #W = map( e -> Distributions.rand(PolyaGammaDevRoye1Sampler(1.0, item.parameters.a *(e.latent.val - item.parameters.b))), examinees)
-    sigma2 = mapreduce(
-        (e, w) -> [(e.latent.val - b)^2, a^2 ] .* w,
-        +,
-        examinees,
-        W,
-    )
+    sigma2 = mapreduce((e, w) -> [(e.latent.val - b)^2, a^2] .* w.val, +, examinees, W)
     sigma2 = 1 ./ (sigma2 + (1 ./ Distributions.var.(prior)))
     mu = mapreduce(
         (e, w, r) -> [
-            (e.latent.val - b) *
-            (r.val - 0.5),
+            (e.latent.val - b) * (r.val - 0.5),
             -a * (
                 #(get_responses_by_examinee_id(e.id, responses)[1].val - 0.5) -
-                (r.val-0.5) -
-                (a * e.latent.val * w)
+                (r.val - 0.5) - (a * e.latent.val * w.val)
             ),
         ],
         +,
         examinees,
         W,
-        responses
+        responses,
     )
+    mu = sigma2 .* (mu + (Distributions.mean.(prior) ./ Distributions.var.(prior)))
+    return Distributions.Product([
+        Distributions.TruncatedNormal(mu[1], sqrt(sigma2[1]), 0.0, Inf),
+        Distributions.Normal(mu[2], sqrt(sigma2[2])),
+    ])
+end
+
+function update_posterior!(
+    item::Item2PL,
+    examinees::Vector{<:AbstractExaminee}, #must be sorted by e.idx
+    responses::Vector{<:AbstractResponse}, #only responses of item sorted by e.idx
+    W::Vector{PolyaGammaSample}, #sorted by e.idx
+)
+    item.parameters.posterior = posterior(item, examinees, responses, W)
+end
+
+function posterior(
+    examinee::Examinee1D,
+    items_e::Vector{<:AbstractItem}, #only items answered by examinee sorted by i.idx
+    responses_e::Vector{<:AbstractResponse}, #only responses of examinee sorted by i.idx
+    W::Vector{PolyaGammaSample},
+)
+    prior = examinee.latent.prior
+    sigma2 = mapreduce((i, w) -> (i.parameters.a^2) * w.val, +, items_e, W)
+    sigma2 = 1 / (sigma2 + (1 / Distributions.var(prior)))
+    mu =
+        sigma2 * (
+            mapreduce(
+                (i, w, r) ->
+                    i.parameters.a * (i.parameters.a * i.parameters.b * w.val +
+                     #(get_responses_by_item_id(i.id, responses_e)[1].val - 0.5)
+                     (r.val - 0.5)),
+                +,
+                items_e,
+                W,
+                responses_e,
+            ) + (prior.μ / Distributions.var(prior))
+        )
+    return Distributions.Normal(mu, sqrt(sigma2))::Distributions.ContinuousDistribution
+end
+
+function update_posterior!(
+    examinee::Examinee1D,
+    items_e::Vector{<:AbstractItem}, #only items answered by examinee sorted by i.idx
+    responses_e::Vector{<:AbstractResponse}, #only responses of examinee sorted by i.idx
+    W::Vector{PolyaGammaSample},
+)
+    examinee.latent.posterior = posterior(examinee, items_e, responses_e, W)
+end
+
+function posterior(
+    item::Item2PL, 
+    examinee::Examinee1D, 
+    w::PolyaGammaSample,
+    r::ResponseBinary
+    )
+    a = item.parameters.a
+    b = item.parameters.b
+    latent_val = examinee.latent.val
+    r_val = r.val
+    w_val = w.val
+
+    sigma2 = [(latent_val - b)^2 * w.val, a^2 * w_val]
+    sigma2 = 1 ./ (sigma2 .+ (1 ./ Distributions.var.(item.parameters.prior.v)))
+    mu = [(latent_val - b) * (r_val - 0.5), -a * ((r_val - 0.5) - (a * latent_val * w_val))]
     mu =
         sigma2 .* (
             mu + (
-                Distributions.mean.(prior) ./
-                Distributions.var.(prior)
+                Distributions.mean.(item.parameters.prior.v) ./
+                Distributions.var.(item.parameters.prior.v)
             )
         )
     return Distributions.Product([
@@ -50,84 +108,24 @@ function posterior(
     ])
 end
 
-function update_posterior!(
-    item::Item2PL, 
-    examinees::Vector{<:AbstractExaminee}, #must be sorted by e.idx
-    responses::Vector{<:AbstractResponse}, #only responses of item sorted by e.idx
-    W::Vector{Float64}, #sorted by e.idx
-)
-       item.parameters.posterior = posterior(item, examinees, responses, W)
-end
-
 function posterior(
     examinee::Examinee1D,
-    items_e::Vector{<:AbstractItem}, #only items answered by examinee sorted by i.idx
-    responses_e::Vector{<:AbstractResponse}, #only responses of examinee sorted by i.idx
-    W::Vector{Float64},
-)
-    prior = examinee.latent.prior
-    sigma2 = mapreduce((i, w) -> (i.parameters.a^2) * w, +, items_e, W)
-    sigma2 = 1 / (sigma2 + (1 / Distributions.var(prior)))
-    mu =
-        sigma2 * (
-            mapreduce(
-                (i, w, r) ->
-                    i.parameters.a * (
-                        i.parameters.a * i.parameters.b * w +
-                        #(get_responses_by_item_id(i.id, responses_e)[1].val - 0.5)
-                        (r.val - 0.5)
-                    ),
-                +,
-                items_e,
-                W,
-                responses_e
-            ) + (prior.μ / Distributions.var(prior))
-        )
-    return Distributions.Normal(mu, sqrt(sigma2))::Distributions.ContinuousDistribution
-end
-function update_posterior!(
-    examinee::Examinee1D,
-    items_e::Vector{<:AbstractItem}, #only items answered by examinee sorted by i.idx
-    responses_e::Vector{<:AbstractResponse}, #only responses of examinee sorted by i.idx
-    W::Vector{Float64},
-)
-    examinee.latent.posterior = posterior(examinee, items_e, responses_e, W)
-end
-
-function posterior(item::Item2PL, examinee::Examinee1D, w::PolyaGammaSample, r::Response)
-    a = item.parameters.a
-    b = item.parameters.b
-    latent_val = examinee.latent.val
-    r_val = r.val
-    w_val = w.val
-    
-    sigma2 = [(latent_val - b)^2 * w.val, a^2 * w_val]
-    sigma2 = 1 ./ (sigma2 .+ (1 ./ Distributions.var.(item.parameters.prior.v)))
-    mu = [
-        (latent_val - b) * (r_val - 0.5),
-        -a * ((r_val-0.5) - (a * latent_val * w_val))
-    ]
-    mu = sigma2 .* (
-            mu + (
-                Distributions.mean.(item.parameters.prior.v) ./
-                Distributions.var.(item.parameters.prior.v)
-            )
-        )
-    return Distributions.Product([
-        Distributions.TruncatedNormal(mu[1], sqrt(sigma2[1]), 0.0, Inf),
-        Distributions.Normal(mu[2], sqrt(sigma2[2]))
-    ])
-end
-
-function posterior(examinee::Examinee1D, item::Item2PL, w::PolyaGammaSample, r::Response)
+    item::Item2PL,
+    w::PolyaGammaSample,
+    r::ResponseBinary
+    )
     sigma2 = (item.parameters.a^2) * w.val
     sigma2 = 1 / (sigma2 + (1 / Distributions.var(examinee.latent.prior)))
-    mu = sigma2 * ( item.parameters.a * ( item.parameters.a * item.parameters.b * w.val + (r.val - 0.5)) + 
-    (examinee.latent.prior.μ / Distributions.var(examinee.latent.prior)))
+    mu =
+        sigma2 * (
+            item.parameters.a *
+            (item.parameters.a * item.parameters.b * w.val + (r.val - 0.5)) +
+            (examinee.latent.prior.μ / Distributions.var(examinee.latent.prior))
+        )
     return Distributions.Normal(mu, sqrt(sigma2))
 end
 
-function generate_w(items::Vector{<:AbstractItem}, examinee::AbstractExaminee)
+function generate_w(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
     return map(
         i -> PolyaGammaSample(
             i.idx,
@@ -135,8 +133,8 @@ function generate_w(items::Vector{<:AbstractItem}, examinee::AbstractExaminee)
             Distributions.rand(PolyaGamma(
                 1,
                 i.parameters.a * (examinee.latent.val - i.parameters.b),
-            ))
-        ), 
+            )),
+        ),
         items,
     )
 end
@@ -148,8 +146,8 @@ function generate_w(item::AbstractItem, examinees::Vector{<:AbstractExaminee})
             Distributions.rand(PolyaGamma(
                 1,
                 item.parameters.a * (e.latent.val - item.parameters.b),
-            ))
-        ), 
+            )),
+        ),
         examinees,
     )
 end
@@ -195,49 +193,72 @@ function set_value_from_chain!(examinee::Examinee1D)
 end
 
 #extract a value from the posterior and append it to the chain
-function chain_append!(item::Item2PL; sampling = false)
+function chain_append!(item::Union{Item2PL,Item3PL}; sampling = false)
     val = Distributions.rand(item.parameters.posterior)
-    if (sampling && size(item.parameters.chain,1)>=1000)
+    if (sampling && size(item.parameters.chain, 1) >= 1000)
         item.parameters.chain[Random.rand(1:1000)] = val
     else
         push!(item.parameters.chain, val)
-    end 
+    end
     return val::Vector{Float64}
 end
 
 function chain_append!(examinee::Examinee1D; sampling = false)
     val = Distributions.rand(examinee.latent.posterior)
-    if (sampling && size(examinee.latent.chain,1)>=1000)
+    if (sampling && size(examinee.latent.chain, 1) >= 1000)
         examinee.latent.chain[Random.rand(1:1_000)] = val
     else
         push!(examinee.latent.chain, val)
-    end 
+    end
     return val::Float64
 end
 
 
 #update the posterior, append sample to chain and set the value as a sample from the posterior
-function mcmc_iter!(item::Item2PL, examinees::Vector{<:AbstractExaminee}, responses::Vector{<:Response}, W::Vector{Float64}; sampling = true)
+function mcmc_iter!(
+    item::Item2PL,
+    examinees::Vector{<:AbstractExaminee},
+    responses::Vector{ResponseBinary},
+    W::Vector{PolyaGammaSample};
+    sampling = true,
+)
     update_posterior!(item, examinees, responses, W)
     #set_value_from_chain!(item)
     set_value_from_posterior!(item; sampling = sampling)
 end
 
-function mcmc_iter!(examinee::Examinee1D, items::Vector{<:AbstractItem}, responses::Vector{<:Response}, W::Vector{Float64}; sampling = true)
+function mcmc_iter!(
+    examinee::Examinee1D,
+    items::Vector{<:AbstractItem},
+    responses::Vector{ResponseBinary},
+    W::Vector{PolyaGammaSample};
+    sampling = true,
+)
     update_posterior!(examinee, items, responses, W)
     #chain_append!(examinee; sampling = sampling)
-    #set_value_from_chain!(examinee)
     set_value_from_posterior!(examinee; sampling = sampling)
+    #set_value_from_chain!(examinee)
 end
 
 #update the estimate as the mean of the chain values
-function update_estimate!(examinee::Examinee1D)
-    examinee.latent.val = sum(examinee.latent.chain)/size(examinee.latent.chain,1)
+function update_estimate!(examinee::Examinee1D; sampling = true)
+    chain_size = size(examinee.latent.chain, 1)
+    if sampling
+        examinee.latent.val = sum(examinee.latent.chain[(chain_size - min(999, chain_size - 1)) : end]) / min(1000, chain_size)
+    else
+        examinee.latent.val = sum(examinee.latent.chain) / chain_size
+    end
 end
 
-function update_estimate!(item::Item2PL)
-    chain_matrix = hcat(item.parameters.chain...) 
-    vals = [sum(i)/size(item.parameters.chain,1) for i in eachrow(chain_matrix)]
+function update_estimate!(item::Item2PL; sampling = true)
+    chain_size = size(item.parameters.chain, 1)
+    if sampling 
+        chain_matrix = hcat(item.parameters.chain[(chain_size - min(999, chain_size - 1)) : end]...)
+        vals = [sum(i) / min(1000, chain_size) for i in eachrow(chain_matrix)]
+    else
+        chain_matrix = hcat(item.parameters.chain...)
+        vals = [sum(i) / chain_size for i in eachrow(chain_matrix)]   
+    end
     item.parameters.a = vals[1]
     item.parameters.b = vals[2]
 end
