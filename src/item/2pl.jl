@@ -1,6 +1,6 @@
 
 """
-Item2PL <: AbstractItemBinary
+Item2PL <: AbstractItem
 
 # Description
 Item struct under the 2-parameter logistic model.
@@ -22,7 +22,7 @@ Item2PL(idx, id, content) = new(idx, id, content, Parameters2PL())
 Randomly generates a new 2PL item with custom index, id, content features and default 2PL item parameters 
 (Look at (`Parameters2PL`)[#Psychometrics.Parameters2PL] for the defaults).
 """
-struct Item2PL <: AbstractItemBinary
+struct Item2PL <: AbstractItem
     idx::Int64
     id::String
     content::Vector{String}

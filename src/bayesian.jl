@@ -8,7 +8,7 @@ end
 function posterior(
     item::Item2PL,
     examinees::Vector{<:AbstractExaminee}, #must be sorted by e.idx
-    responses::Vector{ResponseBinary}, #only responses of item sorted by e.idx
+    responses::Vector{<:AbstractResponse}, #only responses of item sorted by e.idx
     W::Vector{PolyaGammaSample}, #sorted by e.idx
 )
     prior = item.parameters.prior.v
@@ -70,7 +70,6 @@ function posterior(
         )
     return Distributions.Normal(mu, sqrt(sigma2))::Distributions.ContinuousDistribution
 end
-
 function update_posterior!(
     examinee::Examinee1D,
     items_e::Vector{<:AbstractItem}, #only items answered by examinee sorted by i.idx
@@ -84,7 +83,7 @@ function posterior(
     item::Item2PL, 
     examinee::Examinee1D, 
     w::PolyaGammaSample,
-    r::ResponseBinary
+    r::Response
     )
     a = item.parameters.a
     b = item.parameters.b
@@ -112,7 +111,7 @@ function posterior(
     examinee::Examinee1D,
     item::Item2PL,
     w::PolyaGammaSample,
-    r::ResponseBinary
+    r::Response
     )
     sigma2 = (item.parameters.a^2) * w.val
     sigma2 = 1 / (sigma2 + (1 / Distributions.var(examinee.latent.prior)))
@@ -218,7 +217,7 @@ end
 function mcmc_iter!(
     item::Item2PL,
     examinees::Vector{<:AbstractExaminee},
-    responses::Vector{ResponseBinary},
+    responses::Vector{<:Response},
     W::Vector{PolyaGammaSample};
     sampling = true,
 )
@@ -230,7 +229,7 @@ end
 function mcmc_iter!(
     examinee::Examinee1D,
     items::Vector{<:AbstractItem},
-    responses::Vector{ResponseBinary},
+    responses::Vector{<:Response},
     W::Vector{PolyaGammaSample};
     sampling = true,
 )

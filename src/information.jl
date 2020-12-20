@@ -113,7 +113,7 @@ end
     information_latent(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
 
 # Description
-An abstraction of `information_latent(latent::AbstractLatent, parameters::AbstractParametersBinary)` on an examinee and items.
+An abstraction of `information_latent(latent::AbstractLatent, parameters::AbstractParameters)` on an examinee and items.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
@@ -129,12 +129,12 @@ end
     information_latent(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
 
 # Description
-An abstraction of `information_latent(latent::AbstractLatent, parameters::AbstractParametersBinary)` on examinees and items.
+An abstraction of `information_latent(latent::AbstractLatent, parameters::AbstractParameters)` on examinees and items.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
 - **`examinees::Vector{<:AbstractExaminee}`** : Required. 
-- **`items::Vector{<:AbstractItemBinary}`** : Required. 
+- **`items::Vector{<:AbstractItem}`** : Required. 
 
 """
 function information_latent(

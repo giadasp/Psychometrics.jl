@@ -1,10 +1,6 @@
 # 2PL 
-"""
-    Parameters2PL <: AbstractParametersBinary
 
-Contains info about the difficulty of an item under the 2-parameter logistic model.
-"""
-mutable struct Parameters2PL <: AbstractParametersBinary
+mutable struct Parameters2PL <: AbstractParameters
     a::Float64
     bounds_a::Vector{Float64}
     b::Float64
