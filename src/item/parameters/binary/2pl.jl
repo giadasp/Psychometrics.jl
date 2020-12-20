@@ -2,7 +2,7 @@
 """
     Parameters2PL <: AbstractParametersBinary
 
-Contains info about the difficulty of an item under the 2-parameter logistic model.
+    Contains information of a set of item parameters (values, bounds, priors, posteiors, chains, expected Fisher information, calibrated) under the 2-parameter logistic model.
 """
 mutable struct Parameters2PL <: AbstractParametersBinary
     a::Float64

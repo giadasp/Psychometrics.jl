@@ -2,7 +2,7 @@
 """
     Parameters3PL <: AbstractParametersBinary
 
-Contains info about the difficulty of an item under the 3-parameter logistic model.
+    Contains information of a set of item parameters (values, bounds, priors, posteiors, chains, expected Fisher information, calibrated) under the 3-parameter logistic model.
 """
 mutable struct Parameters3PL <: AbstractParametersBinary
     a::Float64
