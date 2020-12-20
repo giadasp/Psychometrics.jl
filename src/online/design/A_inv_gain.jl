@@ -11,9 +11,8 @@ end
 function A_inv_gain_method(parameters::Parameters2PL, latent::Latent1D)
     old_exp_info = copy(parameters.expected_information)
     return LinearAlgebra.tr(
-        LinearAlgebra.inv(
-            old_exp_info + expected_information_item(parameters, latent),
-        ) - LinearAlgebra.inv(old_exp_info),
+        LinearAlgebra.inv(old_exp_info + expected_information_item(parameters, latent)) -
+        LinearAlgebra.inv(old_exp_info),
     )
 end
 

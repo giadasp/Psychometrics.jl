@@ -2,17 +2,16 @@
     A_gain_method(parameters::Parameters1PL, latent::Latent1D)
 """
 function A_gain_method(parameters::Parameters1PL, latent::Latent1D)
-return expected_information_item(parameters, latent)
+    return expected_information_item(parameters, latent)
 end
 
 """
     A_gain_method(parameters::Parameters2PL, latent::Latent1D)
 """
 function A_gain_method(parameters::Parameters2PL, latent::Latent1D)
-old_exp_info = copy(parameters.expected_information)
-return LinearAlgebra.tr(
-    old_exp_info + expected_information_item(parameters, latent),
-) - LinearAlgebra.tr(old_exp_info)
+    old_exp_info = copy(parameters.expected_information)
+    return LinearAlgebra.tr(old_exp_info + expected_information_item(parameters, latent)) -
+           LinearAlgebra.tr(old_exp_info)
 end
 
 """
@@ -31,4 +30,3 @@ It returns a `Float64` scalar.
 function A_gain_method(item::AbstractItem, examinee::AbstractExaminee)
     return A_gain_method(item.parameters, examinee.latent)
 end
-

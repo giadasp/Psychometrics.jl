@@ -27,13 +27,13 @@ LatentND(dist, bounds)
 Randomly generates a value for the N-dimensional latent variable and assigns a custom multivariate distribution to prior and posterior with specific bounds.
 """
 mutable struct LatentND <: AbstractLatent
-names::Vector{String}
-val::Vector{Float64}
-bounds::Vector{Vector{Float64}}
-prior::Distributions.MultivariateDistribution
-posterior::Distributions.MultivariateDistribution
-chain::Vector{Vector{Float64}}
-expected_information::Matrix{Float64}
+    names::Vector{String}
+    val::Vector{Float64}
+    bounds::Vector{Vector{Float64}}
+    prior::Distributions.MultivariateDistribution
+    posterior::Distributions.MultivariateDistribution
+    chain::Vector{Vector{Float64}}
+    expected_information::Matrix{Float64}
 
     function LatentND(names, val, bounds, prior, posterior, chain, expected_information)
         new(names, val, bounds, prior, posterior, chain, expected_information)

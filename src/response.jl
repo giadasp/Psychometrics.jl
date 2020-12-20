@@ -5,13 +5,26 @@ struct ResponseBinary <: AbstractResponse
     examinee_idx::Int64
     item_id::String
     examinee_id::String
-    val::Union{Missing, Float64}
+    val::Union{Missing,Float64}
     start_time::Dates.DateTime
     end_time::Dates.DateTime
-    ResponseBinary(item_idx, examinee_idx, item_id, examinee_id, val, start_time, end_time) =
-        new(item_idx, examinee_idx, item_id, examinee_id, val, start_time, end_time)
-    ResponseBinary(item_idx, examinee_idx, item_id, examinee_id, val, time::Dates.DateTime) =
-        new(item_idx, examinee_idx, item_id, examinee_id, val, time, time)
+    ResponseBinary(
+        item_idx,
+        examinee_idx,
+        item_id,
+        examinee_id,
+        val,
+        start_time,
+        end_time,
+    ) = new(item_idx, examinee_idx, item_id, examinee_id, val, start_time, end_time)
+    ResponseBinary(
+        item_idx,
+        examinee_idx,
+        item_id,
+        examinee_id,
+        val,
+        time::Dates.DateTime,
+    ) = new(item_idx, examinee_idx, item_id, examinee_id, val, time, time)
 end
 
 # Outer Constructor Methods
@@ -56,7 +69,10 @@ end
 
 It returns the vector of responses given by examinee with id = `id`.
 """
-function get_responses_by_examinee_id(examinee_id::String, responses::Vector{<:AbstractResponse})
+function get_responses_by_examinee_id(
+    examinee_id::String,
+    responses::Vector{<:AbstractResponse},
+)
     filter(r -> r.examinee_id == examinee_id, responses)
 end
 
@@ -78,7 +94,7 @@ The vector of responses is sorted by `examinee_idx` if `sorted = true`.
 function get_responses_by_item_idx(
     item_idx::Int64,
     responses::Vector{<:AbstractResponse};
-    sorted = true
+    sorted = true,
 )
     resp_item = filter(r -> r.item_idx == item_idx, responses)
     if sorted
@@ -148,7 +164,10 @@ function answer_binary(
     examinees::Vector{<:AbstractExaminee},
     items::Vector{<:AbstractItem},
 )
-    answer_binary(get_examinee_by_id(examinee_id, examinees), get_item_by_id(item_id, items))
+    answer_binary(
+        get_examinee_by_id(examinee_id, examinees),
+        get_item_by_id(item_id, items),
+    )
 end
 
 """
@@ -229,4 +248,3 @@ function get_examinees_idx_who_answered_item(
     resp_e = get_responses_by_item_id(item.id, responses)
     return map(r -> r.examinee_idx, resp_e)
 end
-

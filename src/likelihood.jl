@@ -147,7 +147,11 @@ end
 
 It computes the likelihood for a 1-dimensional latent variable and item parameters `parameters` with answer `response_val`.
 """
-function likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParametersBinary)
+function likelihood(
+    response_val::Float64,
+    latent::Latent1D,
+    parameters::AbstractParametersBinary,
+)
     return likelihood(response_val, latent.val, parameters)
 end
 

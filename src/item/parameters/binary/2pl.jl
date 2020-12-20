@@ -75,7 +75,7 @@ end
 
 """
 function empty_chain!(parameters::Parameters2PL)
-    parameters.chain = Vector{Vector{Float64}}(undef,0)
+    parameters.chain = Vector{Vector{Float64}}(undef, 0)
 end
 
 """
@@ -99,12 +99,12 @@ end
 """
 function update_estimate!(parameters::Parameters2PL; sampling = true)
     chain_size = size(parameters.chain, 1)
-    if sampling 
-        chain_matrix = hcat(parameters.chain[(chain_size - min(999, chain_size - 1)) : end]...)
+    if sampling
+        chain_matrix = hcat(parameters.chain[(chain_size-min(999, chain_size - 1)):end]...)
         vals = [sum(i) / min(1000, chain_size) for i in eachrow(chain_matrix)]
     else
         chain_matrix = hcat(parameters.chain...)
-        vals = [sum(i) / chain_size for i in eachrow(chain_matrix)]   
+        vals = [sum(i) / chain_size for i in eachrow(chain_matrix)]
     end
     parameters.a = vals[1]
     parameters.b = vals[2]

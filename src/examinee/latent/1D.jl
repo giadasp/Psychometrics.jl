@@ -82,7 +82,9 @@ end
 function update_estimate!(latent::Latent1D; sampling = true)
     chain_size = size(latent.chain, 1)
     if sampling
-        latent.val = sum(latent.chain[(chain_size - min(999, chain_size - 1)) : end]) / min(1000, chain_size)
+        latent.val =
+            sum(latent.chain[(chain_size-min(999, chain_size - 1)):end]) /
+            min(1000, chain_size)
     else
         latent.val = sum(latent.chain) / chain_size
     end

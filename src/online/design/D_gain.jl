@@ -10,9 +10,8 @@ end
 """
 function D_gain_method(parameters::Parameters2PL, latent::Latent1D)
     old_exp_info = copy(parameters.expected_information)
-    return LinearAlgebra.det(
-        old_exp_info + expected_information_item(parameters, latent),
-    ) - LinearAlgebra.det(old_exp_info)
+    return LinearAlgebra.det(old_exp_info + expected_information_item(parameters, latent)) -
+           LinearAlgebra.det(old_exp_info)
 end
 
 """

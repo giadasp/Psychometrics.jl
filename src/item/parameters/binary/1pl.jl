@@ -32,5 +32,5 @@ end
 
 """
 function empty_chain!(parameters::Parameters1PL)
-    parameters.chain = Vector{Float64}(undef,0)
+    parameters.chain = Vector{Float64}(undef, 0)
 end
