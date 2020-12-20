@@ -1,6 +1,10 @@
 ## 3PL
+"""
+    Parameters3PL <: AbstractParametersBinary
 
-mutable struct Parameters3PL <: AbstractParameters
+Contains info about the difficulty of an item under the 3-parameter logistic model.
+"""
+mutable struct Parameters3PL <: AbstractParametersBinary
     a::Float64
     bounds_a::Vector{Float64}
     b::Float64

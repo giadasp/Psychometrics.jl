@@ -1,6 +1,6 @@
 
 """
-Item3PL <: AbstractItem
+Item3PL <: AbstractItemBinary
 
 # Description
 Item struct under the 3-parameter logistic model.
@@ -22,7 +22,7 @@ Item3PL(idx, id, content) = new(idx, id, content, Parameters3PL(), true)
 Randomly generates a new 3PL item with custom index, id, content features and default 3PL item parameters 
 (Look at (`Parameters3PL`)[#Psychometrics.Parameters3PL] for the defaults).
 """
-struct Item3PL <: AbstractItem
+struct Item3PL <: AbstractItemBinary
     idx::Int64
     id::String
     content::Vector{String}

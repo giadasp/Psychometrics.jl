@@ -1,7 +1,7 @@
 function calibrate_item!(
     item::AbstractItem,
     examinees::Vector{<:AbstractExaminee},
-    responses::Vector{Response};
+    responses::Vector{ResponseBinary};
     mcmc_iter = 4_000,
     sampling = true,
 )
@@ -24,7 +24,7 @@ end
 function estimate_ability!(
     examinee::Examinee1D,
     items::Vector{<:AbstractItem},
-    responses::Vector{Response};
+    responses::Vector{ResponseBinary};
     mcmc_iter = 2_000,
     sampling = true,
 )

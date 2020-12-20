@@ -1,7 +1,10 @@
-#
+## NPL
+"""
+    ParametersNPL <: AbstractParametersBinary
 
-
-mutable struct ParametersNPL <: AbstractParameters
+Contains info about the difficulty of an item under the N-parameter logistic model.
+"""
+mutable struct ParametersNPL <: AbstractParametersBinary
     a::Vector{Float64}
     bounds_a::Vector{Vector{Float64}}
     b::Float64

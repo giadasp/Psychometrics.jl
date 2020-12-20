@@ -1,10 +1,10 @@
 
 """
-Parameters1PL
+    Parameters1PL <: AbstractParametersBinary
 
 Contains info about the difficulty of an item under the 1-parameter logistic model.
 """
-mutable struct Parameters1PL <: AbstractParameters
+mutable struct Parameters1PL <: AbstractParametersBinary
     b::Float64
     bounds_b::Vector{Float64}
     prior::Distributions.UnivariateDistribution
