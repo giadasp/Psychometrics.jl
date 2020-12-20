@@ -73,7 +73,7 @@ end
     get_responses_by_item_idx(item_idx::Int64, responses::Vector{<:AbstractResponse}; sorted = true)
 
 It returns the vector of responses to item with idx equal to `item_idx`.
-The vector of responses is sorted if `sorted = true`.
+The vector of responses is sorted by `examinee_idx` if `sorted = true`.
 """
 function get_responses_by_item_idx(
     item_idx::Int64,

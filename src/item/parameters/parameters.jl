@@ -1,7 +1,6 @@
 # Types and Structs
 abstract type AbstractParameters end
 
-
 include("binary/binary.jl")
 
 # Assign prior

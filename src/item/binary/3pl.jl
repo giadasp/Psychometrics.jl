@@ -1,9 +1,9 @@
 
 """
-Item3PL <: AbstractItemBinary
+    Item3PL <: AbstractItemBinary
 
 # Description
-Item struct under the 3-parameter logistic model.
+Item struct under the 3-parameter logistic model and with dichotomous (binary) responses.
 
 # Fields
 - **`idx::Int64`**: An integer that identifies the item in this session.
