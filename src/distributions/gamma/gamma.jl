@@ -1,6 +1,6 @@
 function Distributions.minimum(d::Distributions.Gamma{T}) where {T<:Real}
-    0.0
+    return 0.0
 end
-function Distributions.minimum(d::Distributions.Gamma{T}) where {T<:Real}
-    Inf
+function Distributions.maximum(d::Distributions.Gamma{T}) where {T<:Real}
+    return Inf
 end
