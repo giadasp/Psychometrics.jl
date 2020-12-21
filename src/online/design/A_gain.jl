@@ -1,16 +1,16 @@
 """
-    A_gain_method(parameters::Parameters1PL, latent::Latent1D)
+    _A_gain_method(parameters::Parameters1PL, latent::Latent1D)
 """
-function A_gain_method(parameters::Parameters1PL, latent::Latent1D)
-    return expected_information_item(parameters, latent)
+function _A_gain_method(parameters::Parameters1PL, latent::Latent1D)
+    return _expected_information_item(parameters, latent)
 end
 
 """
-    A_gain_method(parameters::Parameters2PL, latent::Latent1D)
+    _A_gain_method(parameters::Parameters2PL, latent::Latent1D)
 """
-function A_gain_method(parameters::Parameters2PL, latent::Latent1D)
+function _A_gain_method(parameters::Parameters2PL, latent::Latent1D)
     old_exp_info = copy(parameters.expected_information)
-    return LinearAlgebra.tr(old_exp_info + expected_information_item(parameters, latent)) -
+    return LinearAlgebra.tr(old_exp_info + _expected_information_item(parameters, latent)) -
            LinearAlgebra.tr(old_exp_info)
 end
 
@@ -28,5 +28,5 @@ Computes the gain in the trace of the expected information matrix for an item.
 It returns a `Float64` scalar.
 """
 function A_gain_method(item::AbstractItem, examinee::AbstractExaminee)
-    return A_gain_method(item.parameters, examinee.latent)
+    return _A_gain_method(item.parameters, examinee.latent)
 end

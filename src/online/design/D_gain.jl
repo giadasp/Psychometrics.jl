@@ -1,16 +1,16 @@
 """
-    D_gain_method(parameters::Parameters1PL, latent::Latent1D)
+    _D_gain_method(parameters::Parameters1PL, latent::Latent1D)
 """
-function D_gain_method(parameters::Parameters1PL, latent::Latent1D)
-    return expected_information_item(parameters, latent)
+function _D_gain_method(parameters::Parameters1PL, latent::Latent1D)
+    return _expected_information_item(parameters, latent)
 end
 
 """
-    D_gain_method(parameters::Parameters2PL, latent::Latent1D)
+    _D_gain_method(parameters::Parameters2PL, latent::Latent1D)
 """
-function D_gain_method(parameters::Parameters2PL, latent::Latent1D)
+function _D_gain_method(parameters::Parameters2PL, latent::Latent1D)
     old_exp_info = copy(parameters.expected_information)
-    return LinearAlgebra.det(old_exp_info + expected_information_item(parameters, latent)) -
+    return LinearAlgebra.det(old_exp_info + _expected_information_item(parameters, latent)) -
            LinearAlgebra.det(old_exp_info)
 end
 
@@ -31,5 +31,5 @@ end
     __Ren H, van der Linden WJ, Diao Q. Continuous online item calibration: Parameter recovery and item calibration. Psychometrika. 2017;82:498–522. doi: 10.1007/s11336-017-9553-1.__
 """
 function D_gain_method(item::AbstractItem, examinee::AbstractExaminee)
-    return D_gain_method(item.parameters, examinee.latent)
+    return _D_gain_method(item.parameters, examinee.latent)
 end

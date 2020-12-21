@@ -9,46 +9,46 @@ function log_likelihood(
     latent_val::Float64,
     parameters::AbstractParametersBinary,
 )
-    p = probability(latent_val, parameters)
+    p = __probability(latent_val, parameters)
     return response_val * log(p) + (1 - response_val) * log(1 - p)
 end
 
 """
-    likelihood(response_val::Float64, latent_val::Float64, parameters::AbstractParametersBinary)
+    _likelihood(response_val::Float64, latent_val::Float64, parameters::AbstractParametersBinary)
 
 It computes the log likelihood for a latent value and item parameters `parameters` with answer `response_val`.
 """
-function likelihood(
+function _likelihood(
     response_val::Float64,
     latent_val::Float64,
     parameters::AbstractParametersBinary,
 )
-    p = probability(latent_val, parameters)
+    p = __probability(latent_val, parameters)
     return p^response_val * (1 - p)^(1 - response_val)
 end
 
 """
-    log_likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParametersBinary)
+    _log_likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParametersBinary)
 
 It computes the log likelihood for a 1-dimensional latent variable and item parameters `parameters` with answer `response_val`.
 """
-function log_likelihood(
+function _log_likelihood(
     response_val::Float64,
     latent::Latent1D,
     parameters::AbstractParametersBinary,
 )
-    p = probability(latent, parameters)
+    p = _probability(latent, parameters)
     return response_val * log(p) + (1 - response_val) * log(1 - p)
 end
 
 
 """
-    log_likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParametersBinary, g_item::Vector{Float64}, g_latent::Vector{Float64})
+    _log_likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParametersBinary, g_item::Vector{Float64}, g_latent::Vector{Float64})
 
 It computes the log likelihood for a 1-dimensional latent variable and item parameters `parameters` with answer `response_val`. 
 It updates also the gradient vectors.
 """
-function log_likelihood(
+function _log_likelihood(
     response_val::Float64,
     latent::Latent1D,
     parameters::AbstractParametersBinary,
@@ -57,7 +57,7 @@ function log_likelihood(
 )
 
     if size(g_item, 1) > 0 || size(g_latent, 1) > 0
-        p = probability(latent, parameters, g_item, g_latent)
+        p = _probability(latent, parameters, g_item, g_latent)
 
         if size(g_item, 1) > 0
             g_item .=
@@ -70,7 +70,7 @@ function log_likelihood(
         end
     end
 
-    return log_likelihood(response_val, latent, parameters)
+    return _log_likelihood(response_val, latent, parameters)
 end
 
 """
@@ -83,7 +83,7 @@ function log_likelihood(
     examinee::AbstractExaminee,
     item::AbstractItem,
 )
-    log_likelihood(response.val, examinee.latent, item.parameters)
+    _log_likelihood(response.val, examinee.latent, item.parameters)
 end
 
 """
@@ -99,7 +99,7 @@ function log_likelihood(
     g_item::Vector{Float64},
     g_latent::Vector{Float64},
 )
-    log_likelihood(response.val, examinee.latent, item.parameters, g_item, g_latent)
+    _log_likelihood(response.val, examinee.latent, item.parameters, g_item, g_latent)
 end
 
 """
@@ -143,16 +143,16 @@ end
 
 
 """
-    likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParametersBinary)
+    _likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParametersBinary)
 
 It computes the likelihood for a 1-dimensional latent variable and item parameters `parameters` with answer `response_val`.
 """
-function likelihood(
+function _likelihood(
     response_val::Float64,
     latent::Latent1D,
     parameters::AbstractParametersBinary,
 )
-    return likelihood(response_val, latent.val, parameters)
+    return _likelihood(response_val, latent.val, parameters)
 end
 
 """
@@ -165,7 +165,7 @@ function likelihood(
     examinee::AbstractExaminee,
     item::AbstractItem,
 )
-    return likelihood(response.val, examinee.latent.val, item.parameters)
+    return _likelihood(response.val, examinee.latent.val, item.parameters)
 end
 
 """

@@ -103,12 +103,12 @@ function get_responses_by_item_idx(
 end
 
 """
-    generate_response(latent::Latent1D, parameters::AbstractParametersBinary)
+    _generate_response(latent::Latent1D, parameters::AbstractParametersBinary)
 
 Randomly generate a response for a 1-dimensional latent variable and custom item parameters.
 """
-function generate_response(latent::Latent1D, parameters::AbstractParametersBinary)
-    Float64(rand(Distributions.Bernoulli(probability(
+function _generate_response(latent::Latent1D, parameters::AbstractParametersBinary)
+    Float64(rand(Distributions.Bernoulli(_probability(
         latent,
         parameters,
         Array{Float64,1}(undef, 0),
@@ -127,7 +127,7 @@ function answer_binary(examinee::AbstractExaminee, item::AbstractItem)
         examinee.idx,
         item.id,
         examinee.id,
-        generate_response(examinee.latent, item.parameters),
+        _generate_response(examinee.latent, item.parameters),
         Dates.now(),
         Dates.now(),
     )

@@ -8,36 +8,50 @@ end
 """
     posterior(
         item::AbstractItem,
-        examinees::Vector{<:AbstractExaminee}, #must be sorted by e.idx
-        responses::Vector{<:AbstractResponse}, #only responses of item sorted by e.idx
-        W::Vector{PolyaGammaSample}, #sorted by e.idx
+        examinees::Vector{<:AbstractExaminee}, 
+        responses::Vector{<:AbstractResponse},
+        W::Vector{PolyaGammaSample};
+        already_sorted = false,
     )
 
 """
 function posterior(
     item::AbstractItem,
-    examinees::Vector{<:AbstractExaminee}, #must be sorted by e.idx
-    responses::Vector{<:AbstractResponse}, #only responses of item sorted by e.idx
-    W::Vector{PolyaGammaSample}, #sorted by e.idx
+    examinees::Vector{<:AbstractExaminee}, 
+    responses::Vector{<:AbstractResponse},
+    W::Vector{PolyaGammaSample};
+    already_sorted = false
 )
-    return posterior(item.parameters, map(e -> e.latent, examinees), responses, W)
+    if !already_sorted
+        sort!(examinees, by = e -> e.idx)
+        sort!(responses, by = r -> r.examinee_idx)
+        already_sorted = true
+    end
+    return _posterior(item.parameters, map(e -> e.latent, examinees), responses, W)
 end
 
 """
     update_posterior!(
         item::AbstractItem,
-        examinees::Vector{<:AbstractExaminee}, #must be sorted by e.idx
-        responses::Vector{<:AbstractResponse}, #only responses of item sorted by e.idx
-        W::Vector{PolyaGammaSample}, #sorted by e.idx
+        examinees::Vector{<:AbstractExaminee},
+        responses::Vector{<:AbstractResponse},
+        W::Vector{PolyaGammaSample};
+        already_sorted = false,
     )
 """
 function update_posterior!(
     item::AbstractItem,
-    examinees::Vector{<:AbstractExaminee}, #must be sorted by e.idx
-    responses::Vector{<:AbstractResponse}, #only responses of item sorted by e.idx
-    W::Vector{PolyaGammaSample}, #sorted by e.idx
-)
-    item.parameters.posterior = posterior(item, examinees, responses, W)
+    examinees::Vector{<:AbstractExaminee},
+    responses::Vector{<:AbstractResponse},
+    W::Vector{PolyaGammaSample};
+    already_sorted = false,
+)   
+    if !already_sorted
+        sort!(examinees, by = e -> e.idx)
+        sort!(responses, by = r -> r.examinee_idx)
+        already_sorted = true
+    end
+    item.parameters.posterior = posterior(item, examinees, responses, W; already_sorted = already_sorted)
 end
 
 """
@@ -45,19 +59,26 @@ end
         examinee::AbstractExaminee,
         items::Vector{<:AbstractItem}, #only items answered by examinee sorted by i.idx
         responses::Vector{<:AbstractResponse}, #only responses of examinee sorted by i.idx
-        W::Vector{PolyaGammaSample},
+        W::Vector{PolyaGammaSample};
+        already_sorted = false,
     )
 """
 function posterior(
     examinee::AbstractExaminee,
     items::Vector{<:AbstractItem}, #only items answered by examinee sorted by i.idx
     responses::Vector{<:AbstractResponse}, #only responses of examinee sorted by i.idx
-    W::Vector{PolyaGammaSample},
-)
-    return posterior(examinee.latent, map(i -> i.parameters, items), responses, W)
+    W::Vector{PolyaGammaSample};
+    already_sorted = false,
+    )   
+    if !already_sorted
+        sort!(items, by = i -> i.idx)
+        sort!(responses, by = r -> r.item_idx)
+        already_sorted = true
+    end
+    return _posterior(examinee.latent, map(i -> i.parameters, items), responses, W)
 end
 
-function posterior(
+function _posterior(
     latent::Latent1D,
     parameters::Vector{Parameters2PL},
     responses::Vector{ResponseBinary},
@@ -84,21 +105,28 @@ end
 """
     update_posterior!(
         examinee::AbstractExaminee,
-        items::Vector{<:AbstractItem}, #only items answered by examinee sorted by i.idx
-        responses::Vector{<:AbstractResponse}, #only responses of examinee sorted by i.idx
-        W::Vector{PolyaGammaSample},
+        items::Vector{<:AbstractItem},
+        responses::Vector{<:AbstractResponse},
+        W::Vector{PolyaGammaSample};
+        already_sorted = false,
     )
 """
 function update_posterior!(
     examinee::AbstractExaminee,
-    items::Vector{<:AbstractItem}, #only items answered by examinee sorted by i.idx
-    responses::Vector{<:AbstractResponse}, #only responses of examinee sorted by i.idx
-    W::Vector{PolyaGammaSample},
-)
-    examinee.latent.posterior = posterior(examinee, items, responses, W)
+    items::Vector{<:AbstractItem},
+    responses::Vector{<:AbstractResponse},
+    W::Vector{PolyaGammaSample};
+    already_sorted = false,
+    )   
+    if !already_sorted
+        sort!(items, by = i -> i.idx)
+        sort!(responses, by = r -> r.item_idx)
+        already_sorted = true
+    end
+    examinee.latent.posterior = posterior(examinee, items, responses, W; already_sorted = already_sorted)
 end
 
-function posterior(
+function _posterior(
     latent::Latent1D,
     parameters::Parameters2PL,
     response::ResponseBinary,
@@ -127,12 +155,12 @@ function posterior(
     examinee::AbstractExaminee,
     item::AbstractItem,
     response::ResponseBinary,
-    w::PolyaGammaSample,
+    w::PolyaGammaSample
 )
-    return posterior(examinee.latent, item.parameters, response, w)
+    return _posterior(examinee.latent, item.parameters, response, w)
 end
 
-function posterior(
+function _posterior(
     parameters::Parameters2PL,
     latent::Latent1D,
     response::ResponseBinary,
@@ -166,11 +194,11 @@ function posterior(
     response::AbstractResponse,
     w::PolyaGammaSample,
 )
-    return posterior(item.parameters, examinee.latent, response, w)
+    return _posterior(item.parameters, examinee.latent, response, w)
 end
 
 
-function posterior(
+function _posterior(
     parameters::Parameters2PL,
     latents::Vector{Latent1D}, #must be sorted by e.idx
     responses::Vector{ResponseBinary}, #only responses of item sorted by e.idx
@@ -205,22 +233,19 @@ function generate_w(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
         i -> PolyaGammaSample(
             i.idx,
             examinee.idx,
-            Distributions.rand(PolyaGamma(
-                1,
-                i.parameters.a * (examinee.latent.val - i.parameters.b),
-            )),
+            _generate_w(i.parameters, examinee.latent)
         ),
         items,
     )
 end
 
-function generate_w(parameters::Parameters2PL, latent::Latent1D)
+function _generate_w(parameters::Parameters2PL, latent::Latent1D)
     return Distributions.rand(PolyaGamma(1, parameters.a * (latent.val - parameters.b)))
 end
 
 function generate_w(item::AbstractItem, examinees::Vector{<:AbstractExaminee})
     return map(
-        e -> PolyaGammaSample(item.idx, e.idx, generate_w(item.parameters, e.latent)),
+        e -> PolyaGammaSample(item.idx, e.idx, _generate_w(item.parameters, e.latent)),
         examinees,
     )
 end
@@ -231,7 +256,7 @@ function generate_w(
 )
     return mapreduce(
         i -> map(
-            e -> PolyaGammaSample(i.idx, e.idx, generate_w(i.parameters, e.latent)),
+            e -> PolyaGammaSample(i.idx, e.idx, _generate_w(i.parameters, e.latent)),
             examinees_i[i.idx],
         ),
         vcat,
@@ -239,46 +264,26 @@ function generate_w(
     )
 end
 
-#extract a value from the posterior and append it to the chain
-function chain_append!(parameters::Union{Parameters2PL,Parameters3PL}; sampling = false)
-    val = Distributions.rand(parameters.posterior)
-    if (sampling && size(parameters.chain, 1) >= 1000)
-        parameters.chain[Random.rand(1:1000)] = val
-    else
-        push!(parameters.chain, val)
-    end
-    return val::Vector{Float64}
-end
-
-function chain_append!(latent::Latent1D; sampling = false)
-    val = Distributions.rand(latent.posterior)
-    if (sampling && size(latent.chain, 1) >= 1000)
-        latent.chain[Random.rand(1:1_000)] = val
-    else
-        push!(latent.chain, val)
-    end
-    return val::Float64
-end
 
 
 #extract a random value from posterior and set it as value
 function set_val_from_posterior!(item::AbstractItem; sampling = true)
-    vals = chain_append!(item.parameters; sampling = sampling)
-    set_val!(item.parameters, vals)
+    vals = _chain_append!(item.parameters; sampling = sampling)
+    _set_val!(item.parameters, vals)
 end
 
 function set_val_from_posterior!(examinee::AbstractExaminee; sampling = true)
-    val = chain_append!(examinee.latent; sampling = sampling)
-    set_val!(examinee.latent, val)
+    val = _chain_append!(examinee.latent; sampling = sampling)
+    _set_val!(examinee.latent, val)
 end
 
 #take the last value of the chain and set it as value
 function set_val_from_chain!(item::AbstractItem)
-    set_val_from_chain!(item.parameters)
+    _set_val_from_chain!(item.parameters)
 end
 
 function set_val_from_chain!(examinee::AbstractExaminee)
-    set_val_from_chain!(examinee.latent)
+    _set_val_from_chain!(examinee.latent)
 end
 
 
@@ -289,8 +294,14 @@ function mcmc_iter!(
     responses::Vector{<:AbstractResponse},
     W::Vector{PolyaGammaSample};
     sampling = true,
+    already_sorted = false,
 )
-    update_posterior!(item, examinees, responses, W)
+    if !already_sorted
+        sort!(examinees, by = e -> e.idx)
+        sort!(responses, by = r -> r.examinee_idx)
+        already_sorted = true
+    end
+    update_posterior!(item, examinees, responses, W; already_sorted = already_sorted)
     #set_val_from_chain!(item)
     set_val_from_posterior!(item; sampling = sampling)
 end
@@ -301,8 +312,14 @@ function mcmc_iter!(
     responses::Vector{<:AbstractResponse},
     W::Vector{PolyaGammaSample};
     sampling = true,
+    already_sorted = false,
 )
-    update_posterior!(examinee, items, responses, W)
+    if !already_sorted
+        sort!(items, by = i -> i.idx)
+        sort!(responses, by = r -> r.examinee_idx)
+        already_sorted = true
+    end
+    update_posterior!(examinee, items, responses, W; already_sorted = already_sorted)
     #chain_append!(examinee; sampling = sampling)
     set_val_from_posterior!(examinee; sampling = sampling)
     #set_val_from_chain!(examinee)
@@ -310,9 +327,9 @@ end
 
 #update the estimate as the mean of the chain values
 function update_estimate!(examinee::AbstractExaminee; sampling = true)
-    update_estimate!(examinee.latent, sampling = sampling)
+    _update_estimate!(examinee.latent, sampling = sampling)
 end
 
 function update_estimate!(item::AbstractItem; sampling = true)
-    update_estimate!(item.parameters; sampling = sampling)
+    _update_estimate!(item.parameters; sampling = sampling)
 end

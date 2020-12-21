@@ -28,9 +28,9 @@ mutable struct Parameters1PL <: AbstractParametersBinary
 end
 
 """
-    empty_chain!(parameters::Parameters1PL)
+    _empty_chain!(parameters::Parameters1PL)
 
 """
-function empty_chain!(parameters::Parameters1PL)
+function _empty_chain!(parameters::Parameters1PL)
     parameters.chain = Vector{Float64}(undef, 0)
 end

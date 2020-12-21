@@ -82,9 +82,22 @@ mutable struct Parameters3PL <: AbstractParametersBinary
 end
 
 """
-    empty_chain!(parameters::Parameters3PL)
+    _empty_chain!(parameters::Parameters3PL)
+"""
+function _empty_chain!(parameters::Parameters3PL)
+    parameters.chain = Vector{Vector{Float64}}(undef, 0)
+end
+
 
 """
-function empty_chain!(parameters::Parameters3PL)
-    parameters.chain = Vector{Vector{Float64}}(undef, 0)
+    _chain_append!(parameters::Union{Parameters2PL,Parameters3PL}; sampling = false)
+"""
+function _chain_append!(parameters::Union{Parameters2PL,Parameters3PL}; sampling = false)
+    val = Distributions.rand(parameters.posterior)
+    if (sampling && size(parameters.chain, 1) >= 1000)
+        parameters.chain[Random.rand(1:1000)] = val
+    else
+        push!(parameters.chain, val)
+    end
+    return val::Vector{Float64}
 end

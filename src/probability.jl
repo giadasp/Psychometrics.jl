@@ -51,7 +51,7 @@ function probability_3PL(
 end
 
 """
-     probability(latent_val::Float64, parameters::Parameters1PL)
+    __probability(latent_val::Float64, parameters::Parameters1PL)
 
 # Description
 It computes the probability (ICF) of a correct response for item `parameters` under the 1PL model at `latent_val` point.
@@ -64,12 +64,12 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function probability(latent_val::Float64, parameters::Parameters1PL)
+function __probability(latent_val::Float64, parameters::Parameters1PL)
     1 / (1 + _exp_c(parameters.b - latent_val))
 end
 
 """
-     probability(latent::Latent1D, parameters::Parameters1PL)
+    _probability(latent::Latent1D, parameters::Parameters1PL)
 
 # Description
 It computes the probability (ICF) of a correct response for item `parameters` under the 1PL model at `Latent1D` point.
@@ -82,12 +82,12 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function probability(latent::Latent1D, parameters::Parameters1PL)
-    probability(latent.val, parameters)
+function _probability(latent::Latent1D, parameters::Parameters1PL)
+    __probability(latent.val, parameters)
 end
 
 """
-    probability(latent::Latent1D, parameters::Parameters1PL, g_item::Vector{Float64}, g_latent::Vector{Float64})
+    _probability(latent::Latent1D, parameters::Parameters1PL, g_item::Vector{Float64}, g_latent::Vector{Float64})
 
 # Description
 It computes the probability (ICF) of a correct response for item `parameters` under the 1PL model at `Latent1D` point.
@@ -101,13 +101,13 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function probability(
+function _probability(
     latent::Latent1D,
     parameters::Parameters1PL,
     g_item::Vector{Float64},
     g_latent::Vector{Float64},
 )
-    p = probability(latent, parameters)
+    p = _probability(latent, parameters)
 
     if size(g_item, 1) > 0
         g_item .= p * (1 - p)
@@ -121,7 +121,7 @@ function probability(
 end
 
 """
-     probability(latent_val::Float64, parameters::Parameters2PL)
+     __probability(latent_val::Float64, parameters::Parameters2PL)
 
 # Description
 It computes the probability (ICF) of a correct response for item `parameters` under the 2PL model at `latent_val` point.
@@ -134,12 +134,12 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function probability(latent_val::Float64, parameters::Parameters2PL)
+function __probability(latent_val::Float64, parameters::Parameters2PL)
     1 / (1 + _exp_c(-parameters.a * (latent_val - parameters.b)))
 end
 
 """
-    probability(latent::Latent1D, parameters::Parameters2PL)
+    _probability(latent::Latent1D, parameters::Parameters2PL)
 
 # Description
 It computes the probability (ICF) of a correct response for item `parameters` under the 2PL model at `Latent1D` point.
@@ -152,12 +152,12 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function probability(latent::Latent1D, parameters::Parameters2PL)
-    probability(latent.val, parameters)
+function _probability(latent::Latent1D, parameters::Parameters2PL)
+    __probability(latent.val, parameters)
 end
 
 """
-    probability(latent::Latent1D, parameters::Parameters2PL, g_item::Vector{Float64}, g_latent::Vector{Float64})
+    _probability(latent::Latent1D, parameters::Parameters2PL, g_item::Vector{Float64}, g_latent::Vector{Float64})
 
 # Description
 It computes the probability (ICF) of a correct response for item `parameters` under the 2PL model at `Latent1D` point.
@@ -171,13 +171,13 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function probability(
+function _probability(
     latent::Latent1D,
     parameters::Parameters2PL,
     g_item::Vector{Float64},
     g_latent::Vector{Float64},
 )
-    p = probability(latent, parameters)
+    p = _probability(latent, parameters)
 
     if size(g_item, 1) > 0 || size(g_latent, 1) > 0
         p1p = p * (1 - p)
@@ -194,7 +194,7 @@ function probability(
 end
 
 """
-    probability(latent_val::Float64, parameters::Parameters3PL)
+    __probability(latent_val::Float64, parameters::Parameters3PL)
 
 # Description
 It computes the probability (ICF) of a correct response for item `parameters` under the 3PL model at `latent_val` point.
@@ -207,13 +207,13 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function probability(latent_val::Float64, parameters::Parameters3PL)
+function __probability(latent_val::Float64, parameters::Parameters3PL)
     parameters.c +
     (1 - parameters.c) * (1 / (1 + _exp_c(-parameters.a * (latent_val - parameters.b))))
 end
 
 """
- probability(latent::Latent1D, parameters::Parameters3PL)
+    _probability(latent::Latent1D, parameters::Parameters3PL)
 
 # Description
 It computes the probability (ICF) of a correct response for item `parameters` under the 3PL model at `Latent1D` point.
@@ -226,12 +226,12 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function probability(latent::Latent1D, parameters::Parameters3PL)
-    probability(latent.val, parameters)
+function _probability(latent::Latent1D, parameters::Parameters3PL)
+    __probability(latent.val, parameters)
 end
 
 """
-    probability(latent::Latent1D, parameters::Parameters3PL,  g_item::Vector{Float64}, g_latent::Vector{Float64})
+    _probability(latent::Latent1D, parameters::Parameters3PL,  g_item::Vector{Float64}, g_latent::Vector{Float64})
 
 # Description
 It computes the probability (ICF) of a correct response for item `parameters` under the 3PL model at `Latent1D` point.
@@ -245,13 +245,13 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function probability(
+function _probability(
     latent::Latent1D,
     parameters::Parameters3PL,
     g_item::Vector{Float64},
     g_latent::Vector{Float64},
 )
-    p = probability(latent, parameters)
+    p = _probability(latent, parameters)
 
     if size(g_item, 1) > 0 || size(g_latent, 1) > 0
         q1c = (1 - p) / (1 - parameters.c)
@@ -280,7 +280,7 @@ end
 ##########################################
 
 """
-    probability(latent_vals::Vector{Float64}, parameters::Parameters3PL)
+    __probability(latent_vals::Vector{Float64}, parameters::Parameters3PL)
 
 # Description
 It computes the probability (ICF) of a correct response for item `parameters` under the 2PL model at `latent_vals` points.
@@ -294,13 +294,13 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function probability(latent_vals::Vector{Float64}, parameters::ParametersNPL)
+function __probability(latent_vals::Vector{Float64}, parameters::ParametersNPL)
     _sig_c(latent_vals' * parameters.a - parameters.b)
 end
 
 
 """
-    probability(latent::Latent1D, parameters::Parameters3PL,  g_item::Vector{Float64}, g_latent::Vector{Float64})
+    _probability(latent::Latent1D, parameters::Parameters3PL,  g_item::Vector{Float64}, g_latent::Vector{Float64})
 
 # Description
 It computes the probability (ICF) of a correct response for item `parameters` under the 3PL model at `Latent1D` point.
@@ -314,7 +314,7 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function probability(latent::LatentND, parameters::ParametersNPL)
+function _probability(latent::LatentND, parameters::ParametersNPL)
     return _sig_c(latent.val' * parameters.a - parameters.b)
 end
 
@@ -336,7 +336,7 @@ It computes the probability (ICF) that an `examinee` answers correctly at `item`
 A `Float64` scalar. 
 """
 function probability(examinee::AbstractExaminee, item::AbstractItem)
-    probability(examinee.latent, item.parameters)
+    _probability(examinee.latent, item.parameters)
 end
 
 """

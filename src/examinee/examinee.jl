@@ -76,5 +76,5 @@ end
     empty_chain!(examinee::AbstractExaminee)
 """
 function empty_chain!(examinee::AbstractExaminee)
-    empty_chain!(examinee.latent)
+    _empty_chain!(examinee.latent)
 end

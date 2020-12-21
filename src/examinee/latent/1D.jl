@@ -56,30 +56,30 @@ mutable struct Latent1D <: AbstractLatent
 end
 
 """
-    empty_chain!(latent::Latent1D)
+    _empty_chain!(latent::Latent1D)
 """
-function empty_chain!(latent::Latent1D)
+function _empty_chain!(latent::Latent1D)
     latent.chain = Float64[]
 end
 
 """
-    set_val!(latent::Latent1D, val::Float64)
+    _set_val!(latent::Latent1D, val::Float64)
 """
-function set_val!(latent::Latent1D, val::Float64)
+function _set_val!(latent::Latent1D, val::Float64)
     latent.val = copy(val)
 end
 
 """
-    set_val_from_chain!(latent::Latent1D)
+    _set_val_from_chain!(latent::Latent1D)
 """
-function set_val_from_chain!(latent::Latent1D)
+function _set_val_from_chain!(latent::Latent1D)
     latent.val = latent.chain[end]
 end
 
 """
-    update_estimate!(latent::Latent1D; sampling = true)
+    _update_estimate!(latent::Latent1D; sampling = true)
 """
-function update_estimate!(latent::Latent1D; sampling = true)
+function _update_estimate!(latent::Latent1D; sampling = true)
     chain_size = size(latent.chain, 1)
     if sampling
         latent.val =
@@ -88,4 +88,17 @@ function update_estimate!(latent::Latent1D; sampling = true)
     else
         latent.val = sum(latent.chain) / chain_size
     end
+end
+
+"""
+    _chain_append!(latent::Latent1D; sampling = false)
+"""
+function _chain_append!(latent::Latent1D; sampling = false)
+    val = Distributions.rand(latent.posterior)
+    if (sampling && size(latent.chain, 1) >= 1000)
+        latent.chain[Random.rand(1:1_000)] = val
+    else
+        push!(latent.chain, val)
+    end
+    return val::Float64
 end

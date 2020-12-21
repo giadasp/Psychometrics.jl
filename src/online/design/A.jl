@@ -1,15 +1,15 @@
 """
-    A_method(parameters::Parameters1PL, latent::Latent1D)
+    _A_method(parameters::Parameters1PL, latent::Latent1D)
 """
-function A_method(parameters::Parameters1PL, latent::Latent1D)
-    return expected_information_item(parameters, latent)
+function _A_method(parameters::Parameters1PL, latent::Latent1D)
+    return _expected_information_item(parameters, latent)
 end
 
 """
-    A_method(parameters::Parameters2PL, latent::Latent1D)
+    _A_method(parameters::Parameters2PL, latent::Latent1D)
 """
-function A_method(parameters::Parameters2PL, latent::Latent1D)
-    return LinearAlgebra.tr(expected_information_item(parameters, latent))
+function _A_method(parameters::Parameters2PL, latent::Latent1D)
+    return LinearAlgebra.tr(_expected_information_item(parameters, latent))
 end
 
 """
@@ -26,5 +26,5 @@ Computes the trace of the expected information matrix for an item and an examine
 It returns a `Float64` scalar.
 """
 function A_method(item::AbstractItem, examinee::AbstractExaminee)
-    return A_method(item.parameters, examinee.latent)
+    return _A_method(item.parameters, examinee.latent)
 end

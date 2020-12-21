@@ -54,7 +54,7 @@ end
 # Assign posterior distribution
 
 """
-    add_posterior!(parameters::AbstractParameters, posterior::Distributions.Distribution) 
+    _add_posterior!(parameters::AbstractParameters, posterior::Distributions.Distribution) 
 
 # Description
 It assigns the <n>-variate `posterior` distribution to a `AbstractParameters` instance with <n> parameters.
@@ -68,7 +68,7 @@ It assigns the <n>-variate `posterior` distribution to a `AbstractParameters` in
     bivariate_normal = Distributions.MultivariateNormal([0,0], LinearAlgebra.I(2))
     add_posterior!(parameters2PL, bivariate_normal)
 """
-function add_posterior!(
+function _add_posterior!(
     parameters::AbstractParameters,
     posterior::Distributions.Distribution,
 )
@@ -76,7 +76,7 @@ function add_posterior!(
 end
 
 """
-    add_posterior!(parameters::AbstractParameters, priors::Vector{Distributions.UnivariateDistribution}) 
+    _add_posterior!(parameters::AbstractParameters, priors::Vector{Distributions.UnivariateDistribution}) 
 
 # Description
 It transforms the vector `posteriors` of univariate distributions to their products and assign it to `AbstractParameters` instance.
@@ -91,7 +91,7 @@ It transforms the vector `posteriors` of univariate distributions to their produ
     b_dist = Distributions.Normal(0,1)
     add_posterior!(parameters2PL, [a_dist, b_dist])
 """
-function add_posterior!(
+function _add_posterior!(
     parameters::AbstractParameters,
     posteriors::Vector{Distributions.UnivariateDistribution},
 )

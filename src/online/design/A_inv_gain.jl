@@ -1,17 +1,17 @@
 """
-    A_inv_gain_method(parameters::Parameters1PL, latent::Latent1D)
+    _A_inv_gain_method(parameters::Parameters1PL, latent::Latent1D)
 """
-function A_inv_gain_method(parameters::Parameters1PL, latent::Latent1D)
-    return expected_information_item(parameters, latent)
+function _A_inv_gain_method(parameters::Parameters1PL, latent::Latent1D)
+    return _expected_information_item(parameters, latent)
 end
 
 """
-    A_inv_gain_method(parameters::Parameters2PL, latent::Latent1D)
+    _A_inv_gain_method(parameters::Parameters2PL, latent::Latent1D)
 """
-function A_inv_gain_method(parameters::Parameters2PL, latent::Latent1D)
+function _A_inv_gain_method(parameters::Parameters2PL, latent::Latent1D)
     old_exp_info = copy(parameters.expected_information)
     return LinearAlgebra.tr(
-        LinearAlgebra.inv(old_exp_info + expected_information_item(parameters, latent)) -
+        LinearAlgebra.inv(old_exp_info + _expected_information_item(parameters, latent)) -
         LinearAlgebra.inv(old_exp_info),
     )
 end
@@ -30,5 +30,5 @@ Computes the gain in the trace of the inverse of the expected information matrix
 It returns a `Float64` scalar.
 """
 function A_inv_gain_method(item::AbstractItem, examinee::AbstractExaminee)
-    return A_inv_gain_method(item.parameters, examinee.latent)
+    return _A_inv_gain_method(item.parameters, examinee.latent)
 end

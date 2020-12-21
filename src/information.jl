@@ -53,7 +53,7 @@ function information_latent_3PL(
 end
 
 """
-    information_latent(latent::Latent1D, parameters::Parameters1PL)
+    _information_latent(latent::Latent1D, parameters::Parameters1PL)
 
 # Description
 It computes the information (-second derivative of the likelihood) with respect to the 1-dimensional latent variable under the 1PL model.
@@ -66,13 +66,13 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function information_latent(latent::Latent1D, parameters::Parameters1PL)
-    p = probability(latent, parameters)
+function _information_latent(latent::Latent1D, parameters::Parameters1PL)
+    p = _probability(latent, parameters)
     return p * (1 - p)
 end
 
 """
-    information_latent(latent::Latent1D, parameters::Parameters2PL)
+    _information_latent(latent::Latent1D, parameters::Parameters2PL)
 
 # Description
 It computes the information (-second derivative of the likelihood) with respect to the 1-dimensional latent variable under the 2PL model.
@@ -85,13 +85,13 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function information_latent(latent::Latent1D, parameters::Parameters2PL)
-    p = probability(latent, parameters)
+function _information_latent(latent::Latent1D, parameters::Parameters2PL)
+    p = _probability(latent, parameters)
     return p * (1 - p) * parameters.a^2
 end
 
 """
-    information_latent(latent::Latent1D, parameters::Parameters3PL)
+    _information_latent(latent::Latent1D, parameters::Parameters3PL)
 
 # Description
 It computes the information (-second derivative of the likelihood) with respect to the 1-dimensional latent variable under the 3PL model.
@@ -104,8 +104,8 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function information_latent(latent::Latent1D, parameters::Parameters3PL)
-    p = probability(latent, parameters)
+function _information_latent(latent::Latent1D, parameters::Parameters3PL)
+    p = _probability(latent, parameters)
     return (p - parameters.c)^2 * (1 - p) * parameters.a^2 / (1 - parameters.c)^2 / p
 end
 
@@ -113,7 +113,7 @@ end
     information_latent(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
 
 # Description
-An abstraction of `information_latent(latent::AbstractLatent, parameters::AbstractParametersBinary)` on an examinee and items.
+An abstraction of `_information_latent(latent::AbstractLatent, parameters::AbstractParametersBinary)` on an examinee and items.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
@@ -122,14 +122,14 @@ It follows the parametrization \$a(θ - b)\$.
 
 """
 function information_latent(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
-    [information_latent(examinee.latent, i.parameters) for i in items]
+    [_information_latent(examinee.latent, i.parameters) for i in items]
 end
 
 """
     information_latent(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
 
 # Description
-An abstraction of `information_latent(latent::AbstractLatent, parameters::AbstractParametersBinary)` on examinees and items.
+An abstraction of `_information_latent(latent::AbstractLatent, parameters::AbstractParametersBinary)` on examinees and items.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
@@ -141,13 +141,13 @@ function information_latent(
     examinees::Vector{<:AbstractExaminee},
     items::Vector{<:AbstractItem},
 )
-    [information_latent(e.latent, i.parameters) for i in items, e in examinees]
+    [_information_latent(e.latent, i.parameters) for i in items, e in examinees]
 end
 
 ## Item Expected Informations
 
 """
-    expected_information_item(parameters::Parameters1PL, latent::Latent1D)
+    _expected_information_item(parameters::Parameters1PL, latent::Latent1D)
 
 # Description
 It computes the expected information (-second derivative of the likelihood) with respect to the difficulty parameter of the 1PL model.
@@ -160,13 +160,13 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A `Float64` scalar. 
 """
-function expected_information_item(parameters::Parameters1PL, latent::Latent1D)
-    p = probability(latent, parameters)
+function _expected_information_item(parameters::Parameters1PL, latent::Latent1D)
+    p = _probability(latent, parameters)
     return (latent.val - parameters.b)^2 * p * (1 - p)
 end
 
 """
-    expected_information_item(parameters::Parameters2PL, latent::Latent1D)
+    _expected_information_item(parameters::Parameters2PL, latent::Latent1D)
 
 # Description
 It computes the expected information (-second derivative of the likelihood) with respect to the 2 parameters of the 2PL model.
@@ -179,8 +179,8 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A ``2 \\times 2`` matrix of the expected informations. 
 """
-function expected_information_item(parameters::Parameters2PL, latent::Latent1D)
-    p = probability(latent, parameters)
+function _expected_information_item(parameters::Parameters2PL, latent::Latent1D)
+    p = _probability(latent, parameters)
     i_aa = (1 - p) * p * (latent.val - parameters.b)^2
     i_ab = -parameters.a * (1 - p) * p * (latent.val - parameters.b)
     i_bb = parameters.a^2 * (1 - p) * p
@@ -188,7 +188,7 @@ function expected_information_item(parameters::Parameters2PL, latent::Latent1D)
 end
 
 """
-    expected_information_item(parameters::Parameters3PL, latent::Latent1D)
+    _expected_information_item(parameters::Parameters3PL, latent::Latent1D)
 
 # Description
 It computes the expected information (-second derivative of the likelihood) with respect to the 3 parameters of the 3PL model. 
@@ -201,8 +201,8 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A ``3 \\times 3`` matrix of the expected informations. 
 """
-function expected_information_item(parameters::Parameters3PL, latent::Latent1D)
-    p = probability(latent, parameters)
+function _expected_information_item(parameters::Parameters3PL, latent::Latent1D)
+    p = _probability(latent, parameters)
     den = p * (1 - parameters.c)^2
     i_aa = (1 - p) * (p - parameters.c) * (latent.val - parameters.b)^2 / den
     i_ab =
@@ -218,7 +218,7 @@ end
     expected_information_item(items::Vector{<:AbstractItem}, examinees::Vector{<:AbstractExaminee})
 
 # Description
-Abstraction of expected_information_item(latent, parameters) on Vector{<:AbstractExaminee} and items::Vector{<:AbstractItem}.
+Abstraction of _expected_information_item(latent, parameters) on Vector{<:AbstractExaminee} and items::Vector{<:AbstractItem}.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
@@ -233,14 +233,14 @@ function expected_information_item(
     examinees::Vector{<:AbstractExaminee},
 )
     [
-        expected_information_item(i.parameters, e.latent) for i in items, e in examinees
+        _expected_information_item(i.parameters, e.latent) for i in items, e in examinees
     ]::Matrix{Matrix{Float64}}
 end
 
 ## Item Observed Informations
 
 """
-    observed_information_item(parameters::Parameters3PL, latent::Latent1D, response_val::Float64)
+    _observed_information_item(parameters::Parameters3PL, latent::Latent1D, response_val::Float64)
 
 # Description
 It computes the observed information (-second derivative of the likelihood) with respect to the 3 parameters of the 3PL model. 
@@ -254,12 +254,12 @@ It follows the parametrization \$a(θ - b)\$.
 # Output
 A ``3 \\times 3`` matrix of the observed informations. 
 """
-function observed_information_item(
+function _observed_information_item(
     parameters::Parameters3PL,
     latent::Latent1D,
     response_val::Float64,
 )
-    p = probability(latent, parameters)
+    p = _probability(latent, parameters)
     i = (1 - p) * (p - parameters.c)
     h = (response_val * parameters.c - p^2) * i
     j = response_val * i
@@ -281,7 +281,7 @@ end
     observed_information_item(items::Vector{<:AbstractItem}, examinees::Vector{<:AbstractExaminee}, responses::Vector{<:AbstractResponse})
 
 # Description
-Abstraction to response, item and examinee of `observed_information_item(response_val::Float64, latent::Latent1D, parameters::Parameters3PL)`.
+Abstraction to response, item and examinee of `_observed_information_item(response_val::Float64, latent::Latent1D, parameters::Parameters3PL)`.
 It follows the parametrization \$a(θ - b)\$.
 """
 function observed_information_item(
