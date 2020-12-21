@@ -6,7 +6,7 @@ include("binary/binary.jl")
 # Assign prior
 
 """
-    add_prior!(parameters::AbstractParameters, prior::Distributions.Distribution) 
+    _add_prior!(parameters::AbstractParameters, prior::Distributions.Distribution) 
 
 # Description
 It assigns the prior `prior` to a `AbstractParameters` instance.
@@ -18,7 +18,7 @@ It assigns the prior `prior` to a `AbstractParameters` instance.
 # Examples
     parameters2PL = Parameters2PL()
     bivariate_normal = Distributions.MultivariateNormal([0,0], LinearAlgebra.I(2))
-    add_prior!(parameters2PL, bivariate_normal)
+    _add_prior!(parameters2PL, bivariate_normal)
 """
 function add_prior!(
     parameters::AbstractParameters,
@@ -28,7 +28,7 @@ function add_prior!(
 end
 
 """
-    add_prior!(parameters::AbstractParameters, priors::Vector{Distributions.UnivariateDistribution}) 
+    _add_prior!(parameters::AbstractParameters, priors::Vector{Distributions.UnivariateDistribution}) 
 
 # Description
 It transforms the vector `priors` of univariate distributions to their products and assign it to `AbstractParameters` instance.
@@ -41,7 +41,7 @@ It transforms the vector `priors` of univariate distributions to their products 
     parameters2PL = Parameters2PL()
     a_dist = Distributions.Normal(0,1)
     b_dist = Distributions.Normal(0,1)
-    add_prior!(parameters2PL, [a_dist, b_dist])
+    _add_prior!(parameters2PL, [a_dist, b_dist])
 """
 function add_prior!(
     parameters::AbstractParameters,
@@ -66,7 +66,7 @@ It assigns the <n>-variate `posterior` distribution to a `AbstractParameters` in
 # Examples
     parameters2PL = Parameters2PL()
     bivariate_normal = Distributions.MultivariateNormal([0,0], LinearAlgebra.I(2))
-    add_posterior!(parameters2PL, bivariate_normal)
+    _add_posterior!(parameters2PL, bivariate_normal)
 """
 function _add_posterior!(
     parameters::AbstractParameters,
@@ -89,7 +89,7 @@ It transforms the vector `posteriors` of univariate distributions to their produ
     parameters2PL = Parameters2PL()
     a_dist = Distributions.Normal(0,1)
     b_dist = Distributions.Normal(0,1)
-    add_posterior!(parameters2PL, [a_dist, b_dist])
+    _add_posterior!(parameters2PL, [a_dist, b_dist])
 """
 function _add_posterior!(
     parameters::AbstractParameters,
