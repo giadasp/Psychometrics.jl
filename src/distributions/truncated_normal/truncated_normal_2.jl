@@ -1,15 +1,14 @@
 #  Pseudorandom numbers from a truncated Gaussian distribution.
 
-#  This implements the zigguart algorithm from
+#  This implements the ziggurat algorithm from
 #  N. Chopin, "Fast simulation of truncated Gaussian distributions",
 #  Stat Comput (2011) 21:275-288
 #
 #  The code is based on the implementation by Guillaume Dollé, Vincent Mazet
 #  available from http:#miv.u-strasbg.fr/mazet/rtnorm/. In particular, the
 #  rtchopin_twosided and rtchopin_onesided are derived from their code. 
-#  Andreas Dzemski adapted these functions to the R environment on Sep 13, 2018 by 
-#  changing the random number generation using the GNU Scientific library to 
-#  native R functions.
+#  Giada Spaccapanico Proietti adapted these functions to the Julia environment using
+#  the random number generators implemented in the `Distributions` package. 
 #
 
 #------------------------------------------------------------

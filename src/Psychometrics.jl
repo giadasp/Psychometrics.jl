@@ -8,34 +8,46 @@ import Dates
 import LinearAlgebra
 
 include("utils.jl")
-include("dist.jl")
+include("distributions/distributions.jl")
 include("examinee/examinee.jl")
 include("item/item.jl")
 include("response.jl")
 include("probability.jl")
 include("likelihood.jl")
 include("information.jl")
-include("distributions/distributions.jl")
 include("online/online.jl")
 include("bayesian.jl")
 include("calibration/PolyaGamma_MCMC.jl")
 
 
-export Latent1D,
-    LatentND,
+export 
+    TruncatedInverseGaussian,
+    PolyaGamma,
+    TruncatedGamma,
+    rand,
+    #truncate_rand,
+    AbstractExaminee,
+    Examinee,
+    AbstractLatent,
     Latent,
+    Latent1D,
+    LatentND,
+    AbstractItem,
+    Item,
     AbstractParameters,
     AbstractParametersBinary,
     Parameters1PL,
     Parameters2PL,
     Parameters3PL,
     ParametersNPL,
-    AbstractItem,
-    Item,
-    Examinee,
-    AbstractExaminee,
     AbstractResponse,
     ResponseBinary,
+    probability,
+    log_likelihood,
+    likelihood,
+    information_latent,
+    observed_information_item,
+    expected_information_item,
     add_prior!,
     get_item_by_id,
     get_parameters,
@@ -60,18 +72,6 @@ export Latent1D,
     posterior,
     update_posterior!,
     get_latents,
-    probability,
-    log_likelihood,
-    likelihood,
-    information_latent,
-    observed_information_item,
-    expected_information_item,
-    AbstractLatent,
-    TruncatedInverseGaussian,
-    PolyaGamma,
-    TruncatedGamma,
-    truncate_rand,
-    rand,
     find_best_item,
     find_best_examinee,
     calibrate_item!,
