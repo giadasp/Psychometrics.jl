@@ -13,7 +13,7 @@ The documentation is still in progress. Nevertheless, some functions have detail
  - `Latent1D` and `LatentND`: mutables describing an univariate or multivariate latent variable, respectively. For the univariate case, the field `val::Float64` holds the estimate of the ability of the examinee, like the item parameters, also the latent variables can have a prior or a posterior, assigning them to the fields `prior` and `posterior`, respectively.
  - Responses: `ResponseBinary`.
  
-Each of the mentioned struct has a random default factory, callable by using the name of the struct followed by `()`.
+Each of the mentioned structs has a random default factory, callable by using the name of the struct followed by `()`.
 
 _Example: `Parameters2PL()` generates a set of 2PL item parameters from the product distribution (independent bivariate)_
 ```
