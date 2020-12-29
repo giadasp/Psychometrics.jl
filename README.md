@@ -32,11 +32,13 @@ The immutable structs `Item` and `Examinee` need the identification fields `id` 
 
 _Example: `Item(1, "item_1")` generates an operational item with an empty `content` description, and a default 1PL item parameter._
 
-## Main functions
+## Basic functions
 
   - Item characteristic function (ICF): `probability`.
   - Latent and item information function (IIF) (expected and observed are different for the 3PL model): `expected_information_item`,  `observed_information_item`, `information_latent`.
   - Likelihood function: `likelihood`, `log_likelihood`.
+  
+  
   
  
 
