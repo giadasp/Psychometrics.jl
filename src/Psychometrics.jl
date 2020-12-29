@@ -29,7 +29,6 @@ export
     AbstractExaminee,
     Examinee,
     AbstractLatent,
-    Latent,
     Latent1D,
     LatentND,
     AbstractItem,
