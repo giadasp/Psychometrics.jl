@@ -22,7 +22,9 @@ A generic item struct.
 Creates a new generic item with custom index, id, content features and item parameters.
 
 # Random initilizers
+    Item(idx, id) = new(idx, id, "", Parameters1PL(), true)
     Item(idx, id, content) = new(idx, id, content, Parameters1PL(), true)
+
 
 Randomly generates a new generic calibrated item with custom index, id, content features and default 1PL item parameters 
 (Look at (`Parameters1PL`)[#Psychometrics.Parameters1PL] for the defaults).
@@ -37,6 +39,7 @@ struct Item <: AbstractItem
     Item(idx, id, content, parameters) = new(idx, id, content, parameters)
 
     # Random initilizers
+    Item(idx, id) = new(idx, id, "", Parameters1PL())
     Item(idx, id, content) = new(idx, id, content, Parameters1PL())
 end
 
