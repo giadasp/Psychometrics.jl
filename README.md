@@ -25,7 +25,7 @@ _Example: `Parameters2PL()` generates a set of 2PL item parameters from the prod
 Distributions.Product([
    Distributions.LogNormal(0, 0.25),
    Distributions.Normal(0, 1)
-   ])
+])
 ```
 
 The immutable structs `Item` and `Examinee` need the identification fields `id` and `idx` to be randomly generated. 
