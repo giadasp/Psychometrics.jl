@@ -32,7 +32,7 @@ AbstractLatent
 Latent1D <: AbstractLatent
 LatentND <: AbstractLatent
 AbstractResponse
-ResponseBinary <: AbstractResponse
+Response <: AbstractResponse
 ```
 
 Each of the mentioned structs has a random default factory, callable by using the name of the struct followed by `()`.
@@ -54,11 +54,12 @@ _Example: `Item(1, "item_1")` generates an operational item with an empty `conte
 
 ```@contents
 Pages = [
-    "methods/exported/item.md",
-    "methods/exported/examinee.md",
-    "methods/exported/probability.md",
-    "methods/exported/information.md",
-    "methods/exported/likelihood.md",
+    "/methods/exported/item.md",
+    "/methods/exported/examinee.md",
+    "/methods/internals/response.md",
+    "/methods/exported/probability.md",
+    "/methods/exported/information.md",
+    "/methods/exported/likelihood.md",
 ]
 Depth = 1
 ```

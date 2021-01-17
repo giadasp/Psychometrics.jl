@@ -16,7 +16,7 @@ The documentation is still in progress. Nevertheless, some functions have detail
  For example, the object `Parameters2PL` has the fields difficulty `b::Float64` and discrimination `a::Float64`. It is possible to define the Bayesian priors and posterior by assigning multivariate distributions from the package `Distributions` to the fields `prior::Distributions.MultivariateDistribution` and `posterior::Distributions.MultivariateDistribution`.
  - `Latent1D` and `LatentND`: mutables describing an univariate or multivariate latent variable, respectively.
  For the univariate case, the field `val::Float64` holds the estimate of the ability of the examinee, like the item parameters, also the latent variables can have a prior or a posterior, assigning them to the fields `prior` and `posterior`, respectively.
- - `ResponseBinary`: an immutable which holds the information about a binary (correct or incorrect) response, such as the identifier of the examinee who gave the response `examinee_id::String`, the identifier of the answered item `item_idx::String`, and the answer starting and ending times `start_time::Dates.DateTime` and `end_time::Dates.DateTime`.
+ - `Response`: an immutable which holds the information about a binary (correct or incorrect) response, such as the identifier of the examinee who gave the response `examinee_id::String`, the identifier of the answered item `item_idx::String`, and the answer starting and ending times `start_time::Dates.DateTime` and `end_time::Dates.DateTime`.
  
 Each of the mentioned structs has a random default factory, callable by using the name of the struct followed by `()`.
 

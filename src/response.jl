@@ -1,14 +1,17 @@
+"""
+    AbstractResponse
+"""
 abstract type AbstractResponse end
 
 """
-ResponseBinary <: AbstractResponse
+    Response <: AbstractResponse
 
 # Description
-An immutable which holds the information about a binary (correct or incorrect) response, such as the identifier of the examinee who gave the response,
+An immutable which holds the information about response, such as the identifier of the examinee who gave the response,
 `examinee_id::String`, the identifier of the answered item `item_idx::String`, and the answer starting and ending times `start_time::Dates.DateTime` and `end_time::Dates.DateTime`.
 
 """
-struct ResponseBinary <: AbstractResponse
+struct Response <: AbstractResponse
     item_idx::Int64
     examinee_idx::Int64
     item_id::String
@@ -16,7 +19,7 @@ struct ResponseBinary <: AbstractResponse
     val::Union{Missing,Float64}
     start_time::Dates.DateTime
     end_time::Dates.DateTime
-    ResponseBinary(
+    Response(
         item_idx,
         examinee_idx,
         item_id,
@@ -25,7 +28,7 @@ struct ResponseBinary <: AbstractResponse
         start_time,
         end_time,
     ) = new(item_idx, examinee_idx, item_id, examinee_id, val, start_time, end_time)
-    ResponseBinary(
+    Response(
         item_idx,
         examinee_idx,
         item_id,
@@ -125,12 +128,12 @@ function _generate_response(latent::Latent1D, parameters::AbstractParametersBina
 end
 
 """
-    answer_binary(examinee::AbstractExaminee, item::AbstractItem)
+    answer(examinee::AbstractExaminee, item::AbstractItem)
 
-Randomly generate a dichotomous (binary) response by `examinee` to a dichotomous (binary) `item`.
+Randomly generate a response by `examinee` to a dichotomous (binary) `item`.
 """
-function answer_binary(examinee::AbstractExaminee, item::AbstractItem)
-    ResponseBinary(
+function answer(examinee::AbstractExaminee, item::AbstractItem)
+    Response(
         item.idx,
         examinee.idx,
         item.id,
@@ -143,13 +146,13 @@ end
 
 
 """
-    answer_binary(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
+    answer(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
 
-Randomly generate a dichotomous (binary) response by `examinee` to dichotomous (binary) `items`.
+Randomly generate a response by `examinee` to dichotomous (binary) `items`.
 """
-function answer_binary(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
+function answer(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
     map(
-        i -> ResponseBinary(
+        i -> Response(
             i.idx,
             examinee.idx,
             i.id,
@@ -162,37 +165,37 @@ function answer_binary(examinee::AbstractExaminee, items::Vector{<:AbstractItem}
 end
 
 """
-    answer_binary(examinee_id::String, item_id::String, examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
+    answer(examinee_id::String, item_id::String, examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
 
-Randomly generate a dichotomous (binary) response by `Examinee` with index `examinee_id` to a dichotomous (binary) `item` with index `item_id`.
+Randomly generate a response by `Examinee` with index `examinee_id` to a dichotomous (binary) `item` with index `item_id`.
 """
-function answer_binary(
+function answer(
     examinee_id::String,
     item_id::String,
     examinees::Vector{<:AbstractExaminee},
     items::Vector{<:AbstractItem},
 )
-    answer_binary(
+    answer(
         get_examinee_by_id(examinee_id, examinees),
         get_item_by_id(item_id, items),
     )
 end
 
 """
-    answer_binary(examinees:Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
+    answer(examinees:Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
 
 Randomly generate dichotomous (binary) responses by all the examinees in `examinees` to dichotomous (binary) items in `items`.
 """
-function answer_binary(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
-    mapreduce(e -> map(i -> answer_binary(e, i), items), vcat, examinees)
+function answer(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
+    mapreduce(e -> map(i -> answer(e, i), items), vcat, examinees)
 end
 
 """
-    get_design_matrix(responses::Vector{ResponseBinary}, I::Int64, N::Int64)
+    get_design_matrix(responses::Vector{Response}, I::Int64, N::Int64)
 
-Returns the dichotomous (binary) `I x N` design matrix.
+Returns the ``I \\times N `` design matrix.
 """
-function get_design_matrix(responses::Vector{ResponseBinary}, I::Int64, N::Int64)
+function get_design_matrix(responses::Vector{Response}, I::Int64, N::Int64)
     has_answered = map(r -> CartesianIndex(r.item_idx, r.examinee_idx), responses)
     design = zeros(Float64, I, N)
     design[has_answered] .= one(Float64)
@@ -200,12 +203,12 @@ function get_design_matrix(responses::Vector{ResponseBinary}, I::Int64, N::Int64
 end
 
 """
-    get_response_matrix(responses::Vector{ResponseBinary}, I::Int64, N::Int64)
+    get_response_matrix(responses::Vector{Response}, I::Int64, N::Int64)
 
-Transform vector of `ResponseBinary`s in a `I x N` response matrix.
+Transform vector of `Response`s in a `I x N` response matrix.
 A non given answer has value `0.0`.
 """
-function get_response_matrix(responses::Vector{ResponseBinary}, I::Int64, N::Int64)
+function get_response_matrix(responses::Vector{Response}, I::Int64, N::Int64)
     response_matrix = zeros(Float64, I, N)
     map(r -> response_matrix[CartesianIndex(r.item_idx, r.examinee_idx)] = r.val, responses)
     return response_matrix::Matrix{Float64}
@@ -215,7 +218,7 @@ end
 """
     get_responses(response_matrix::Matrix{Float64}, design_matrix::Matrix{Float64}, items::Vector{<:AbstractItem}, examinees::Vector{<:AbstractExaminee})
 
-Transforms a `I x N` response matrix in a vector of `ResponseBinary`s given a valid `design_matrix`, a vector of `Item`s and a vector of `Examinee`s.
+Transforms a `I x N` response matrix in a vector of `Response`s given a valid `design_matrix`, a vector of `Item`s and a vector of `Examinee`s.
 """
 function get_responses(
     response_matrix::Matrix{Float64},
@@ -225,7 +228,7 @@ function get_responses(
 )
     mapreduce(
         e -> map(
-            i -> ResponseBinary(
+            i -> Response(
                 i.idx,
                 e.idx,
                 i.id,
@@ -240,7 +243,16 @@ function get_responses(
     )
 end
 
+"""
+get_items_idx_answered_by_examinee(
+    examinee::AbstractExaminee,
+    responses::Vector{<:AbstractResponse},
+)
 
+# Description
+
+Returns the idx of the items answered by examinee.
+"""
 function get_items_idx_answered_by_examinee(
     examinee::AbstractExaminee,
     responses::Vector{<:AbstractResponse},
@@ -249,6 +261,16 @@ function get_items_idx_answered_by_examinee(
     return map(r -> r.item_idx, resp_e)
 end
 
+"""
+get_examinees_idx_who_answered_item(
+    item::AbstractItem,
+    responses::Vector{<:AbstractResponse},
+)
+
+# Description
+
+Returns the idx of the examinees who answered to item.
+"""
 function get_examinees_idx_who_answered_item(
     item::AbstractItem,
     responses::Vector{<:AbstractResponse},

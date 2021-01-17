@@ -81,7 +81,7 @@ end
 function _posterior(
     latent::Latent1D,
     parameters::Vector{Parameters2PL},
-    responses::Vector{ResponseBinary},
+    responses::Vector{Response},
     W::Vector{PolyaGammaSample},
 )
     prior = latent.prior
@@ -129,7 +129,7 @@ end
 function _posterior(
     latent::Latent1D,
     parameters::Parameters2PL,
-    response::ResponseBinary,
+    response::Response,
     w::PolyaGammaSample,
 )
     sigma2 = (parameters.a^2) * w.val
@@ -147,14 +147,14 @@ end
     posterior(
         examinee::AbstractExaminee,
         item::AbstractItem,
-        response::ResponseBinary,
+        response::Response,
         w::PolyaGammaSample,
         )
 """
 function posterior(
     examinee::AbstractExaminee,
     item::AbstractItem,
-    response::ResponseBinary,
+    response::Response,
     w::PolyaGammaSample
 )
     return _posterior(examinee.latent, item.parameters, response, w)
@@ -163,7 +163,7 @@ end
 function _posterior(
     parameters::Parameters2PL,
     latent::Latent1D,
-    response::ResponseBinary,
+    response::Response,
     w::PolyaGammaSample,
 )
     a = parameters.a
@@ -201,7 +201,7 @@ end
 function _posterior(
     parameters::Parameters2PL,
     latents::Vector{Latent1D}, #must be sorted by e.idx
-    responses::Vector{ResponseBinary}, #only responses of item sorted by e.idx
+    responses::Vector{Response}, #only responses of item sorted by e.idx
     W::Vector{PolyaGammaSample}, #sorted by e.idx
 )
     prior = parameters.prior.v

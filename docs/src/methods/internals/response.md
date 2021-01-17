@@ -1,6 +1,9 @@
-# Responses
+# Responses (Internals)
 
-```@autodocs
-Modules = [Psychometrics]
-Pages   = ["response.jl"]
+```@meta
+    CurrentModule = Psychometrics
+```
+
+```@docs
+_generate_response(latent::Latent1D, parameters::AbstractParametersBinary)
 ```
