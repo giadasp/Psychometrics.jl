@@ -19,7 +19,13 @@ function log_likelihood(
 end
 
 """
-    _likelihood(response_val::Float64, latent_val::Float64, parameters::AbstractParametersBinary)
+_likelihood(
+    response_val::Float64,
+    latent_val::Float64,
+    parameters::AbstractParametersBinary,
+)
+
+#Description
 
 It computes the log likelihood for a latent value and item parameters `parameters` with answer `response_val`.
 """
@@ -33,7 +39,13 @@ function _likelihood(
 end
 
 """
-    _log_likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParametersBinary)
+_log_likelihood(
+    response_val::Float64,
+    latent::Latent1D,
+    parameters::AbstractParametersBinary,
+)
+
+# Description
 
 It computes the log likelihood for a 1-dimensional latent variable and item parameters `parameters` with answer `response_val`.
 """
@@ -48,7 +60,15 @@ end
 
 
 """
-    _log_likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParametersBinary, g_item::Vector{Float64}, g_latent::Vector{Float64})
+_log_likelihood(
+    response_val::Float64,
+    latent::Latent1D,
+    parameters::AbstractParametersBinary,
+    g_item::Vector{Float64},
+    g_latent::Vector{Float64},
+)
+
+# Description
 
 It computes the log likelihood for a 1-dimensional latent variable and item parameters `parameters` with answer `response_val`. 
 It updates also the gradient vectors.
@@ -79,7 +99,13 @@ function _log_likelihood(
 end
 
 """
-    log_likelihood(response::AbstractResponse, examinee::AbstractExaminee, item::AbstractItem)
+log_likelihood(
+    response::AbstractResponse,
+    examinee::AbstractExaminee,
+    item::AbstractItem,
+)
+
+# Description
 
 It computes the log likelihood for a `response`. 
 """
@@ -92,7 +118,15 @@ function log_likelihood(
 end
 
 """
-    log_likelihood(response::AbstractResponse, examinee::AbstractExaminee, item::AbstractItem, g_item::Vector{Float64}, g_latent::Vector{Float64})
+log_likelihood(
+    response::AbstractResponse,
+    examinee::AbstractExaminee,
+    item::AbstractItem,
+    g_item::Vector{Float64},
+    g_latent::Vector{Float64},
+)
+
+# Description
 
 It computes the log likelihood for a response `response`. 
 It updates also the gradient vectors.
@@ -108,7 +142,13 @@ function log_likelihood(
 end
 
 """
-    log_likelihood(responses::Vector{<:AbstractResponse},  examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
+log_likelihood(
+    responses::Vector{<:AbstractResponse},
+    examinees::Vector{<:AbstractExaminee},
+    items::Vector{<:AbstractItem},
+)
+
+# Description
 
 It computes the log likelihood for a vector of responses `responses`. 
 """
@@ -121,7 +161,15 @@ function log_likelihood(
 end
 
 """
-    log_likelihood(responses::Vector{<:AbstractResponse},  examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem}, g_item::Vector{Float64}, g_latent::Vector{Float64})
+log_likelihood(
+    responses::Vector{<:AbstractResponse},
+    examinees::Vector{<:AbstractExaminee},
+    items::Vector{<:AbstractItem},
+    g_item::Vector{Float64},
+    g_latent::Vector{Float64},
+)
+
+# Description
 
 It computes the log likelihood for a vector of responses `responses`. 
 It updates also the gradient vectors.
@@ -148,7 +196,13 @@ end
 
 
 """
-    _likelihood(response_val::Float64, latent::Latent1D, parameters::AbstractParametersBinary)
+_likelihood(
+    response_val::Float64,
+    latent::Latent1D,
+    parameters::AbstractParametersBinary,
+)
+
+# Description
 
 It computes the likelihood for a 1-dimensional latent variable and item parameters `parameters` with answer `response_val`.
 """
@@ -161,7 +215,13 @@ function _likelihood(
 end
 
 """
-    likelihood(response::AbstractResponse, examinee::AbstractExaminee, item::AbstractItem)
+likelihood(
+    response::AbstractResponse,
+    examinee::AbstractExaminee,
+    item::AbstractItem,
+)
+
+# Description
 
 It computes the log likelihood for a `response`. 
 """
@@ -174,7 +234,13 @@ function likelihood(
 end
 
 """
-    likelihood(responses::Vector{<:AbstractResponse},  examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
+likelihood(
+    responses::Vector{<:AbstractResponse},
+    examinees::Vector{<:AbstractExaminee},
+    items::Vector{<:AbstractItem},
+)
+
+# Description
 
 It computes the log likelihood for a vector of responses `responses`. 
 """
