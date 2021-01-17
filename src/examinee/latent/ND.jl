@@ -3,7 +3,7 @@
 LatentND <: AbstractLatent
 
 # Description
-N-dimensional latent variable struct.
+A mutable describing a multivariate latent variable.
 
 # Fields
 - **`names::Vector{String}`**

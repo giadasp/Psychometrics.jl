@@ -2,15 +2,16 @@
     Latent1D <: AbstractLatent
 
 # Description
-1-dimensional latent variable struct.
+A mutable describing an univariate latent variable.
+The field `val::Float64` holds the estimate of the ability of the examinee, like the item parameters, also the latent variables can have a prior or a posterior, assigning them to the fields `prior` and `posterior`, respectively.
 
 # Fields
-    - **`val::Float64`**
-    - **`bounds::Vector{Float64}`**
-    - **`prior::Distributions.ContinuousUnivariateDistribution`**
-    - **`posterior::Distributions.ContinuousUnivariateDistribution`**
-    - **`chain::Vector{Float64}`**
-    - **`expected_information::Float64`**
+- **`val::Float64`**
+- **`bounds::Vector{Float64}`**
+- **`prior::Distributions.ContinuousUnivariateDistribution`**
+- **`posterior::Distributions.ContinuousUnivariateDistribution`**
+- **`chain::Vector{Float64}`**
+- **`expected_information::Float64`**
 
 # Factories
     Latent1D(val, bounds, prior, posterior, chain, expected_information) = new(val, bounds, prior, posterior, chain, expected_information)

@@ -1,4 +1,17 @@
 # Types and Structs
+"""
+    AbstractParameters
+
+# Description
+
+An abstract type which, at the moment, has only the abstract `AbstractParametersBinary` as subtype.
+Thus, it works only with binary (dichotomous) responses. The available mutables for the latter are `Parameters1PL`, `Parameters2PL`, `Parameters3PL`.
+They contain the details about the item parameters under the 1-parameter logistic (1PL), 2-parameters logistic (2PL) and 3-parameter logistic (3PL) IRT models, respectively.
+
+# Example
+
+The object `Parameters2PL` has the fields difficulty `b::Float64` and discrimination `a::Float64`. It is possible to define the Bayesian priors and posterior by assigning multivariate distributions from the package `Distributions` to the fields `prior::Distributions.MultivariateDistribution` and `posterior::Distributions.MultivariateDistribution`.
+"""
 abstract type AbstractParameters end
 
 include("binary/binary.jl")

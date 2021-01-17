@@ -1,5 +1,13 @@
 abstract type AbstractResponse end
 
+"""
+ResponseBinary <: AbstractResponse
+
+# Description
+An immutable which holds the information about a binary (correct or incorrect) response, such as the identifier of the examinee who gave the response,
+`examinee_id::String`, the identifier of the answered item `item_idx::String`, and the answer starting and ending times `start_time::Dates.DateTime` and `end_time::Dates.DateTime`.
+
+"""
 struct ResponseBinary <: AbstractResponse
     item_idx::Int64
     examinee_idx::Int64

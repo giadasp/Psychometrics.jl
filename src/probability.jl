@@ -121,7 +121,7 @@ function _probability(
 end
 
 """
-     __probability(latent_val::Float64, parameters::Parameters2PL)
+    __probability(latent_val::Float64, parameters::Parameters2PL)
 
 # Description
 It computes the probability (ICF) of a correct response for item `parameters` under the 2PL model at `latent_val` point.
@@ -170,6 +170,16 @@ It follows the parametrization \$a(θ - b)\$.
 
 # Output
 A `Float64` scalar. 
+
+# Example
+_Probability of a correct response is computed for each examinee and each item._
+
+```julia
+examinees = [Examinee() for n = 1 : 10]; #default examinee factory
+items = [Item() for i = 1 : 30]; #default item factory
+probability(examinees, items) #compute the probability
+```
+
 """
 function _probability(
     latent::Latent1D,
@@ -283,7 +293,7 @@ end
     __probability(latent_vals::Vector{Float64}, parameters::Parameters3PL)
 
 # Description
-It computes the probability (ICF) of a correct response for item `parameters` under the 2PL model at `latent_vals` points.
+It computes the probability (ICF) of a correct response for item `parameters` under the 3PL model at `latent_vals` points.
 N-dimensional latent.
 It follows the parametrization \$a(θ - b)\$.
 

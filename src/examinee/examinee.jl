@@ -6,12 +6,12 @@ include("latent/latent.jl")
     Examinee <: AbstractExaminee
 
 # Description
-Examinee struct with a generic latent variable.
+An immutable containing the information about the examinee (the test taker).
 
 # Fields
   - **`idx::Int64`**: An integer that identifies the Examinee in this session.
   - **`id::String`**: A string that identifies the Examinee.
-  - **`latent::Latent`**: A generic latent variable associated with the Examinee.
+  - **`latent::Latent`**: A mutable latent struct associated with the Examinee.
 
 # Factories
     Examinee(idx, id, latent) = new(idx, id, latent)

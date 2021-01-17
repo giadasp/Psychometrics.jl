@@ -1,3 +1,6 @@
+"""
+    AbstractLatent
+"""
 abstract type AbstractLatent end
 
 include("1D.jl")

@@ -7,7 +7,7 @@ abstract type AbstractItem end
     Item <: AbstractItem
 
 # Description
-A generic item struct.
+An immutable containing information about an item (a question in a test), e.g. `id::String` the item identifier, `calibrated::Bool` says if it is a field item (`false`) or an operational item (`true`), and the field `parameters::AbstractParameter` which accepts a mutable item parameter object
 
 # Fields
   - **`idx::Int64`**: An integer that identifies the item in this session.
@@ -88,7 +88,6 @@ end
 
 """
     empty_chain!(item::AbstractItem)
-
 """
 function empty_chain!(item::AbstractItem)
     _empty_chain!(item.parameters)
