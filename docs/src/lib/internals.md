@@ -1,3 +1,11 @@
+# Internal Documentation
+
+## Index
+
+```@contents
+Pages = ["public.md"]
+```
+
 # Internal Methods
 
 ```@contents

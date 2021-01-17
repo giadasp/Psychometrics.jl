@@ -4,17 +4,12 @@ Documentation for `Psychometrics.jl`'s public interface.
 
 See the [Internals Documentation](@ref) Section of the manual for internal package docs covering unexported functions.
 
-## Contents
+## Index
 
 ```@contents
 Pages = ["public.md"]
 ```
 
-## Index
-
-```@index
-Pages = ["public.md"]
-```
 ## Abstracts
 
 ```@docs
