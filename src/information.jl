@@ -6,13 +6,13 @@
 
 # Description
 It computes the information function (IIF) for item parameters at latents values provided in matrix form.
-Not suitable for 3PL models, for such a kind of model use information_latent_3PL().
+Not suitable for 3PL models, for such a kind of model use `information_latent_3PL()`.
 It follows the parametrization ``a \\theta - b ``.
 See the docs of [`information_latent(examinee::AbstractExaminee, item::AbstractItem)`](@ref) for details.
 
 # Arguments
 - **`latents_matrix::Matrix{Float64}`** : Required. A `n_latents x N` matrix with latents values. 
-- **`parameters_matrix::Matrix{Float64}`** : Required. A `(n_latents + 1) x I` matrix with item parameters. intercept (b) must be in first row, latents coefficients (a_j) in next rows (2, ..., n_latents + 1). 
+- **`parameters_matrix::Matrix{Float64}`** : Required. A `(n_latents + 1) x I` matrix with item parameters. intercept (b) must be in first row, latents coefficients ``(a_j)`` in next rows ``(2, \\ldots, n_latents + 1)``. 
     
 # Output
 A `I x N` `Float64` matrix. 
