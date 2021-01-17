@@ -41,7 +41,13 @@ end
 # Outer Constructor Methods
 
 """
-    get_examinees_by_item_id(item_id::String, responses::Vector{<:AbstractResponse}, examinees::Vector{<:AbstractExaminee})
+get_examinees_by_item_id(
+    item_id::String,
+    responses::Vector{<:AbstractResponse},
+    examinees::Vector{<:AbstractExaminee},
+)
+
+# Description
 
 It returns the examinees who answered to the item with id `item_id`.
 """
@@ -54,7 +60,13 @@ function get_examinees_by_item_id(
 end
 
 """
-    get_items_by_examinee_id(examinee_id::String, responses::Vector{<:AbstractItem})
+get_items_by_examinee_id(
+    examinee_id::String,
+    responses::Vector{<:AbstractResponse},
+    items::Vector{<:AbstractItem},
+)
+
+# Description
 
 It returns the items answered by the examinee with id `examinee_id`.
 """

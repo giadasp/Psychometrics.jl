@@ -6,7 +6,11 @@
 
 ```@docs
 get_examinees_by_item_id(item_id::String, responses::Vector{<:AbstractResponse},  examinees::Vector{<:AbstractExaminee})
-get_items_by_examinee_id(examinee_id::String, responses::Vector{<:AbstractItem})
+get_items_by_examinee_id(
+    examinee_id::String,
+    responses::Vector{<:AbstractResponse},
+    items::Vector{<:AbstractItem},
+)
 add_response!(response::AbstractResponse, responses::Vector{<:AbstractResponse})
 get_responses_by_examinee_id(examinee_id::String, responses::Vector{<:AbstractResponse})
 get_responses_by_item_id(item_id::String, responses::Vector{<:AbstractResponse})
