@@ -1,8 +1,13 @@
 """
-    log_likelihood(responses::Matrix{Float64}, latents_matrix::Matrix{Float64}, parameters_matrix::Matrix{Float64}, design::Matrix{Float64})
+log_likelihood(
+    response_val::Float64,
+    latent_val::Float64,
+    parameters::AbstractParametersBinary,
+)
+
+# Description
 
 It computes the log likelihood for a matrix of latent values, item parameters, responses and design. 
-
 """
 function log_likelihood(
     response_val::Float64,
