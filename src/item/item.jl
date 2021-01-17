@@ -4,7 +4,7 @@ include("parameters/parameters.jl")
 abstract type AbstractItem end
 
 """
-    Item <: AbstractItem
+Item <: AbstractItem
 
 # Description
 An immutable containing information about an item (a question in a test), e.g. `id::String` the item identifier, `calibrated::Bool` says if it is a field item (`false`) or an operational item (`true`), and the field `parameters::AbstractParameter` which accepts a mutable item parameter object

@@ -1,7 +1,5 @@
 # Types and Structs
 """
-    AbstractParameters
-
 # Description
 
 An abstract type which, at the moment, has only the abstract `AbstractParametersBinary` as subtype.
@@ -19,7 +17,10 @@ include("binary/binary.jl")
 # Assign prior
 
 """
-    _add_prior!(parameters::AbstractParameters, prior::Distributions.Distribution) 
+add_prior!(
+    parameters::AbstractParameters,
+    prior::Distributions.MultivariateDistribution,
+)
 
 # Description
 It assigns the prior `prior` to a `AbstractParameters` instance.
@@ -41,7 +42,10 @@ function add_prior!(
 end
 
 """
-    _add_prior!(parameters::AbstractParameters, priors::Vector{Distributions.UnivariateDistribution}) 
+add_prior!(
+    parameters::AbstractParameters,
+    priors::Vector{Distributions.UnivariateDistribution},
+)
 
 # Description
 It transforms the vector `priors` of univariate distributions to their products and assign it to `AbstractParameters` instance.
@@ -67,7 +71,10 @@ end
 # Assign posterior distribution
 
 """
-    _add_posterior!(parameters::AbstractParameters, posterior::Distributions.Distribution) 
+_add_posterior!(
+    parameters::AbstractParameters,
+    posterior::Distributions.Distribution,
+)
 
 # Description
 It assigns the <n>-variate `posterior` distribution to a `AbstractParameters` instance with <n> parameters.
@@ -89,7 +96,10 @@ function _add_posterior!(
 end
 
 """
-    _add_posterior!(parameters::AbstractParameters, priors::Vector{Distributions.UnivariateDistribution}) 
+_add_posterior!(
+    parameters::AbstractParameters,
+    posteriors::Vector{Distributions.UnivariateDistribution},
+)
 
 # Description
 It transforms the vector `posteriors` of univariate distributions to their products and assign it to `AbstractParameters` instance.
