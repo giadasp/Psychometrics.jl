@@ -1,9 +1,11 @@
 """
+```julia 
 log_likelihood(
     response_val::Float64,
     latent_val::Float64,
     parameters::AbstractParametersBinary,
 )
+```
 
 # Description
 
@@ -19,11 +21,13 @@ function log_likelihood(
 end
 
 """
+```julia 
 _likelihood(
     response_val::Float64,
     latent_val::Float64,
     parameters::AbstractParametersBinary,
 )
+```
 
 #Description
 
@@ -39,11 +43,13 @@ function _likelihood(
 end
 
 """
+```julia 
 _log_likelihood(
     response_val::Float64,
     latent::Latent1D,
     parameters::AbstractParametersBinary,
 )
+```
 
 # Description
 
@@ -60,6 +66,7 @@ end
 
 
 """
+```julia 
 _log_likelihood(
     response_val::Float64,
     latent::Latent1D,
@@ -67,6 +74,7 @@ _log_likelihood(
     g_item::Vector{Float64},
     g_latent::Vector{Float64},
 )
+```
 
 # Description
 
@@ -99,11 +107,13 @@ function _log_likelihood(
 end
 
 """
-`log_likelihood(
+```julia 
+log_likelihood(
     response::AbstractResponse,
     examinee::AbstractExaminee,
     item::AbstractItem,
-)`
+)
+```
 
 # Description
 
@@ -118,13 +128,15 @@ function log_likelihood(
 end
 
 """
-`log_likelihood(
+```julia 
+log_likelihood(
     response::AbstractResponse,
     examinee::AbstractExaminee,
     item::AbstractItem,
     g_item::Vector{Float64},
     g_latent::Vector{Float64},
-)`
+)
+```
 
 # Description
 
@@ -142,11 +154,13 @@ function log_likelihood(
 end
 
 """
+```julia 
 log_likelihood(
     responses::Vector{<:AbstractResponse},
     examinees::Vector{<:AbstractExaminee},
     items::Vector{<:AbstractItem},
 )
+```
 
 # Description
 
@@ -161,6 +175,7 @@ function log_likelihood(
 end
 
 """
+```julia 
 log_likelihood(
     responses::Vector{<:AbstractResponse},
     examinees::Vector{<:AbstractExaminee},
@@ -168,6 +183,7 @@ log_likelihood(
     g_item::Vector{Float64},
     g_latent::Vector{Float64},
 )
+```
 
 # Description
 
@@ -196,11 +212,13 @@ end
 
 
 """
+```julia 
 _likelihood(
     response_val::Float64,
     latent::Latent1D,
     parameters::AbstractParametersBinary,
 )
+```
 
 # Description
 
@@ -214,12 +232,14 @@ function _likelihood(
     return _likelihood(response_val, latent.val, parameters)
 end
 
-"""
+"""`
+```julia 
 likelihood(
     response::AbstractResponse,
     examinee::AbstractExaminee,
     item::AbstractItem,
 )
+```
 
 # Description
 
@@ -234,11 +254,13 @@ function likelihood(
 end
 
 """
+```julia 
 likelihood(
     responses::Vector{<:AbstractResponse},
     examinees::Vector{<:AbstractExaminee},
     items::Vector{<:AbstractItem},
 )
+```
 
 # Description
 
