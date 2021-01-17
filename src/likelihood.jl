@@ -99,11 +99,11 @@ function _log_likelihood(
 end
 
 """
-log_likelihood(
+`log_likelihood(
     response::AbstractResponse,
     examinee::AbstractExaminee,
     item::AbstractItem,
-)
+)`
 
 # Description
 
@@ -118,13 +118,13 @@ function log_likelihood(
 end
 
 """
-log_likelihood(
+`log_likelihood(
     response::AbstractResponse,
     examinee::AbstractExaminee,
     item::AbstractItem,
     g_item::Vector{Float64},
     g_latent::Vector{Float64},
-)
+)`
 
 # Description
 
