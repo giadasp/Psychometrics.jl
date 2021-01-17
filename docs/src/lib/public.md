@@ -36,7 +36,7 @@ Response
 
 Each of the mentioned structs has a random default factory, callable by using the name of the struct followed by `()`.
 
-_Example:_ `Parameters2PL()` _generates a set of 2PL item parameters from the product distribution (independent bivariate)._
+_Example: `Parameters2PL()` generates a set of 2PL item parameters from the product distribution (independent bivariate)._
 
 ```julia
 Distributions.Product([
@@ -47,7 +47,7 @@ Distributions.Product([
 
 The immutable structs `Item` and `Examinee` need the identification fields `id` and `idx` to be randomly generated. 
 
-_Example:_ `Item(1, "item_1")` _generates an operational item with an empty `content` description, and a default 1PL item parameter._
+_Example: `Item(1, "item_1")` generates an operational item with an empty `content` description, and a default 1PL item parameter._
 
 ## Exported Methods
 
