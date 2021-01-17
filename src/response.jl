@@ -194,9 +194,11 @@ function answer(
 end
 
 """
-    answer(examinees:Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
+answer(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
 
-Randomly generate dichotomous (binary) responses by all the examinees in `examinees` to dichotomous (binary) items in `items`.
+# Description
+
+Randomly generate responses by all the examinees in `examinees` to items in `items`.
 """
 function answer(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
     mapreduce(e -> map(i -> answer(e, i), items), vcat, examinees)
