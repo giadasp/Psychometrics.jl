@@ -55,7 +55,7 @@ _Example: `Item(1, "item_1")` generates an operational item with an empty `conte
 Pages = [
     "../methods/exported/item.md",
     "../methods/exported/examinee.md",
-    "../methods/internals/response.md",
+    "../methods/exported/response.md",
     "../methods/exported/probability.md",
     "../methods/exported/information.md",
     "../methods/exported/likelihood.md",
