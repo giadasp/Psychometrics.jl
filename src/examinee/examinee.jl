@@ -3,8 +3,6 @@ abstract type AbstractExaminee end
 include("latent/latent.jl")
 
 """
-    Examinee <: AbstractExaminee
-
 # Description
 An immutable containing the information about the examinee (the test taker).
 
