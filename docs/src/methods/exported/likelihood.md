@@ -4,14 +4,6 @@
     CurrentModule = Psychometrics
 ```
 
-## Values in Matrix form
-
-```@docs
-log_likelihood(responses::Matrix{Float64}, latents_matrix::Matrix{Float64}, parameters_matrix::Matrix{Float64}, design::Matrix{Float64})
-```
-
-## Using Structs
-
 ```@docs
 log_likelihood(
     response_val::Float64,

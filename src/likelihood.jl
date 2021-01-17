@@ -7,7 +7,7 @@ log_likelihood(
 
 # Description
 
-It computes the log likelihood for a matrix of latent values, item parameters, responses and design. 
+It computes the log likelihood for a latent value and item parameters `parameters` with answer `response_val`.
 """
 function log_likelihood(
     response_val::Float64,
@@ -15,7 +15,7 @@ function log_likelihood(
     parameters::AbstractParametersBinary,
 )
     p = __probability(latent_val, parameters)
-    return response_val * log(p) + (1 - response_val) * log(1 - p)
+    return response_val * _log_c(p) + (1 - response_val) * _log_c(1 - p)
 end
 
 """
@@ -27,7 +27,7 @@ _likelihood(
 
 #Description
 
-It computes the log likelihood for a latent value and item parameters `parameters` with answer `response_val`.
+It computes the likelihood for a latent value and item parameters `parameters` with answer `response_val`.
 """
 function _likelihood(
     response_val::Float64,

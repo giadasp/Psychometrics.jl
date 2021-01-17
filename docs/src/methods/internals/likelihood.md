@@ -24,5 +24,4 @@ _log_likelihood(
     g_item::Vector{Float64},
     g_latent::Vector{Float64},
 )
-
 ```
