@@ -15,8 +15,12 @@
 ## Information wrt Item Parameters
 
 ```@docs
-    _expected_information_item(parameters::Parameters1PL, latent::Latent1D)
-    _expected_information_item(parameters::Parameters2PL, latent::Latent1D)
-    _expected_information_item(parameters::Parameters3PL, latent::Latent1D)
-    _observed_information_item(parameters::Parameters3PL, latent::Latent1D, response_val::Float64)
+_expected_information_item(parameters::Parameters1PL, latent::Latent1D)
+_expected_information_item(parameters::Parameters2PL, latent::Latent1D)
+_expected_information_item(parameters::Parameters3PL, latent::Latent1D)
+_observed_information_item(
+    parameters::Parameters3PL,
+    latent::Latent1D,
+    response_val::Float64,
+)
 ```

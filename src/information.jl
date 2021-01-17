@@ -30,9 +30,13 @@ function information_latent(
 end
 
 """
-    information_latent_3PL(latents_matrix::Matrix{Float64}, parameters_matrix::Matrix{Float64})
+information_latent_3PL(
+    latents_matrix::Matrix{Float64},
+    parameters_matrix::Matrix{Float64},
+)
 
 # Description
+
 Only for models which has guessing parameter (c) in last row of parameters_matrix.
 It computes the information function (IIF) for item parameters at latents values provided in matrix form.
 It follows the parametrization ``a \\theta - b ``.
@@ -54,7 +58,7 @@ function information_latent_3PL(
 end
 
 """
-    _information_latent(latent::Latent1D, parameters::Parameters1PL)
+_information_latent(latent::Latent1D, parameters::Parameters1PL)
 
 # Description
 It computes the information (second derivative of the likelihood) with respect to the 1-dimensional latent variable under the 1PL model.
@@ -73,7 +77,7 @@ function _information_latent(latent::Latent1D, parameters::Parameters1PL)
 end
 
 """
-    _information_latent(latent::Latent1D, parameters::Parameters2PL)
+_information_latent(latent::Latent1D, parameters::Parameters2PL)
 
 # Description
 It computes the information (-second derivative of the likelihood) with respect to the 1-dimensional latent variable under the 2PL model.
@@ -92,7 +96,7 @@ function _information_latent(latent::Latent1D, parameters::Parameters2PL)
 end
 
 """
-    _information_latent(latent::Latent1D, parameters::Parameters3PL)
+_information_latent(latent::Latent1D, parameters::Parameters3PL)
 
 # Description
 It computes the information (-second derivative of the likelihood) with respect to the 1-dimensional latent variable under the 3PL model.
@@ -112,13 +116,15 @@ end
 
 
 """
-    information_latent(examinee::AbstractExaminee, item::AbstractItem)
+information_latent(examinee::AbstractExaminee, item::AbstractItem)
 
 # Description
+
 An abstraction of `_information_latent(latent::AbstractLatent, parameters::AbstractParametersBinary)` on an examinee and an item.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
+
 - **`examinee::AbstractExaminee`** : Required. 
 - **`item::AbstractItem`** : Required. 
 
@@ -128,7 +134,7 @@ function information_latent(examinee::AbstractExaminee, item::AbstractItem)
 end
 
 """
-    information_latent(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
+information_latent(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
 
 # Description
 An abstraction of `_information_latent(latent::AbstractLatent, parameters::AbstractParametersBinary)` on an examinee and items.
@@ -155,13 +161,18 @@ function information_latent(examinee::AbstractExaminee, items::Vector{<:Abstract
 end
 
 """
-    information_latent(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
+information_latent(
+    examinees::Vector{<:AbstractExaminee},
+    items::Vector{<:AbstractItem},
+)
 
 # Description
+
 An abstraction of `_information_latent(latent::AbstractLatent, parameters::AbstractParametersBinary)` on examinees and items.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
+
 - **`examinees::Vector{<:AbstractExaminee}`** : Required. 
 - **`items::Vector{<:AbstractItem}`** : Required. 
 
@@ -176,7 +187,7 @@ end
 ## Item Expected Informations
 
 """
-    _expected_information_item(parameters::Parameters1PL, latent::Latent1D)
+_expected_information_item(parameters::Parameters1PL, latent::Latent1D)
 
 # Description
 It computes the expected information (-second derivative of the likelihood) with respect to the difficulty parameter of the 1PL model.
@@ -195,7 +206,7 @@ function _expected_information_item(parameters::Parameters1PL, latent::Latent1D)
 end
 
 """
-    _expected_information_item(parameters::Parameters2PL, latent::Latent1D)
+_expected_information_item(parameters::Parameters2PL, latent::Latent1D)
 
 # Description
 It computes the expected information (-second derivative of the likelihood) with respect to the 2 parameters of the 2PL model.
@@ -217,7 +228,7 @@ function _expected_information_item(parameters::Parameters2PL, latent::Latent1D)
 end
 
 """
-    _expected_information_item(parameters::Parameters3PL, latent::Latent1D)
+_expected_information_item(parameters::Parameters3PL, latent::Latent1D)
 
 # Description
 It computes the expected information (-second derivative of the likelihood) with respect to the 3 parameters of the 3PL model. 
@@ -244,13 +255,18 @@ function _expected_information_item(parameters::Parameters3PL, latent::Latent1D)
 end
 
 """
-    expected_information_item(items::Vector{<:AbstractItem}, examinees::Vector{<:AbstractExaminee})
+expected_information_item(
+    items::Vector{<:AbstractItem},
+    examinees::Vector{<:AbstractExaminee},
+)
 
 # Description
+
 Abstraction of _expected_information_item(latent, parameters) on Vector{<:AbstractExaminee} and items::Vector{<:AbstractItem}.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
+
 - **`items::Vector{<:AbstractItem}`** : Required. Size I x 1.
 - **`examinees::Vector{<:AbstractExaminee}`** : Required. Size N x 1.
 
@@ -269,13 +285,19 @@ end
 ## Item Observed Informations
 
 """
-    _observed_information_item(parameters::Parameters3PL, latent::Latent1D, response_val::Float64)
+_observed_information_item(
+    parameters::Parameters3PL,
+    latent::Latent1D,
+    response_val::Float64,
+)
 
 # Description
+
 It computes the observed information (-second derivative of the likelihood) with respect to the 3 parameters of the 3PL model. 
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
+
 - **`parameters::Parameters3PL`** : Required. A 3-parameter logistic parameters object. 
 - **`response_val::Float64`** : Required. A scalar response. 
 - **`latent::Latent1D`** : Required. A 1-dimensional `Latent1D` latent variable. 
@@ -307,9 +329,14 @@ function _observed_information_item(
 end
 
 """
-    observed_information_item(items::Vector{<:AbstractItem}, examinees::Vector{<:AbstractExaminee}, responses::Vector{<:AbstractResponse})
+observed_information_item(
+    items::Vector{<:AbstractItem},
+    examinees::Vector{<:AbstractExaminee},
+    responses::Vector{<:AbstractResponse},
+)
 
 # Description
+
 Abstraction to response, item and examinee of `_observed_information_item(response_val::Float64, latent::Latent1D, parameters::Parameters3PL)`.
 It follows the parametrization \$a(θ - b)\$.
 """
