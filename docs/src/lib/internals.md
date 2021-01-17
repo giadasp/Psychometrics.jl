@@ -1,4 +1,4 @@
-# Internal Documentation
+# Internals Documentation
 
 ## Index
 
