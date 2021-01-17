@@ -15,24 +15,28 @@ Pages = ["public.md"]
 ```@index
 Pages = ["public.md"]
 ```
-
-## Structs
+## Abstracts
 
 ```@docs
 AbstractItem
-Item <: AbstractItem
 AbstractExaminee
-Examinee <: AbstractExaminee
 AbstractParameters
-AbstractParametersBinary <: AbstractParameters
-Parameters1PL <: AbstractParametersBinary
-Parameters2PL <: AbstractParametersBinary
-Parameters3PL <: AbstractParametersBinary
+AbstractParametersBinary
 AbstractLatent
-Latent1D <: AbstractLatent
-LatentND <: AbstractLatent
 AbstractResponse
-Response <: AbstractResponse
+```
+
+## Structs and Abstracts
+
+```@docs
+Item
+Examinee
+Parameters1PL
+Parameters2PL
+Parameters3PL
+Latent1D
+LatentND
+Response
 ```
 
 Each of the mentioned structs has a random default factory, callable by using the name of the struct followed by `()`.
