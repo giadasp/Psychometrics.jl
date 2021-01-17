@@ -14,11 +14,9 @@ This package is a playground I built for working on my research projects. It pro
 
 The documentation is still in progress. Nevertheless, some functions have detailed descriptions that can be found in the documentation pages or using the Julia help ?.
 
-The [Tutorial](@ref) provides a tutorial explaining how to get started using Psychometrics.
+(In progress) The [Tutorial](@ref) provides a tutorial explaining how to get started using Psychometrics.
 
-See the [Index](@ref main-index) for the complete list of documented functions and types.
-
-## Documentation Contents
+## Index
 
 ```@contents
 Pages = ["lib/public.md", "lib/internals.md"]
