@@ -8,7 +8,7 @@
 # Description
 It computes the probability (ICF) of a correct response for item parameters and latents values provided in matrix form.
 Not suitable for 3PL models, for such a kind of model use probability_3PL().
-It follows the parametrization \$aθ - b\$.
+It follows the parametrization ``a \\theta - b ``.
 
 # Arguments
 - **`parameters_matrix::Matrix{Float64}`** : Required. A `n_latents x N` matrix with latents values. 
@@ -29,7 +29,7 @@ end
 
 # Description
 Only for models which has guessing parameter (c) in last row of parameters_matrix. It computes the probability (ICF) of a correct response for item parameters and latents values provided in matrix form.
-It follows the parametrization \$aθ - b\$.
+It follows the parametrization ``a \\theta - b ``.
 
 # Arguments
 - **`parameters_matrix::Matrix{Float64}`** : Required. A `n_latents x N` matrix with latents values. 

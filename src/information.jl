@@ -7,7 +7,7 @@
 # Description
 It computes the information function (IIF) for item parameters at latents values provided in matrix form.
 Not suitable for 3PL models, for such a kind of model use information_latent_3PL().
-It follows the parametrization \$aθ - b\$.
+It follows the parametrization ``a \\theta - b ``.
 See the docs of [`information_latent(examinee::AbstractExaminee, item::AbstractItem)`](@ref) for details.
 
 # Arguments
@@ -35,7 +35,7 @@ end
 # Description
 Only for models which has guessing parameter (c) in last row of parameters_matrix.
 It computes the information function (IIF) for item parameters at latents values provided in matrix form.
-It follows the parametrization \$aθ - b\$.
+It follows the parametrization ``a \\theta - b ``.
 
 # Arguments
 - **`latents_matrix::Matrix{Float64}`** : Required. A `n_latents x N` matrix with latents values. 
@@ -139,10 +139,11 @@ It follows the parametrization \$a(θ - b)\$.
 - **`items::Vector{<:AbstractItem}`** : Required. 
 
 # Example
-Compute the Fisher information for the latents of the examinees (second derivatives of the likelihood with respect to the latent $\theta$) and each item._
-\$\$
-E_\theta_n \[ I(\theta_n | b_i) \] =  
-\$\$ 
+Compute the Fisher information for the latents of the examinees (second derivatives of the likelihood with respect to the latent ``\\theta``) and each item.
+
+```math
+E_\theta_n \[ I(\theta_n | b_i) \] 
+``` 
 
 ```julia
 examinees = [Examinee() for n = 1 : 10]; #default examinee factory
