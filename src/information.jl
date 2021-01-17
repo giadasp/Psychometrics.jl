@@ -11,8 +11,8 @@ It follows the parametrization ``a \\theta - b ``.
 See the docs of [`information_latent(examinee::AbstractExaminee, item::AbstractItem)`](@ref) for details.
 
 # Arguments
-- **`latents_matrix::Matrix{Float64}`** : Required. A `n_latents x N` matrix with latents values. 
-- **`parameters_matrix::Matrix{Float64}`** : Required. A `(n_latents + 1) x I` matrix with item parameters. intercept (b) must be in first row, latents coefficients ``(a_j)`` in next rows ``(2, \\ldots, n_latents + 1)``. 
+- **`latents_matrix::Matrix{Float64}`** : Required. A ``n_latents \\times N`` matrix with latents values. 
+- **`parameters_matrix::Matrix{Float64}`** : Required. A ``(n_latents + 1) \\times I`` matrix with item parameters. intercept (b) must be in first row, latents coefficients ``(a_j)`` in next rows ``(2, \\ldots, n_latents + 1)``. 
     
 # Output
 A `I x N` `Float64` matrix. 
