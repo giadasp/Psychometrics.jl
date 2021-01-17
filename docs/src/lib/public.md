@@ -10,28 +10,12 @@ See the [Internals Documentation](@ref) Section of the manual for internal packa
 Pages = ["public.md"]
 ```
 
-## Abstracts
-
-```@docs
-AbstractItem
-AbstractExaminee
-AbstractParameters
-AbstractParametersBinary
-AbstractLatent
-AbstractResponse
-```
-
 ## Structs and Abstracts
 
-```@docs
-Item
-Examinee
-Parameters1PL
-Parameters2PL
-Parameters3PL
-Latent1D
-LatentND
-Response
+```@autodocs
+Modules = [Psychometrics]
+Public = false
+Order = [:type]
 ```
 
 Each of the mentioned structs has a random default factory, callable by using the name of the struct followed by `()`.

@@ -18,7 +18,7 @@ get_responses_by_item_idx(item_idx::Int64, responses::Vector{<:AbstractResponse}
 answer(examinee::AbstractExaminee, item::AbstractItem)
 answer(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
 answer(examinee_id::String, item_id::String, examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
-answer(examinees:Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
+answer(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
 get_design_matrix(responses::Vector{Response}, I::Int64, N::Int64)
 get_response_matrix(responses::Vector{Response}, I::Int64, N::Int64)
 get_responses(response_matrix::Matrix{Float64}, design_matrix::Matrix{Float64}, items::Vector{<:AbstractItem}, examinees::Vector{<:AbstractExaminee})
