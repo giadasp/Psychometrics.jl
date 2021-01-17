@@ -8,7 +8,6 @@ Main module for `Psychometrics.jl` -- A Julia package that provides tools for ps
     PolyaGamma
     TruncatedGamma
     rand
-    #truncate_rand
     AbstractExaminee
     Examinee
     AbstractLatent
@@ -85,7 +84,6 @@ export
     PolyaGamma,
     TruncatedGamma,
     rand,
-    #truncate_rand,
     AbstractExaminee,
     Examinee,
     AbstractLatent,
