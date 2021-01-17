@@ -141,9 +141,7 @@ It follows the parametrization \$a(θ - b)\$.
 # Example
 Compute the Fisher information for the latents of the examinees (second derivatives of the likelihood with respect to the latent ``\\theta``) and each item.
 
-```math
-E_\theta_n \[ I(\theta_n | b_i) \] 
-``` 
+``E_\\theta_n \\[ I(\\theta_n | b_i) \\] ``
 
 ```julia
 examinees = [Examinee() for n = 1 : 10]; #default examinee factory
