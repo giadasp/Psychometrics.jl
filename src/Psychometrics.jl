@@ -1,4 +1,10 @@
 __precompile__(true)
+"""
+Main module for `Psychometrics.jl` -- A Julia package that provides tools for psychometric data analysis.
+
+# Exports
+$(EXPORTS)
+"""
 module Psychometrics
 
 import Distributions

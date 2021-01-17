@@ -8,6 +8,7 @@
 It computes the information function (IIF) for item parameters at latents values provided in matrix form.
 Not suitable for 3PL models, for such a kind of model use information_latent_3PL().
 It follows the parametrization \$aθ - b\$.
+See the docs of [`information_latent(examinee::AbstractExaminee, item::AbstractItem)`](@ref) for details.
 
 # Arguments
 - **`latents_matrix::Matrix{Float64}`** : Required. A `n_latents x N` matrix with latents values. 
@@ -56,7 +57,7 @@ end
     _information_latent(latent::Latent1D, parameters::Parameters1PL)
 
 # Description
-It computes the information (-second derivative of the likelihood) with respect to the 1-dimensional latent variable under the 1PL model.
+It computes the information (second derivative of the likelihood) with respect to the 1-dimensional latent variable under the 1PL model.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
@@ -109,6 +110,23 @@ function _information_latent(latent::Latent1D, parameters::Parameters3PL)
     return (p - parameters.c)^2 * (1 - p) * parameters.a^2 / (1 - parameters.c)^2 / p
 end
 
+
+"""
+    information_latent(examinee::AbstractExaminee, item::AbstractItem)
+
+# Description
+An abstraction of `_information_latent(latent::AbstractLatent, parameters::AbstractParametersBinary)` on an examinee and an item.
+It follows the parametrization \$a(θ - b)\$.
+
+# Arguments
+- **`examinee::AbstractExaminee`** : Required. 
+- **`item::AbstractItem`** : Required. 
+
+"""
+function information_latent(examinee::AbstractExaminee, item::AbstractItem)
+    _information_latent(examinee.latent, item.parameters)
+end
+
 """
     information_latent(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
 
@@ -120,9 +138,21 @@ It follows the parametrization \$a(θ - b)\$.
 - **`examinee::AbstractExaminee`** : Required. 
 - **`items::Vector{<:AbstractItem}`** : Required. 
 
+# Example
+Compute the Fisher information for the latents of the examinees (second derivatives of the likelihood with respect to the latent $\theta$) and each item._
+\$\$
+E_\theta_n \[ I(\theta_n | b_i) \] =  
+\$\$ 
+
+```julia
+examinees = [Examinee() for n = 1 : 10]; #default examinee factory
+items = [Item() for i = 1 : 30]; #default item factory
+probability(examinees, items) #compute the probability
+information_latent(examinees, items) #compute the information wrt θ   
+```
 """
 function information_latent(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
-    [_information_latent(examinee.latent, i.parameters) for i in items]
+    mapreduce( i -> _information_latent(examinee.latent, i.parameters), vcat, items)
 end
 
 """
