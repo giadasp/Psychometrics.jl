@@ -1,7 +1,7 @@
 # Probability (Item Characteristic Function) (Internals)
 
 ```@meta
-    Modules = Psychometrics
+    CurrentModule = Psychometrics
 ```
 
 ## 1PL

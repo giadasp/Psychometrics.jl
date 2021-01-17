@@ -1,7 +1,7 @@
 # Item Parameters (Internals)
 
 ```@meta
-    Modules = Psychometrics
+    CurrentModule = Psychometrics
 ```
 ```@docs
     _add_prior!(parameters::AbstractParameters, prior::Distributions.Distribution) 

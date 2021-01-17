@@ -1,7 +1,7 @@
 # Items
 
 ```@meta
-    Modules = Psychometrics
+    CurrentModule = Psychometrics
 ```
 ```@docs
 get_latents(examinees::Vector{<:AbstractExaminee})

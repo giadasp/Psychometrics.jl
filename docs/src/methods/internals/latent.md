@@ -1,7 +1,7 @@
 # Latent Variable (Internals)
 
 ```@meta
-    Modules = Psychometrics
+    CurrentModule = Psychometrics
 ```
 ```@docs
     _empty_chain!(latent::Latent1D)

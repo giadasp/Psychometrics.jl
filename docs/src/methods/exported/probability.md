@@ -1,7 +1,7 @@
 # Probability (Item Characteristic Function)
 
 ```@meta
-    Modules = Psychometrics
+    CurrentModule = Psychometrics
 ```
 
 ## Values in Matrix form

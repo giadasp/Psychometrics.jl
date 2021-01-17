@@ -1,7 +1,7 @@
 # Information (Item Information Function) (Internals)
 
 ```@meta
-    Modules = Psychometrics
+    CurrentModule = Psychometrics
 ```
 
 ## Information wrt $\theta$
