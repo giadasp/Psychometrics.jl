@@ -36,7 +36,7 @@ Response
 
 Each of the mentioned structs has a random default factory, callable by using the name of the struct followed by `()`.
 
-_Example: `Parameters2PL()` generates a set of 2PL item parameters from the product distribution (independent bivariate)._
+_Example:_ `Parameters2PL()` _generates a set of 2PL item parameters from the product distribution (independent bivariate)._
 
 ```julia
 Distributions.Product([
