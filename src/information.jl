@@ -2,8 +2,6 @@
 
 
 """
-    information_latent(latents_matrix::Matrix{Float64}, parameters_matrix::Matrix{Float64})
-
 # Description
 It computes the information function (IIF) for item parameters at latents values provided in matrix form.
 Not suitable for 3PL models, for such a kind of model use `information_latent_3PL()`.
