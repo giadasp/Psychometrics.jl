@@ -37,7 +37,7 @@ _Example: `Item(1, \"item_1\")` generates an operational item with an empty `con
 
 ```@contents
 Pages = [
-    "../methods/exported/item.md",
+    hide("../methods/exported/item.md"),
     "../methods/exported/examinee.md",
     "../methods/exported/response.md",
     "../methods/exported/probability.md",
