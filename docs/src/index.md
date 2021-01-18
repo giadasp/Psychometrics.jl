@@ -12,9 +12,7 @@ end
 
 This package is a playground I built for working on my research projects. It provides objects (Julia structs) and dedicated methods (functions) to deal with psychometric data under the item response theory (IRT) statistical paradigm.
 
-The documentation is still in progress. Nevertheless, some functions have detailed descriptions that can be found in the documentation pages or using the Julia help ?.
-
-(In progress) The [Tutorial](@ref) provides a tutorial explaining how to get started using Psychometrics.
+The documentation is still in progress. Nevertheless, some functions have detailed descriptions that can be found in the documentation pages or using the Julia help `?`.
 
 ## Index
 

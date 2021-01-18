@@ -8,25 +8,14 @@ makedocs(
     sitename = "Psychometrics",
     format = Documenter.HTML(),
     modules = [Psychometrics],
-    doctest = true,
+    doctest = false,
+    
     pages = [
-        hide("methods/exported/bayesian.md"),
-        hide("methods/exported/distributions.md"),
-        hide("methods/exported/examinee.md"),
-        hide("methods/exported/information.md"),
-        hide("methods/exported/likelihood.md"),
-        hide("methods/exported/probability.md"),
-        hide("methods/exported/response.md"),
-        hide("methods/exported/item.md"),
-        hide("methods/internals/bayesian.md"),
-        hide("methods/internals/distributions.md"),
-        hide("methods/internals/information.md"),
-        hide("methods/internals/latent.md"),
-        hide("methods/internals/likelihood.md"),
-        hide("methods/internals/probability.md"),
-        hide("methods/internals/response.md"),
-        hide("methods/internals/parameters.md")
-    ]
+        "index.md",
+        "lib/public.md",
+        "lib/internals.md"   ]
+    
 )
 
-deploydocs(repo = ENV["REPO"], devurl = "docs", devbranch = ENV["DEVBRANCH"])
+#deploydocs(repo = ENV["REPO"], devurl = "docs", devbranch = ENV["DEVBRANCH"])
+#deploydocs(repo = ENV["REPO"], devurl = "docs", devbranch = ENV["DEVBRANCH"])
