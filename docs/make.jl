@@ -25,7 +25,7 @@ makedocs(
         hide("methods/internals/likelihood.md"),
         hide("methods/internals/probability.md"),
         hide("methods/internals/response.md"),
-        hide("methods/internals/parameters.md"),
+        hide("methods/internals/parameters.md")
     ]
 )
 
