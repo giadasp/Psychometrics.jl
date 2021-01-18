@@ -31,13 +31,17 @@ Distributions.Product([
 
 The immutable structs `Item` and `Examinee` need the identification fields `id` and `idx` to be randomly generated. 
 
-_Example: `Item(1, \"item_1\")` generates an operational item with an empty `content` description, and a default 1PL item parameter._
+_Example:_
+````@example 
+Item(1, "item_1")
+```
+_Generates an operational item with an empty `content` description, and a default 1PL item parameter._
 
 ## Exported Methods
 
 ```@contents
 Pages = [
-    hide("../methods/exported/item.md"),
+    "../methods/exported/item.md",
     "../methods/exported/examinee.md",
     "../methods/exported/response.md",
     "../methods/exported/probability.md",

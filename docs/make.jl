@@ -12,28 +12,15 @@ makedocs(
     
     pages = [
         "index.md",
-        hide("lib/public.md", [
-            "methods/exported/bayesian.md",
-            "methods/exported/distributions.md",
-            "methods/exported/examinee.md",
-            "methods/exported/information.md",
-            "methods/exported/likelihood.md",
-            "methods/exported/probability.md",
-            "methods/exported/response.md",
-            "methods/exported/item.md"
-        ]),
-        hide("lib/internals.md", [
-            "methods/internals/bayesian.md",
-            "methods/internals/distributions.md",
-            "methods/internals/information.md",
-            "methods/internals/latent.md",
-            "methods/internals/likelihood.md",
-            "methods/internals/probability.md",
-            "methods/internals/response.md",
-            "methods/internals/parameters.md"
-        ])
+        hide("lib/public.md", map(
+            s -> "methods/exported/$(s)",
+            sort(readdir(joinpath(@__DIR__, "methods/exported")))
+        )),
+        hide("lib/internals.md", map(
+            s -> "methods/internals/$(s)",
+            sort(readdir(joinpath(@__DIR__, "methods/internals")))
+        ))
     ]
-    
 )
 
 deploydocs(repo = ENV["REPO"], devurl = "docs", devbranch = ENV["DEVBRANCH"])
