@@ -17,16 +17,15 @@ makedocs(
         hide("methods/exported/likelihood.md"),
         hide("methods/exported/probability.md"),
         hide("methods/exported/response.md"),
-        hide("methods/internals/item.md"),
+        hide("methods/exported/item.md"),
         hide("methods/internals/bayesian.md"),
         hide("methods/internals/distributions.md"),
-        hide("methods/internals/examinee.md"),
         hide("methods/internals/information.md"),
+        hide("methods/internals/latent.md"),
         hide("methods/internals/likelihood.md"),
         hide("methods/internals/probability.md"),
         hide("methods/internals/response.md"),
-        hide("methods/internals/item.md"),
-
+        hide("methods/internals/parameters.md"),
     ]
 )
 
