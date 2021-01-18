@@ -4,9 +4,10 @@
 abstract type AbstractResponse end
 
 """
-    Response <: AbstractResponse
+`Response <: AbstractResponse`
 
 # Description
+
 An immutable which holds the information about response, such as the identifier of the examinee who gave the response,
 `examinee_id::String`, the identifier of the answered item `item_idx::String`, and the answer starting and ending times `start_time::Dates.DateTime` and `end_time::Dates.DateTime`.
 
@@ -41,11 +42,13 @@ end
 # Outer Constructor Methods
 
 """
+```julia
 get_examinees_by_item_id(
     item_id::String,
     responses::Vector{<:AbstractResponse},
     examinees::Vector{<:AbstractExaminee},
 )
+```
 
 # Description
 
@@ -60,11 +63,13 @@ function get_examinees_by_item_id(
 end
 
 """
+```julia
 get_items_by_examinee_id(
     examinee_id::String,
     responses::Vector{<:AbstractResponse},
     items::Vector{<:AbstractItem},
 )
+```
 
 # Description
 
@@ -79,7 +84,11 @@ function get_items_by_examinee_id(
 end
 
 """
-    add_response!(response::AbstractResponse, responses::Vector{<:AbstractResponse})
+```julia
+add_response!(response::AbstractResponse, responses::Vector{<:AbstractResponse})
+```
+
+# Description
 
 Push the response in the response vector `responses`.
 """
@@ -88,7 +97,11 @@ function add_response!(response::AbstractResponse, responses::Vector{<:AbstractR
 end
 
 """
-    get_responses_by_examinee_id(examinee_id::String, responses::Vector{<:AbstractResponse})
+```julia
+get_responses_by_examinee_id(examinee_id::String, responses::Vector{<:AbstractResponse})
+```
+
+# Description
 
 It returns the vector of responses given by examinee with id = `id`.
 """
@@ -100,7 +113,11 @@ function get_responses_by_examinee_id(
 end
 
 """
-    get_responses_by_item_id(item_id::String, responses::Vector{<:AbstractResponse})
+```julia
+get_responses_by_item_id(item_id::String, responses::Vector{<:AbstractResponse})
+```
+
+# Description
 
 It returns the vector of responses to item with id equal to `item_id`.
 """
@@ -109,7 +126,11 @@ function get_responses_by_item_id(item_id::String, responses::Vector{<:AbstractR
 end
 
 """
-    get_responses_by_item_idx(item_idx::Int64, responses::Vector{<:AbstractResponse}; sorted = true)
+```julia
+get_responses_by_item_idx(item_idx::Int64, responses::Vector{<:AbstractResponse}; sorted = true)
+```
+
+# Description
 
 It returns the vector of responses to item with idx equal to `item_idx`.
 The vector of responses is sorted by `examinee_idx` if `sorted = true`.
@@ -126,7 +147,11 @@ function get_responses_by_item_idx(
 end
 
 """
-    _generate_response(latent::Latent1D, parameters::AbstractParametersBinary)
+```julia
+_generate_response(latent::Latent1D, parameters::AbstractParametersBinary)
+```
+
+# Description
 
 Randomly generate a response for a 1-dimensional latent variable and custom item parameters.
 """
@@ -140,7 +165,11 @@ function _generate_response(latent::Latent1D, parameters::AbstractParametersBina
 end
 
 """
-    answer(examinee::AbstractExaminee, item::AbstractItem)
+```julia
+answer(examinee::AbstractExaminee, item::AbstractItem)
+```
+
+# Description
 
 Randomly generate a response by `examinee` to a dichotomous (binary) `item`.
 """
@@ -158,7 +187,11 @@ end
 
 
 """
-    answer(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
+```julia
+answer(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
+```
+
+# Description
 
 Randomly generate a response by `examinee` to dichotomous (binary) `items`.
 """
@@ -177,7 +210,11 @@ function answer(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
 end
 
 """
-    answer(examinee_id::String, item_id::String, examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
+```julia
+answer(examinee_id::String, item_id::String, examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
+```
+
+# Description
 
 Randomly generate a response by `Examinee` with index `examinee_id` to a dichotomous (binary) `item` with index `item_id`.
 """
@@ -194,7 +231,9 @@ function answer(
 end
 
 """
+```julia
 answer(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractItem})
+```
 
 # Description
 
@@ -205,7 +244,11 @@ function answer(examinees::Vector{<:AbstractExaminee}, items::Vector{<:AbstractI
 end
 
 """
-    get_design_matrix(responses::Vector{Response}, I::Int64, N::Int64)
+```julia
+get_design_matrix(responses::Vector{Response}, I::Int64, N::Int64)
+```
+
+# Description
 
 Returns the ``I \\times N `` design matrix.
 """
@@ -217,9 +260,13 @@ function get_design_matrix(responses::Vector{Response}, I::Int64, N::Int64)
 end
 
 """
-    get_response_matrix(responses::Vector{Response}, I::Int64, N::Int64)
+```julia
+get_response_matrix(responses::Vector{Response}, I::Int64, N::Int64)
+```
 
-Transform vector of `Response`s in a `I x N` response matrix.
+# Description
+
+Transform vector of `Response`s in a ``I \\times N`` response matrix.
 A non given answer has value `0.0`.
 """
 function get_response_matrix(responses::Vector{Response}, I::Int64, N::Int64)
@@ -230,9 +277,11 @@ end
 
 
 """
-    get_responses(response_matrix::Matrix{Float64}, design_matrix::Matrix{Float64}, items::Vector{<:AbstractItem}, examinees::Vector{<:AbstractExaminee})
+```julia
+get_responses(response_matrix::Matrix{Float64}, design_matrix::Matrix{Float64}, items::Vector{<:AbstractItem}, examinees::Vector{<:AbstractExaminee})
+```
 
-Transforms a `I x N` response matrix in a vector of `Response`s given a valid `design_matrix`, a vector of `Item`s and a vector of `Examinee`s.
+Transforms a ``I \\times N`` response matrix in a vector of `Response`s given a valid `design_matrix`, a vector of `Item`s and a vector of `Examinee`s.
 """
 function get_responses(
     response_matrix::Matrix{Float64},
@@ -258,10 +307,12 @@ function get_responses(
 end
 
 """
+```julia
 get_items_idx_answered_by_examinee(
     examinee::AbstractExaminee,
     responses::Vector{<:AbstractResponse},
 )
+```
 
 # Description
 
@@ -276,10 +327,12 @@ function get_items_idx_answered_by_examinee(
 end
 
 """
+```julia
 get_examinees_idx_who_answered_item(
     item::AbstractItem,
     responses::Vector{<:AbstractResponse},
 )
+```
 
 # Description
 

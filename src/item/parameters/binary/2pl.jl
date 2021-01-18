@@ -1,8 +1,8 @@
 # 2PL 
 """
-    Parameters2PL <: AbstractParametersBinary
+`Parameters2PL <: AbstractParametersBinary`
 
-    Contains information of a set of item parameters (values, bounds, priors, posteiors, chains, expected Fisher information, calibrated) under the 2-parameter logistic model.
+Contains information of a set of item parameters (values, bounds, priors, posteiors, chains, expected Fisher information, calibrated) under the 2-parameter logistic model.
 """
 mutable struct Parameters2PL <: AbstractParametersBinary
     a::Float64
@@ -71,7 +71,7 @@ mutable struct Parameters2PL <: AbstractParametersBinary
 end
 
 """
-    _empty_chain!(parameters::Parameters2PL)
+`_empty_chain!(parameters::Parameters2PL)`
 
 """
 function _empty_chain!(parameters::Parameters2PL)
@@ -79,7 +79,7 @@ function _empty_chain!(parameters::Parameters2PL)
 end
 
 """
-    _set_val!(parameters::Parameters2PL, vals::Vector{Float64})
+`_set_val!(parameters::Parameters2PL, vals::Vector{Float64})`
 """
 function _set_val!(parameters::Parameters2PL, vals::Vector{Float64})
     parameters.a = vals[1]
@@ -87,7 +87,7 @@ function _set_val!(parameters::Parameters2PL, vals::Vector{Float64})
 end
 
 """
-    _set_val_from_chain!(parameters::Parameters2PL)
+`_set_val_from_chain!(parameters::Parameters2PL)`
 """
 function _set_val_from_chain!(parameters::Parameters2PL)
     parameters.a = parameters.chain[end][1]
@@ -95,7 +95,7 @@ function _set_val_from_chain!(parameters::Parameters2PL)
 end
 
 """
-    _update_estimate!(parameters::Parameters2PL; sampling = true)
+`_update_estimate!(parameters::Parameters2PL; sampling = true)`
 """
 function _update_estimate!(parameters::Parameters2PL; sampling = true)
     chain_size = size(parameters.chain, 1)

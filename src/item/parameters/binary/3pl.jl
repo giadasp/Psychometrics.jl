@@ -1,6 +1,10 @@
 ## 3PL
 """
-    Contains information of a set of item parameters (values, bounds, priors, posteiors, chains, expected Fisher information, calibrated) under the 3-parameter logistic model.
+```julia
+Parameters3PL <: AbstractParametersBinary
+```
+
+Contains information of a set of item parameters (values, bounds, priors, posteiors, chains, expected Fisher information, calibrated) under the 3-parameter logistic model.
 """
 mutable struct Parameters3PL <: AbstractParametersBinary
     a::Float64

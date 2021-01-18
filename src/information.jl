@@ -2,18 +2,28 @@
 
 
 """
+```julia
+information_latent(
+    latents_matrix::Matrix{Float64},
+    parameters_matrix::Matrix{Float64},
+)
+```
+
 # Description
+
 It computes the information function (IIF) for item parameters at latents values provided in matrix form.
 Not suitable for 3PL models, for such a kind of model use `information_latent_3PL()`.
 It follows the parametrization ``a \\theta - b ``.
 See the docs of [`information_latent(examinee::AbstractExaminee, item::AbstractItem)`](@ref) for details.
 
 # Arguments
+
 - **`latents_matrix::Matrix{Float64}`** : Required. A ``n_latents \\times N`` matrix with latents values. 
 - **`parameters_matrix::Matrix{Float64}`** : Required. A ``(n_latents + 1) \\times I`` matrix with item parameters. intercept (b) must be in first row, latents coefficients ``(a_j)`` in next rows ``(2, \\ldots, n_latents + 1)``. 
     
 # Output
-A `I x N` `Float64` matrix. 
+
+A ``I \\time N`` `Float64` matrix. 
 """
 function information_latent(
     latents_matrix::Matrix{Float64},
@@ -28,10 +38,12 @@ function information_latent(
 end
 
 """
+```julia
 information_latent_3PL(
     latents_matrix::Matrix{Float64},
     parameters_matrix::Matrix{Float64},
 )
+```
 
 # Description
 
@@ -40,10 +52,12 @@ It computes the information function (IIF) for item parameters at latents values
 It follows the parametrization ``a \\theta - b ``.
 
 # Arguments
+
 - **`latents_matrix::Matrix{Float64}`** : Required. A `n_latents x N` matrix with latents values. 
 - **`parameters_matrix::Matrix{Float64}`** : Required. A `(n_latents + 1) x I` matrix with item parameters. intercept (b) must be in first row, latents coefficients (a_j) in next rows (2, ..., n_latents + 1). 
 
 # Output
+
 A `I x N` `Float64` matrix. 
 """
 function information_latent_3PL(
@@ -56,17 +70,22 @@ function information_latent_3PL(
 end
 
 """
+```julia
 _information_latent(latent::Latent1D, parameters::Parameters1PL)
+```
 
 # Description
+
 It computes the information (second derivative of the likelihood) with respect to the 1-dimensional latent variable under the 1PL model.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
+
 - **`latent::Latent1D`** : Required. A 1-dimensional `Latent1D` latent variable. 
 - **`parameters::Parameters1PL`** : Required. A 1-parameter logistic parameters object. 
 
 # Output
+
 A `Float64` scalar. 
 """
 function _information_latent(latent::Latent1D, parameters::Parameters1PL)
@@ -75,17 +94,22 @@ function _information_latent(latent::Latent1D, parameters::Parameters1PL)
 end
 
 """
+```julia
 _information_latent(latent::Latent1D, parameters::Parameters2PL)
+```
 
 # Description
+
 It computes the information (-second derivative of the likelihood) with respect to the 1-dimensional latent variable under the 2PL model.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
+
 - **`latent::Latent1D`** : Required. A 1-dimensional `Latent1D` latent variable. 
 - **`parameters::Parameters2PL`** : Required. A 2-parameter logistic parameters object. 
 
 # Output
+
 A `Float64` scalar. 
 """
 function _information_latent(latent::Latent1D, parameters::Parameters2PL)
@@ -94,17 +118,22 @@ function _information_latent(latent::Latent1D, parameters::Parameters2PL)
 end
 
 """
+```julia
 _information_latent(latent::Latent1D, parameters::Parameters3PL)
+```
 
 # Description
+
 It computes the information (-second derivative of the likelihood) with respect to the 1-dimensional latent variable under the 3PL model.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
+
 - **`latent::Latent1D`** : Required. A 1-dimensional `Latent1D` latent variable. 
 - **`parameters::Parameters3PL`** : Required. A 3-parameter logistic parameters object. 
 
 # Output
+
 A `Float64` scalar. 
 """
 function _information_latent(latent::Latent1D, parameters::Parameters3PL)
@@ -114,7 +143,9 @@ end
 
 
 """
+```julia
 information_latent(examinee::AbstractExaminee, item::AbstractItem)
+```
 
 # Description
 
@@ -132,17 +163,22 @@ function information_latent(examinee::AbstractExaminee, item::AbstractItem)
 end
 
 """
+```julia
 information_latent(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
+```
 
 # Description
+
 An abstraction of `_information_latent(latent::AbstractLatent, parameters::AbstractParametersBinary)` on an examinee and items.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
+
 - **`examinee::AbstractExaminee`** : Required. 
 - **`items::Vector{<:AbstractItem}`** : Required. 
 
 # Example
+
 Compute the Fisher information for the latents of the examinees (second derivatives of the likelihood with respect to the latent ``\\theta``) and each item.
 
 ``E_\\theta_n \\[ I(\\theta_n | b_i) \\] ``
@@ -159,10 +195,12 @@ function information_latent(examinee::AbstractExaminee, items::Vector{<:Abstract
 end
 
 """
+```julia
 information_latent(
     examinees::Vector{<:AbstractExaminee},
     items::Vector{<:AbstractItem},
 )
+```
 
 # Description
 
@@ -185,17 +223,22 @@ end
 ## Item Expected Informations
 
 """
+```julia
 _expected_information_item(parameters::Parameters1PL, latent::Latent1D)
+```
 
 # Description
+
 It computes the expected information (-second derivative of the likelihood) with respect to the difficulty parameter of the 1PL model.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
+
 - **`parameters::Parameters1PL`** : Required. A 1-parameter logistic parameters object. 
 - **`latent::Latent1D`** : Required. A 1-dimensional `Latent1D` latent variable. 
 
 # Output
+
 A `Float64` scalar. 
 """
 function _expected_information_item(parameters::Parameters1PL, latent::Latent1D)
@@ -204,17 +247,22 @@ function _expected_information_item(parameters::Parameters1PL, latent::Latent1D)
 end
 
 """
+```julia
 _expected_information_item(parameters::Parameters2PL, latent::Latent1D)
+```
 
 # Description
+
 It computes the expected information (-second derivative of the likelihood) with respect to the 2 parameters of the 2PL model.
 It follows the parametrization \$a(θ - b)\$.
 
 # Arguments
+
 - **`parameters::Parameters1PL`** : Required. A 2-parameter logistic parameters object. 
 - **`latent::Latent1D`** : Required. A 1-dimensional `Latent1D` latent variable. 
 
 # Output
+
 A ``2 \\times 2`` matrix of the expected informations. 
 """
 function _expected_information_item(parameters::Parameters2PL, latent::Latent1D)
@@ -226,9 +274,12 @@ function _expected_information_item(parameters::Parameters2PL, latent::Latent1D)
 end
 
 """
+```julia
 _expected_information_item(parameters::Parameters3PL, latent::Latent1D)
+```
 
 # Description
+
 It computes the expected information (-second derivative of the likelihood) with respect to the 3 parameters of the 3PL model. 
 It follows the parametrization \$a(θ - b)\$.
 
@@ -253,10 +304,12 @@ function _expected_information_item(parameters::Parameters3PL, latent::Latent1D)
 end
 
 """
+```julia
 expected_information_item(
     items::Vector{<:AbstractItem},
     examinees::Vector{<:AbstractExaminee},
 )
+```
 
 # Description
 
@@ -283,11 +336,13 @@ end
 ## Item Observed Informations
 
 """
+```julia
 _observed_information_item(
     parameters::Parameters3PL,
     latent::Latent1D,
     response_val::Float64,
 )
+```
 
 # Description
 
@@ -327,11 +382,13 @@ function _observed_information_item(
 end
 
 """
+```julia
 observed_information_item(
     items::Vector{<:AbstractItem},
     examinees::Vector{<:AbstractExaminee},
     responses::Vector{<:AbstractResponse},
 )
+```
 
 # Description
 

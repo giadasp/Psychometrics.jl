@@ -232,7 +232,7 @@ function _likelihood(
     return _likelihood(response_val, latent.val, parameters)
 end
 
-"""`
+"""
 ```julia 
 likelihood(
     response::AbstractResponse,

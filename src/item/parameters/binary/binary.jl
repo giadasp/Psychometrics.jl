@@ -1,3 +1,6 @@
+"""
+`AbstractParametersBinary <: AbstractParameters`
+"""
 abstract type AbstractParametersBinary <: AbstractParameters end
 
 include("1pl.jl")
