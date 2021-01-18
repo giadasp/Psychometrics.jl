@@ -1,6 +1,8 @@
 ## NPL
 """
-`ParametersNPL <: AbstractParametersBinary`
+    ParametersNPL <: AbstractParametersBinary
+
+# Description
 
 Contains info about the difficulty of an item under the N-parameter logistic model.
 """

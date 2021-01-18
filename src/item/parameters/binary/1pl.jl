@@ -1,6 +1,6 @@
 
 """
-`Parameters1PL <: AbstractParametersBinary`
+    Parameters1PL <: AbstractParametersBinary
 
 Contains information of a set of item parameters (values, bounds, priors, posteiors, chains, expected Fisher information, calibrated) under the 1-parameter logistic model.
 """
@@ -28,7 +28,7 @@ mutable struct Parameters1PL <: AbstractParametersBinary
 end
 
 """
-`_empty_chain!(parameters::Parameters1PL)`
+    _empty_chain!(parameters::Parameters1PL)
 """
 function _empty_chain!(parameters::Parameters1PL)
     parameters.chain = Vector{Float64}(undef, 0)

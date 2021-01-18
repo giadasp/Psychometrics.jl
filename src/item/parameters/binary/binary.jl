@@ -1,5 +1,5 @@
 """
-`AbstractParametersBinary <: AbstractParameters`
+    AbstractParametersBinary <: AbstractParameters
 """
 abstract type AbstractParametersBinary <: AbstractParameters end
 

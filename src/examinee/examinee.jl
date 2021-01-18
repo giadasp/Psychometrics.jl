@@ -3,7 +3,7 @@ abstract type AbstractExaminee end
 include("latent/latent.jl")
 
 """
-` Examinee <: AbstractExaminee`
+    Examinee <: AbstractExaminee
 
 # Description
 
@@ -16,12 +16,14 @@ An immutable containing the information about the examinee (the test taker).
   - **`latent::Latent`**: A mutable latent struct associated with the Examinee.
 
 # Factories
-    `Examinee(idx, id, latent) = new(idx, id, latent)`
+    Examinee(idx, id, latent) = new(idx, id, latent)
 
 Creates a new Examinee with custom index, id and a generic latent variable.
 
 # Random initializers
-    `Examinee(idx, id) = new(idx, id, Latent1D())`
+    Examinee(idx, id) = new(idx, id, Latent1D())
+
+# Description
 
 Randomly generates an Examinee with custom index and id and with a default 1-dimensional latent variable 
 (Look at (`Latent1D`)[#Psychometrics.Latent1D] for the defaults).
@@ -49,7 +51,9 @@ end
 
 
 """
-`get_latents(examinees::Vector{<:AbstractExaminee})`
+    get_latents(examinees::Vector{<:AbstractExaminee})
+
+    #Description 
 
 Returns a matrix with latent values displayed by row.
 """
@@ -75,8 +79,38 @@ end
 
 
 """
-`empty_chain!(examinee::AbstractExaminee)`
+    empty_chain!(examinee::AbstractExaminee)
 """
 function empty_chain!(examinee::AbstractExaminee)
     _empty_chain!(examinee.latent)
+end
+
+"""
+    set_val!(examinee::AbstractExaminee, val::Float64)
+"""
+function set_val!(examinee::AbstractExaminee, val::Float64)
+    _set_val!(examinee.latent, val)
+end
+
+"""
+    set_val_from_chain!(examinee::AbstractExaminee)
+"""
+function set_val_from_chain!(examinee::AbstractExaminee)
+    _set_val_from_chain!(examinee.latent)
+end
+
+
+"""
+    update_estimate!(examinee::AbstractExaminee; sampling = true)
+"""
+function update_estimate!(examinee::AbstractExaminee; sampling = true)
+    _update_estimate!(examinee.latent; sampling = sampling)
+end
+
+
+"""
+    chain_append!(examinee::AbstractExaminee; sampling = false)
+"""
+function chain_append!(examinee::AbstractExaminee; sampling = false)
+    _chain_append!(examinee.latent; sampling = sampling)
 end

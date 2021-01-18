@@ -282,10 +282,6 @@ function set_val_from_chain!(item::AbstractItem)
     _set_val_from_chain!(item.parameters)
 end
 
-function set_val_from_chain!(examinee::AbstractExaminee)
-    _set_val_from_chain!(examinee.latent)
-end
-
 
 #update the posterior, append sample to chain and set the value as a sample from the posterior
 function mcmc_iter!(
@@ -323,11 +319,6 @@ function mcmc_iter!(
     #chain_append!(examinee; sampling = sampling)
     set_val_from_posterior!(examinee; sampling = sampling)
     #set_val_from_chain!(examinee)
-end
-
-#update the estimate as the mean of the chain values
-function update_estimate!(examinee::AbstractExaminee; sampling = true)
-    _update_estimate!(examinee.latent, sampling = sampling)
 end
 
 function update_estimate!(item::AbstractItem; sampling = true)

@@ -15,7 +15,9 @@ Finds the best item for the `examinee` among the vector `items` using maximum in
 It returns an item of generic type.
 
 # References
-__Ren H, van der Linden WJ, Diao Q. Continuous online item calibration: Parameter recovery and item calibration. Psychometrika. 2017;82:498–522. doi: 10.1007/s11336-017-9553-1.__
+[^RenDiao2017]
+
+[^RenDiao2017]:Ren H, van der Linden WJ, Diao Q. Continuous online item calibration: Parameter recovery and item calibration. Psychometrika. 2017;82:498–522. doi: 10.1007/s11336-017-9553-1.
 """
 function find_best_item(
     examinee::AbstractExaminee,
