@@ -47,6 +47,7 @@ Pages = [
     "../methods/exported/probability.md",
     "../methods/exported/information.md",
     "../methods/exported/likelihood.md",
+
 ]
 Depth = 1
 ```

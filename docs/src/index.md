@@ -17,7 +17,7 @@ The documentation is still in progress. Nevertheless, some functions have detail
 ## Index
 
 ```@contents
-Pages = ["lib/public.md", "lib/internals.md"]
+Pages = ["lib/public.md", "lib/internals.md","bayesian.md"]
 ```
 
 
