@@ -13,12 +13,12 @@ makedocs(
     pages = [
         "index.md",
         hide("lib/public.md", map(
-            s -> "methods/exported/$(s)",
-            sort(readdir(joinpath(@__DIR__, "methods/exported")))
+            s -> "src/methods/exported/$(s)",
+            sort(readdir(joinpath(@__DIR__, "src/methods/exported")))
         )),
         hide("lib/internals.md", map(
-            s -> "methods/internals/$(s)",
-            sort(readdir(joinpath(@__DIR__, "methods/internals")))
+            s -> "src/methods/internals/$(s)",
+            sort(readdir(joinpath(@__DIR__, "src/methods/internals")))
         ))
     ]
 )
