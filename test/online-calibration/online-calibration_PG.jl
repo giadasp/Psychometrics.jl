@@ -22,12 +22,12 @@ function copy(examinee::Examinee)
 end
 
 
-@sync @distributed for rep = 1:20
+@sync @distributed for rep = 17:24
 
-    I_operational = 1000
+    I_operational = 1_000
     I_field = 25
     I_total = I_field + I_operational
-    N = 2_000
+    N = 3_000
     
     test_operational  = 25
     test_field = 5
@@ -37,16 +37,16 @@ end
     iter_mcmc_item = 4_000
     #after how many responses update item parameter estimates
     batch_size = 5
-    N_T = 200
+    N_T = 400
     items = load(string("test/online-calibration/true values/true_items.jld2"), "items")
-    examinees = load(string("test/online-calibration/true values/true_examinees.jld2"), "examinees")
+    examinees = load(string("test/online-calibration/true values/true_examinees.jld2"), "examinees")[1:N]
     
     retired_items = 0
     retired_items_vector= fill(0, N)
 
     # RESPONSES
 
-    responses_per_examinee = [ResponseBinary[] for e in examinees];
+    responses_per_examinee = [Response[] for e in examinees];
 
     # INITIAL VALUES
 
@@ -80,7 +80,7 @@ end
     # append not calibrated items 
     items_est = vcat(items_est_operational, items_est_field);
     #responses vectors for not calibrated items
-    responses_not_calibrated = ResponseBinary[]
+    responses_not_calibrated = Response[]
 
     ## EXAMINEES
 
@@ -108,7 +108,7 @@ end
         examinee_true = copy(examinees[n])
         idx_n = examinee.idx
         items_idx_n = Int64[]
-        responses_n = ResponseBinary[]
+        responses_n = Response[]
         items_est_n = AbstractItem[]
         println("n: ", n)
         #println("true: ", examinees[n].latent.val)
@@ -119,7 +119,7 @@ end
             push!(items_idx_n, next_item_idx);
             available_items_idx = setdiff(available_items_idx, next_item_idx)
             # answer to the item
-            resp = answer_binary(examinee_true, items[next_item_idx])
+            resp = answer(examinee_true, items[next_item_idx])
             push!(responses_n, resp)
             estimate_ability!(examinee, items_est[items_idx_n], responses_n; mcmc_iter = iter_mcmc_latent, sampling = false, already_sorted = false)
             #println("est_BIAS: ", examinee.latent.val - examinees[n].latent.val)
@@ -135,7 +135,7 @@ end
                 push!(items_idx_n, next_item_idx);
                 available_items_idx = setdiff(available_items_idx, next_item_idx)
                 # answer to the item
-                resp = answer_binary(examinee_true, items[next_item_idx])
+                resp = answer(examinee_true, items[next_item_idx])
                 push!(responses_n, resp)
 
                 # set the theta prior as theta posterior
@@ -160,12 +160,14 @@ end
                     end
                     items_est_parameters[next_item_idx - I_operational][Int64(size(resp_item,1)/batch_size)] = [item.parameters.a, item.parameters.b]
                     if next_item_idx==1001
-                    println("est_BIAS a 2: ", sqrt((item.parameters.a - items[next_item_idx].parameters.a)^2))
-                    println("est_BIAS b 2: ", sqrt((item.parameters.b - items[next_item_idx].parameters.b)^2))
+                    println("est_BIAS a: ", sqrt((item.parameters.a - items[next_item_idx].parameters.a)^2))
+                    println("est_BIAS b: ", sqrt((item.parameters.b - items[next_item_idx].parameters.b)^2))
                     end
                     if size(resp_item, 1) >= N_T
                         item.parameters.calibrated = true
                         retired_items +=1
+                        #remove all responses from responses_not_calibrated
+                        responses_not_calibrated = filter( r -> r.item_idx != item.idx, responses_not_calibrated)
                     end
                     #update expected information
                     item.parameters.expected_information = mapreduce(e -> Psychometrics._expected_information_item(item.parameters, e.latent), +, examinees_est_item)
@@ -192,16 +194,15 @@ end
     @save string("test/online-calibration/items_est_rep_",rep,".jld2") items_est
     @save string("test/online-calibration/examinees_est_rep_",rep,".jld2") examinees_est
 
-    rmse_a =  sqrt(mean(map( (i, i_est)-> (i.parameters.a - i_est.parameters.a)^2, items[I_operational:I_total], items_est[I_operational:I_total]))) 
-    rmse_b = sqrt(mean(map( (i, i_est)-> (i.parameters.b - i_est.parameters.b)^2, items[I_operational:I_total], items_est[I_operational:I_total])))
+    rmse_a =  sqrt(mean(map( (i, i_est)-> (i.parameters.a - i_est.parameters.a)^2, items[(I_operational+1):I_total], items_est[(I_operational+1):I_total]))) 
+    rmse_b = sqrt(mean(map( (i, i_est)-> (i.parameters.b - i_est.parameters.b)^2, items[(I_operational+1):I_total], items_est[(I_operational+1):I_total])))
     rmse_theta = sqrt(mean(map( (e, e_est)-> (e.latent.val- e_est.latent.val)^2, examinees[1:(n-1)], examinees_est[1:(n-1)])))
     println( "avg RMSE a = ", rmse_a)
     println( "avg RMSE b = ", rmse_b)
     println( "avg RMSE tehta = ", rmse_theta)
-
-    @save string("test/online-calibration/rep_", rep, "_items_est.jld2") items_est
+    items_est_field = items_est[(I_operational+1):I_total]
+    @save string("test/online-calibration/rep_", rep, "_items_est_field.jld2") items_est_field
     @save string("test/online-calibration/rep_", rep, "_responses.jld2") responses_per_examinee
-
 end
 # theta_sets = collect(-6.0:0.5:6.0)
 # rmse_theta = zeros(Float64,(size(theta_sets,1) ))
@@ -216,10 +217,10 @@ end
 #         end
 # end
 # plot(theta_sets, rmse_theta)
+rep=100
 
-
-a_s = zeros(1020,rep)
-b_s = zeros(1020,rep)
+a_s = zeros(I_total,rep)
+b_s = zeros(I_total,rep)
 for rep = 1:rep
     @load string("test/online-calibration/rep_", rep, "_items_est.jld2") items_est
     a = map(i -> i.parameters.a, items_est)

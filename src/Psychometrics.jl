@@ -52,6 +52,7 @@ Main module for `Psychometrics.jl` -- A Julia package that provides tools for ps
     update_estimate!
     posterior
     update_posterior!
+    get_latent_vals
     get_latents
     find_best_item
     find_best_examinee
