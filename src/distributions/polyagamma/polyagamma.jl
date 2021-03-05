@@ -1,3 +1,5 @@
+# Adaptation of BayesLogit C code by Nicholas Polson, James Scott, Jesse Windle, 2012-2019
+
 const __PI = 3.14159265358979323846264338327950288419716939937510582097494459230781640628
 const _TERMS = 100
 
@@ -38,7 +40,6 @@ mean(d::PolyaGamma) = d.h / (2 * d.z) * tanh(d.z / 2) # ord.h / (2 * d.z) * ((_e
 
 var(d::PolyaGamma) = d.h / (4 * d.z^3) * (sinh(d.z) - d.z) * sech(d.z / 2)^2
 
-#### pdf
 ## DEPRECATED IN BAYESLOGIT
 ## Calculate coefficient n in density of PG(1.0, 0.0), i.e. J* from Devroye.
 ##------------------------------------------------------------------------------
@@ -58,7 +59,10 @@ end
 
 """
     The log coefficients of the infinite sum for the density of PG(b, 0).
-    See Polson et al. 2013, section 2.3.
+    See [^Polson], section 2.3.
+
+    [^Polson]     See [^Polson], section 2.3.
+
 """
 function _pg_logcoef(x, b, n)
     loggamma(n + b) - loggamma(n + 1) - loggamma(b) + _log_c(2n + b) -
@@ -67,7 +71,9 @@ end
 
 """
    log density of the PG(b, 0) distribution.
-    See Polson et al. 2013, section 2.3.
+   See [^Polson], section 2.3.
+
+   [^Polson]: Polson, Nicholas G., Scott, James G., & Windle, J., (2013). Bayesian Inference for Logistic Models Using P olya–Gamma Latent Variables, Journal of the American Statistical Association, 108:504, 1339–1349, DOI: 10.1080/01621459.2013.
 """
 function _pg0_logpdf(x::Float64, b::Float64; ntrunc::Int = _TERMS)
     v = zero(x)
@@ -80,6 +86,8 @@ end
 """
     log density of the PG(b, c) distribution.
     See Polson et al. 2013, section 2.2 and equation (5).
+
+    [^Polson]: Polson, Nicholas G., Scott, James G., & Windle, J., (2013). Bayesian Inference for Logistic Models Using P olya–Gamma Latent Variables, Journal of the American Statistical Association, 108:504, 1339–1349, DOI: 10.1080/01621459.2013.
 """
 function _pg_logpdf(b::Float64, c::Float64, x::Float64; ntrunc::Int = _TERMS)
     b * _log_cosh_c(c / 2) - x * c^2 / 2 + _pg0_logpdf(x, b; ntrunc = ntrunc)
@@ -93,9 +101,9 @@ function logpdf(d::PolyaGamma, x::Float64; ntrunc::Int = _TERMS)
     end
 end
 
-Distributions.pdf(d::PolyaGamma, x::Real; ntrunc::Int = _TERMS) =
+function Distributions.pdf(d::PolyaGamma, x::Real; ntrunc::Int = _TERMS)
     _exp_c(logpdf(d, x; ntrunc = ntrunc))
-
+end
 
 function Distributions.rand(rng::Distributions.AbstractRNG, d::PolyaGamma)
     if d.h == 1.0

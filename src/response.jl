@@ -202,7 +202,7 @@ function answer(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
             examinee.idx,
             i.id,
             examinee.id,
-            generate_response(examinee.latent, i.parameters),
+            _generate_response(examinee.latent, i.parameters),
             Dates.now(),
         ),
         items,
@@ -270,11 +270,10 @@ Transform vector of `Response`s in a ``I \\times N`` response matrix.
 A non given answer has value `0.0`.
 """
 function get_response_matrix(responses::Vector{Response}, I::Int64, N::Int64)
-    response_matrix = zeros(Float64, I, N)
+    response_matrix = Matrix{Union{Missing, Float64}}(missing .* ones(Float64, I, N))
     map(r -> response_matrix[CartesianIndex(r.item_idx, r.examinee_idx)] = r.val, responses)
-    return response_matrix::Matrix{Float64}
+    return response_matrix::Matrix{Union{Missing, Float64}}
 end
-
 
 """
 ```julia

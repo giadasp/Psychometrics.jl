@@ -2,5 +2,6 @@
 
 ```@autodocs
 Modules = [Psychometrics]
-Pages   = ["bayesian.jl"]
+Pages   = ["item/calibration/polyagamma/polyagamma_mcmc.jl",
+"examinee/assessment/polyagamma/polyagamma_mcmc.jl"]
 ```

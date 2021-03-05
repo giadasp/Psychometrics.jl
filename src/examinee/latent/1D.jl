@@ -8,8 +8,9 @@ The field `val::Float64` holds the estimate of the ability of the examinee, like
 # Fields
 - **`val::Float64`**
 - **`bounds::Vector{Float64}`**
-- **`prior::Distributions.ContinuousUnivariateDistribution`**
-- **`posterior::Distributions.ContinuousUnivariateDistribution`**
+- **`prior::Union{Distributions.ContinuousUnivariateDistribution, Distributions.DiscreteUnivariateDistribution}`**
+- **`posterior::Union{Distributions.ContinuousUnivariateDistribution, Distributions.DiscreteUnivariateDistribution}`**
+- **`likelihood::Float64`**
 - **`chain::Vector{Float64}`**
 - **`expected_information::Float64`**
 
@@ -31,28 +32,29 @@ Randomly generates a value for the 1-dimensional latent variable and assigns a c
 mutable struct Latent1D <: AbstractLatent
     val::Float64
     bounds::Vector{Float64}
-    prior::Distributions.ContinuousUnivariateDistribution
-    posterior::Distributions.ContinuousUnivariateDistribution
+    prior::Union{Distributions.ContinuousUnivariateDistribution, Distributions.DiscreteUnivariateDistribution}
+    posterior::Union{Distributions.ContinuousUnivariateDistribution, Distributions.DiscreteUnivariateDistribution}
+    likelihood::Float64
     chain::Vector{Float64}
     expected_information::Float64
-    Latent1D(val, bounds, prior, posterior, chain, expected_information) =
-        new(val, bounds, prior, posterior, chain, expected_information)
+    Latent1D(val, bounds, prior, posterior, likelihood, chain, expected_information) =
+        new(val, bounds, prior, posterior, likelihood, chain, expected_information)
 
     # Random Initializers
     function Latent1D()
         bounds = [-6.0, 6.0]
         dist = Distributions.Normal(0.0, 1.0)
         val = truncate_rand(dist, bounds)[1]
-        new(val, bounds, dist, dist, [val], 1.0)
+        new(val, bounds, dist, dist, 0.0, [val], 1.0)
     end
     function Latent1D(val::Float64)
         latent = Latent1D()
         latent.val = val
         return latent
     end
-    function Latent1D(dist::Distributions.UnivariateDistribution, bounds::Vector{Float64})
+    function Latent1D(dist::Union{Distributions.ContinuousUnivariateDistribution, Distributions.DiscreteUnivariateDistribution}, bounds::Vector{Float64})
         val = truncate_rand(dist, bounds)[1]
-        new(val, bounds, dist, dist, [val], 1.0)
+        new(val, bounds, dist, dist, 0.0, [val], 1.0)
     end
 end
 
@@ -89,6 +91,7 @@ function _update_estimate!(latent::Latent1D; sampling = true)
     else
         latent.val = sum(latent.chain) / chain_size
     end
+    latent.val = clamp(latent.val, latent.bounds[1], latent.bounds[2])
 end
 
 """
@@ -102,4 +105,19 @@ function _chain_append!(latent::Latent1D; sampling = false)
         push!(latent.chain, val)
     end
     return val::Float64
+end
+
+
+"""
+    _set_prior!(
+        latent::Latent1D,
+        prior::Union{Distributions.DiscreteUnivariateDistribution, Distributions.ContinuousUnivariateDistribution}
+    )
+"""
+function  _set_prior!(
+    latent::Latent1D,
+    prior::Union{Distributions.DiscreteUnivariateDistribution, Distributions.ContinuousUnivariateDistribution}
+)
+    latent.prior = prior
+    return nothing
 end

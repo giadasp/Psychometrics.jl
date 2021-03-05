@@ -2,7 +2,7 @@
 #Stat Comput (2011) 21:275-288
 
 #------------------------------------------------------------
-include("constants.jl")
+#include("constants.jl")
 
 const N_tn = 4001# Index of the right tail
 const yl0 = 0.053513975472# y_l of the leftmost rectangle

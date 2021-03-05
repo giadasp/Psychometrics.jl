@@ -165,7 +165,7 @@ It follows the parametrization \$a(θ - b)\$.
 A `Float64` scalar. 
 """
 function __probability(latent_val::Float64, parameters::Parameters2PL)
-    1 / (1 + _exp_c(-parameters.a * (latent_val - parameters.b)))
+    _sig_c(parameters.a * (latent_val - parameters.b))
 end
 
 """

@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = Psychometrics
+DocTestSetup = quote
+    using Psychometrics
+end
+```
+
 # Public Documentation
 
 Documentation for `Psychometrics.jl`'s public interface.

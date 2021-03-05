@@ -65,32 +65,11 @@ function get_item_by_id(item_id::String, items::Vector{<:AbstractItem})
     filter(i -> i.id == item_id, items)[1]
 end
 
-
 """
-    get_parameters(items::Vector{<:AbstractItem})
-
-# Description
-
-Returns a matrix with item parameters displayed by row.
+    get_parameters_vals(item::AbstractItem)
 """
-function get_parameters(items::Vector{<:AbstractItem})
-    ret = Vector{Vector{Float64}}(undef, size(items, 1))
-    max_length = 1
-    i_2 = 0
-    for i in items
-        i_2 += 1
-        local pars = get_parameters(i)
-        ret[i_2] = copy(pars)
-        max_length = max_length < size(pars, 1) ? size(pars, 1) : max_length
-    end
-
-    for i_3 = 1:i_2
-        local length_i = size(ret[i_3], 1)
-        if length_i < max_length
-            ret[i_3] = vcat(ret[i_3], zeros(Float64, max_length - length_i))
-        end
-    end
-    return permutedims(reduce(hcat, ret))
+function get_parameters_vals(item::AbstractItem)
+    _get_parameters_vals(item.parameters)
 end
 
 """
@@ -101,8 +80,9 @@ function empty_chain!(item::AbstractItem)
 end
 
 """
-    `hain_append!(item::AbstractItem; sampling = false)
+    chain_append!(item::AbstractItem; sampling = false)
 """
 function chain_append!(item::AbstractItem)
     _chain_append!(item.parameters)
 end
+

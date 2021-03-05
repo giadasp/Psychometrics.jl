@@ -44,7 +44,7 @@ mutable struct Parameters2PL <: AbstractParametersBinary
         bounds_b,
     )
         pars = truncate_rand(bivariate_dist, [bounds_a, bounds_b])
-        Parameters2PL(
+        return Parameters2PL(
             pars[1][1],
             bounds_a,
             pars[1][2],
@@ -58,7 +58,7 @@ mutable struct Parameters2PL <: AbstractParametersBinary
     end
 
     function Parameters2PL()
-        Parameters2PL(
+        return Parameters2PL(
             Distributions.Product([
                 Distributions.LogNormal(0, 0.25),
                 Distributions.Normal(0, 1),
@@ -66,6 +66,13 @@ mutable struct Parameters2PL <: AbstractParametersBinary
             [1e-5, 5.0],
             [-6.0, 6.0],
         )
+    end
+
+    function Parameters2PL(bounds_a::Vector{Float64}, bounds_b::Vector{Float64})
+        par = Parameters2PL()
+        par.bounds_a = bounds_a
+        par.bounds_b = bounds_b
+        return par::Parameters2PL
     end
 
 end
@@ -105,6 +112,13 @@ function _update_estimate!(parameters::Parameters2PL; sampling = true)
         chain_matrix = hcat(parameters.chain...)
         vals = [sum(i) / chain_size for i in eachrow(chain_matrix)]
     end
-    parameters.a = vals[1]
-    parameters.b = vals[2]
+    parameters.a = clamp(vals[1], parameters.bounds_a[1], parameters.bounds_a[2])
+    parameters.b = clamp(vals[2], parameters.bounds_b[1], parameters.bounds_b[2])
+end
+
+"""
+    _get_parameters_vals(parameters::Parameters2PL)
+"""
+function _get_parameters_vals(parameters::Parameters2PL)
+    return [parameters.a, parameters.b]
 end

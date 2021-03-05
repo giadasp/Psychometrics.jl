@@ -81,7 +81,7 @@ end
 function _posterior(
     latent::Latent1D,
     parameters::Vector{Parameters2PL},
-    responses::Vector{Response},
+    responses::Vector{ResponseBinary},
     W::Vector{PolyaGammaSample},
 )
     prior = latent.prior
@@ -129,7 +129,7 @@ end
 function _posterior(
     latent::Latent1D,
     parameters::Parameters2PL,
-    response::Response,
+    response::ResponseBinary,
     w::PolyaGammaSample,
 )
     sigma2 = (parameters.a^2) * w.val
@@ -147,14 +147,14 @@ end
     posterior(
         examinee::AbstractExaminee,
         item::AbstractItem,
-        response::Response,
+        response::ResponseBinary,
         w::PolyaGammaSample,
         )
 """
 function posterior(
     examinee::AbstractExaminee,
     item::AbstractItem,
-    response::Response,
+    response::ResponseBinary,
     w::PolyaGammaSample
 )
     return _posterior(examinee.latent, item.parameters, response, w)
@@ -163,7 +163,7 @@ end
 function _posterior(
     parameters::Parameters2PL,
     latent::Latent1D,
-    response::Response,
+    response::ResponseBinary,
     w::PolyaGammaSample,
 )
     a = parameters.a
@@ -201,7 +201,7 @@ end
 function _posterior(
     parameters::Parameters2PL,
     latents::Vector{Latent1D}, #must be sorted by e.idx
-    responses::Vector{Response}, #only responses of item sorted by e.idx
+    responses::Vector{ResponseBinary}, #only responses of item sorted by e.idx
     W::Vector{PolyaGammaSample}, #sorted by e.idx
 )
     prior = parameters.prior.v
@@ -282,6 +282,10 @@ function set_val_from_chain!(item::AbstractItem)
     _set_val_from_chain!(item.parameters)
 end
 
+function set_val_from_chain!(examinee::AbstractExaminee)
+    _set_val_from_chain!(examinee.latent)
+end
+
 
 #update the posterior, append sample to chain and set the value as a sample from the posterior
 function mcmc_iter!(
@@ -319,6 +323,11 @@ function mcmc_iter!(
     #chain_append!(examinee; sampling = sampling)
     set_val_from_posterior!(examinee; sampling = sampling)
     #set_val_from_chain!(examinee)
+end
+
+#update the estimate as the mean of the chain values
+function update_estimate!(examinee::AbstractExaminee; sampling = true)
+    _update_estimate!(examinee.latent, sampling = sampling)
 end
 
 function update_estimate!(item::AbstractItem; sampling = true)
