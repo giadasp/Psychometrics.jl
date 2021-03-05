@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = Psychometrics
+DocTestSetup = quote
+    using Psychometrics
+end
+```
+
 # Internals Documentation
 
 ## Index

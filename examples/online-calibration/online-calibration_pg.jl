@@ -2,44 +2,45 @@
 @everywhere Pkg.instantiate()
 @everywhere Pkg.activate(".")
 @everywhere using Psychometrics
-@everywhere using Distributions
-@everywhere using LinearAlgebra
-@everywhere using Dates
-@everywhere using Random
-@everywhere using SharedArrays
 @everywhere using JLD2
-@everywhere using StatsBase
+@everywhere using Statistics
 @everywhere using DelimitedFiles
 @everywhere using FileIO
-
+@everywhere using StatsBase
+@everywhere using Distributions
 
 
 import Base.copy
 
-function copy(examinee::Examinee) 
+function Base.copy(examinee::Examinee) 
     e = Examinee(examinee.idx, examinee.id, examinee.latent)
     return e::Examinee
 end
 
+function online_calibrate()
+    replications = 1:1
 
-@sync @distributed for rep = 17:24
 
-    I_operational = 1_000
-    I_field = 25
-    I_total = I_field + I_operational
-    N = 3_000
+
+I_operational = 1_000
+I_field = 25
+I_total = I_field + I_operational
+N = 3_000
     
-    test_operational  = 25
-    test_field = 5
-    test_length = test_field + test_operational
-    
-    iter_mcmc_latent = 2_000
-    iter_mcmc_item = 4_000
-    #after how many responses update item parameter estimates
-    batch_size = 5
-    N_T = 400
-    items = load(string("test/online-calibration/true values/true_items.jld2"), "items")
-    examinees = load(string("test/online-calibration/true values/true_examinees.jld2"), "examinees")[1:N]
+test_operational  = 25
+test_field = 5
+test_length = test_field + test_operational
+
+iter_mcmc_latent = 2_000
+iter_mcmc_item = 4_000
+#after how many responses update item parameter estimates
+batch_size = 100
+N_T = 500
+
+items = load(string("examples/online-calibration/true values/true_items.jld2"), "items")
+examinees = load(string("examples/online-calibration/true values/true_examinees.jld2"), "examinees")[1:N]
+
+for rep in replications
     
     retired_items = 0
     retired_items_vector= fill(0, N)
@@ -91,14 +92,14 @@ end
     #set starting value taking a random value in the interval -0.5:0.5
     map(e ->
             begin
-                e.latent.val = Random.rand(-0.3:0.3)
+                e.latent.val = Distributions.rand(-0.3:0.3)
             end,
     examinees_est)
     items_idx_per_examinee = Vector{Vector{Int64}}(undef, N);
     examinees_est_theta = [[zero(Float64) for i=1:test_length] for n=1:N];
     items_est_parameters = [[[0.0, 0.0] for n=1:ceil(N_T/batch_size)] for i=1:I_field]
-    #@save string("test/online-calibration/true values/priors.jld2") a_est_prior b_est_prior latent_est_prior 
-    #@save string("test/online-calibration/true values/bounds.jld2") a_est_bounds b_est_bounds latent_est_bounds 
+    #@save string("examples/online-calibration/true values/priors.jld2") a_est_prior b_est_prior latent_est_prior 
+    #@save string("examples/online-calibration/true values/bounds.jld2") a_est_bounds b_est_bounds latent_est_bounds 
 
     # START ONLINE-CALIBRATION
 
@@ -121,7 +122,7 @@ end
             # answer to the item
             resp = answer(examinee_true, items[next_item_idx])
             push!(responses_n, resp)
-            estimate_ability!(examinee, items_est[items_idx_n], responses_n; mcmc_iter = iter_mcmc_latent, sampling = false, already_sorted = false)
+            Psychometrics.assess_examinee_pg!(examinee, items_est[items_idx_n], responses_n; mcmc_iter = iter_mcmc_latent, sampling = false, already_sorted = false)
             #println("est_BIAS: ", examinee.latent.val - examinees[n].latent.val)
             # store theta estimate
             examinees_est_theta[n][i] = examinee.latent.val
@@ -152,11 +153,11 @@ end
             if mod(size(resp_item, 1), batch_size) == 0
 
                     examinees_est_item = examinees_est[map( r -> r.examinee_idx, resp_item)]
-                    calibrate_item!(item, examinees_est_item, resp_item; mcmc_iter = iter_mcmc_item, sampling = false, already_sorted = true)
+                    Psychometrics.calibrate_item_pg!(item, examinees_est_item, resp_item; mcmc_iter = iter_mcmc_item, sampling = false, already_sorted = true)
                     #save chain
                     if rep ==1
                         chain = item.parameters.chain
-                        @save string("test/online-calibration/rep_", rep, "_item_", item.idx, "_resp_", size(resp_item, 1), "_chain.jld2") chain
+                        @save string("examples/online-calibration/rep_", rep, "_item_", item.idx, "_resp_", size(resp_item, 1), "_chain.jld2") chain
                     end
                     items_est_parameters[next_item_idx - I_operational][Int64(size(resp_item,1)/batch_size)] = [item.parameters.a, item.parameters.b]
                     if next_item_idx==1001
@@ -186,13 +187,13 @@ end
         global n+=1
     end
     global n-=1
-    @save string("test/online-calibration/how_many_examinees_rep_",rep,".jld2") n
-    @save string("test/online-calibration/retired_items_vector_rep_",rep,".jld2") retired_items_vector
-    @save string("test/online-calibration/examinees_est_theta_rep_",rep,".jld2") examinees_est_theta
-    @save string("test/online-calibration/items_est_parameters_rep_",rep,".jld2") items_est_parameters
+    @save string("examples/online-calibration/how_many_examinees_rep_",rep,".jld2") n
+    @save string("examples/online-calibration/retired_items_vector_rep_",rep,".jld2") retired_items_vector
+    @save string("examples/online-calibration/examinees_est_theta_rep_",rep,".jld2") examinees_est_theta
+    @save string("examples/online-calibration/items_est_parameters_rep_",rep,".jld2") items_est_parameters
 
-    @save string("test/online-calibration/items_est_rep_",rep,".jld2") items_est
-    @save string("test/online-calibration/examinees_est_rep_",rep,".jld2") examinees_est
+    @save string("examples/online-calibration/items_est_rep_",rep,".jld2") items_est
+    @save string("examples/online-calibration/examinees_est_rep_",rep,".jld2") examinees_est
 
     rmse_a =  sqrt(mean(map( (i, i_est)-> (i.parameters.a - i_est.parameters.a)^2, items[(I_operational+1):I_total], items_est[(I_operational+1):I_total]))) 
     rmse_b = sqrt(mean(map( (i, i_est)-> (i.parameters.b - i_est.parameters.b)^2, items[(I_operational+1):I_total], items_est[(I_operational+1):I_total])))
@@ -201,8 +202,8 @@ end
     println( "avg RMSE b = ", rmse_b)
     println( "avg RMSE tehta = ", rmse_theta)
     items_est_field = items_est[(I_operational+1):I_total]
-    @save string("test/online-calibration/rep_", rep, "_items_est_field.jld2") items_est_field
-    @save string("test/online-calibration/rep_", rep, "_responses.jld2") responses_per_examinee
+    @save string("examples/online-calibration/rep_", rep, "_items_est_field.jld2") items_est_field
+    @save string("examples/online-calibration/rep_", rep, "_responses.jld2") responses_per_examinee
 end
 # theta_sets = collect(-6.0:0.5:6.0)
 # rmse_theta = zeros(Float64,(size(theta_sets,1) ))
@@ -217,24 +218,27 @@ end
 #         end
 # end
 # plot(theta_sets, rmse_theta)
-rep=100
+# rep=100
 
-a_s = zeros(I_total,rep)
-b_s = zeros(I_total,rep)
-for rep = 1:rep
-    @load string("test/online-calibration/rep_", rep, "_items_est.jld2") items_est
-    a = map(i -> i.parameters.a, items_est)
-    a_s[:, rep] = copy(a)
-    b = map(i -> i.parameters.b, items_est)
-    b_s[:, rep] = copy(b)
+# a_s = zeros(I_total,rep)
+# b_s = zeros(I_total,rep)
+# for rep = 1:rep
+#     @load string("examples/online-calibration/rep_", rep, "_items_est.jld2") items_est
+#     a = map(i -> i.parameters.a, items_est)
+#     a_s[:, rep] = copy(a)
+#     b = map(i -> i.parameters.b, items_est)
+#     b_s[:, rep] = copy(b)
+# end
+
+# a_true = map(i -> i.parameters.a, items)
+# a_true = hcat([a_true for rep=1:rep]...)
+# b_true = map(i -> i.parameters.b, items)
+# b_true = hcat([b_true for rep=1:rep]...)
+# diff_a = (a_s[1001:1020,:] - a_true[1001:1020,:]).^2
+# diff_b = (b_s[1001:1020,:] - b_true[1001:1020,:]).^2
+
+# println(sqrt(sum(diff_a)/I_field/rep))
+# println(sqrt(sum(diff_b)/I_field/rep))
+return examinees, examinees_est, items, items_est, responses
 end
-
-a_true = map(i -> i.parameters.a, items)
-a_true = hcat([a_true for rep=1:rep]...)
-b_true = map(i -> i.parameters.b, items)
-b_true = hcat([b_true for rep=1:rep]...)
-diff_a = (a_s[1001:1020,:] - a_true[1001:1020,:]).^2
-diff_b = (b_s[1001:1020,:] - b_true[1001:1020,:]).^2
-
-println(sqrt(sum(diff_a)/20/rep))
-println(sqrt(sum(diff_b)/20/rep))
+examinees, examinees_est, items, items_est, responses = online_calibrate();

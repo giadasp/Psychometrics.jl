@@ -3,20 +3,17 @@
  Pkg.activate(".")
  using Psychometrics
  using Distributions
- using LinearAlgebra
- using Dates
- using Random
- using SharedArrays
  using JLD2
  using StatsBase
  using DelimitedFiles
  using FileIO
 
 
+ function online_calibrate()
 I_operational = 1000
 I_field = 25
 I_total = I_field + I_operational
-N = 2_000
+N = 3_000
 
 test_operational  = 25
 test_field = 5
@@ -63,9 +60,9 @@ N_T = 200
     )
     items = vcat(items_operational, items_field)
 
-    @save "test/online-calibration/true values/true_items.jld2" items
+    @save "examples/online-calibration/true values/true_items.jld2" items
 
-    @save "test/online-calibration/settings.jld2" I_total  I_field N test_length test_field test_operational iter_mcmc_latent iter_mcmc_item batch_size N_T
+    @save "examples/online-calibration/settings.jld2" I_total  I_field N test_length test_field test_operational iter_mcmc_latent iter_mcmc_item batch_size N_T
 
     
 
@@ -79,5 +76,7 @@ N_T = 200
         push!(examinees,  Examinee(n, string("examinee_", n), Latent1D(latent_dist, latent_bounds))) 
     end
     
-    @save "test/online-calibration/true values/true_examinees.jld2" examinees
+    @save "examples/online-calibration/true values/true_examinees.jld2" examinees
 
+    return examinees, items, responses, examinees_est, items_est
+end

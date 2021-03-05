@@ -1,3 +1,4 @@
+# Adaptation of BayesLogit C code by Nicholas Polson, James Scott, Jesse Windle, 2012-2019
 
 function jj_m1(b::Float64, z::Float64)
     z = abs(z)

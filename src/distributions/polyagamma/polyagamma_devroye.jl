@@ -1,3 +1,5 @@
+# Adaptation of BayesLogit C code by Nicholas Polson, James Scott, Jesse Windle, 2012-2019
+
 const FOURPISQ = 4 * __PI^2
 const HALFPISQ = 0.5 * __PI * __PI
 const __TRUNC = 0.64

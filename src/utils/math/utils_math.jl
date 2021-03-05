@@ -37,6 +37,49 @@ Base.copy(x::T) where {T} = T([getfield(x, k) for k ∈ fieldnames(T)]...)
 # function logcosh(x::Real)
 #     return x + log1pexp(-2x) - _log_c(2)
 # end 
+function cutR(
+    x::Vector{Float64};
+    start = "minimum",
+    stop = "maximum",
+    n_bins = 2,
+    return_breaks = true,
+    return_mid_points = false,
+)
+    if (start == "minimum")
+        start = minimum(x)
+    end
+    if (stop == "maximum")
+        stop = maximum(x)
+    end
+    bw = (stop - start) / (n_bins - 1)
+    midPts = zeros(n_bins)
+    for i = 1:n_bins
+        midPts[i] = start + (i - 1) * bw
+    end
+    breaks = collect(range(start - (bw / 2); length = n_bins + 1, stop = stop + (bw / 2)))
+    y = zeros(size(x, 1))
+    for j = 1:size(x, 1)
+        for i = 1:n_bins
+            if (x[j] >= breaks[i]) && (x[j] < breaks[i+1])
+                y[j] = i
+            end
+            if i == n_bins && x[j] == breaks[i+1]
+                y[j] = i
+            end
+        end
+    end
+    if (return_breaks == true || return_mid_points == true)
+        if return_mid_points == false
+            return (Int.(y), breaks)
+        elseif return_breaks == false
+            return (Int.(y), midPts)
+        else
+            return (Int.(y), breaks, midPts)
+        end
+    else
+        return Int.(y)
+    end
+end
 
 function _gemmblasATB!(
     A::Matrix{Float64},

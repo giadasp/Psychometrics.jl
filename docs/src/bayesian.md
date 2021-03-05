@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = Psychometrics
+DocTestSetup = quote
+    using Psychometrics
+end
+```
+
 # Bayesian IRT
 
 These functions allow to calibrate item parameters or estimate abilities under a unidimensional 2PL IRT model by using the PolyaGamma distribution approach introduced by [^Polson] and adapted to IRT models by [^JiangTemplin].
@@ -25,6 +32,7 @@ In this case, the field `latent` is an instance of the `Latent1D` mutable struct
 - **`bounds::Vector{Float64}`**
 - **`prior::Distributions.ContinuousUnivariateDistribution`**
 - **`posterior::Distributions.ContinuousUnivariateDistribution`**
+- **`likelihood::Float64`**
 - **`chain::Vector{Float64}`**
 - **`expected_information::Float64`**
 
@@ -48,39 +56,6 @@ println(get_latent_vals(true_examinees[1:10]))
 
 ## Basic Tools for Items
 
-In IRT, an item is a test question which has 
-First of all, we generate a groundtruth set of ``N = 100`` examinees with 1-dimensional latent ability sampled from a standardized Normal distribution.
-
-```@example basic-tools-examinees, continued = true
-N = 100
-true_examinees = [Examinee(n, "examinee_$(n)") for n = 1 : N]
-```
-
-We can look at the values of the latent variables by printing the field `latent.val`.
-
-```@example basic-tools-examinees; continued = true
-println(true_examinees[1].latent.val)
-```
-
-The field `latent` is an instance of the `Latent1D` mutable struct (i.e. its subfields can be modified). It has the following subfields:
-
-- **`val::Float64`**
-- **`bounds::Vector{Float64}`**
-- **`prior::Distributions.ContinuousUnivariateDistribution`**
-- **`posterior::Distributions.ContinuousUnivariateDistribution`**
-- **`chain::Vector{Float64}`**
-- **`expected_information::Float64`**
-
-Any latent object of such a type has structural properties, such as value and bounds, but also Bayesian properties, such as prior and posterior distributions 
-(which, in this case, are specified as univariate, thanks to `Distributions.jl`).
-
-The default factory for an examinee returns an examinee with a `Distributions.Normal(0,1)` as prior (and posterior) for their ability. The value of their ability is randomly extracted from the posterior distribution. In our example, the examinees in `true_examinees` are all default examinees. Thus, we can see that their latent properties have been set to the defaults:
-
-```@example basic-tools-examinees; continued = true
-println(true_examinees[1].latent.prior)
-println(true_examinees[1].latent.posterior)
-println(true_examinees[1].latent.val)
-```
 ## Examinee Assessment
 
 ## Item Calibration
@@ -92,10 +67,3 @@ println(true_examinees[1].latent.val)
 
 [^JiangTemplin]:  Jiang, Z., & Templin, J. (2019). Gibbs Samplers for Logistic Item Response Models via the Polya-Gamma Distribution: A Computationally Efficient Data-Augmentation Strategy.Psychometrika,84(2), 358-374.  DOI: 10.1007/s11336-018-9641-x.
 
-```@meta
-    CurrentModule = Psychometrics
-```
-```@docs
-get_latents(examinees::Vector{<:AbstractExaminee})
-empty_chain!(examinee::AbstractExaminee)
-```

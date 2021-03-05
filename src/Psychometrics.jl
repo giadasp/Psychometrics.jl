@@ -48,7 +48,7 @@ Main module for `Psychometrics.jl` -- A Julia package that provides tools for ps
     set_val_from_chain!
     set_val_from_posterior!
     chain_append!
-    mcmc_iter!
+    mcmc_iter_pg!
     update_estimate!
     posterior
     update_posterior!
@@ -57,31 +57,40 @@ Main module for `Psychometrics.jl` -- A Julia package that provides tools for ps
     find_best_item
     find_best_examinee
     calibrate_item!
-    estimate_ability!
+    assess!
+    joint_estimation!
 """
 module Psychometrics
 
 import Distributions
 import Distributed
-import SharedArrays
 import Dates
 import LinearAlgebra
+import Interpolations
+import NLopt
+using Requires
 
-include("utils.jl")
+include("utils/math/utils_math.jl")
 include("distributions/distributions.jl")
 include("examinee/examinee.jl")
+include("examinee/examinees.jl")
 include("item/item.jl")
+include("item/items.jl")
 include("response.jl")
 include("probability.jl")
 include("likelihood.jl")
+include("utils/polyagamma/utils_pg.jl")
+include("posterior/posterior.jl")
 include("information.jl")
 include("online/online.jl")
-include("bayesian.jl")
-include("calibration/PolyaGamma_MCMC.jl")
-
+include("utils/mmle/utils_mmle.jl")
+include("item/calibration/calibration.jl")
+include("examinee/assessment/assessment.jl")
+include("joint_estimation/joint_estimation.jl")
 
 export 
-    TruncatedInverseGaussian
+    TruncatedInverseGaussian,
+    TruncatedNormal,
     PolyaGamma,
     TruncatedGamma,
     rand,
@@ -125,13 +134,11 @@ export
     set_val_from_chain!,
     set_val_from_posterior!,
     chain_append!,
-    mcmc_iter!,
-    update_estimate!,
-    posterior,
-    update_posterior!,
     get_latents,
     find_best_item,
     find_best_examinee,
     calibrate_item!,
-    estimate_ability!
+    assess_examinee!,
+    joint_estimate!,
+    rescale!
 end # module

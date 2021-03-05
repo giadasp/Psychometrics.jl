@@ -1,11 +1,12 @@
-function calibrate_item!(
+function calibrate_item_pg!(
     item::AbstractItem,
     examinees::Vector{<:AbstractExaminee},
     responses::Vector{Response};
-    mcmc_iter = 4_000,
-    sampling = true,
-    already_sorted = false,
+    mcmc_iter::Int64 = 4_000,
+    sampling::Bool = true,
+    already_sorted::Bool = false
 )
+
     if !already_sorted
         sort!(examinees, by = e -> e.idx)
         sort!(responses, by = r -> r.examinee_idx)
@@ -27,7 +28,7 @@ function calibrate_item!(
     update_estimate!(item; sampling = sampling)
 end
 
-function estimate_ability!(
+function estimate_ability_pg!(
     examinee::AbstractExaminee,
     items::Vector{<:AbstractItem},
     responses::Vector{Response};

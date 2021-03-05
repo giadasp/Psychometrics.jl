@@ -17,30 +17,75 @@ function log_likelihood(
     parameters::AbstractParametersBinary,
 )
     p = __probability(latent_val, parameters)
-    return response_val * _log_c(p) + (1 - response_val) * _log_c(1 - p)
+    if (response_val > 0)
+        return _log_c(p) * weight::Float64
+    else
+        return _log_c(1 - p) * weight::Float64
+    end
 end
 
 """
 ```julia 
-_likelihood(
+__likelihood(
     response_val::Float64,
     latent_val::Float64,
-    parameters::AbstractParametersBinary,
+    parameters::AbstractParametersBinary;
+    weight::Float64 = 1.0
 )
 ```
 
 #Description
 
-It computes the likelihood for a latent value and item parameters `parameters` with answer `response_val`.
+It computes the likelihood for a latent value and item parameters `parameters` with answer value `response_val`.
+Optionally weights the result by setting `weight`, that is equal to 1.0 by default.
 """
+function __likelihood(
+    response_val::Float64,
+    latent_val::Float64,
+    parameters::AbstractParametersBinary;
+    weight::Float64 = 1.0
+)
+    p = __probability(latent_val, parameters)
+    if (response_val > 0)
+        return p * weight::Float64
+    else
+        return (1 - p) * weight::Float64
+    end
+end
+
 function _likelihood(
     response_val::Float64,
     latent_val::Float64,
-    parameters::AbstractParametersBinary,
+    item::AbstractItem;
+    weight::Float64 = 1.0
 )
-    p = __probability(latent_val, parameters)
-    return p^response_val * (1 - p)^(1 - response_val)
+    return __likelihood(response_val, latent_val, item.parameters; weight = weight)
 end
+
+"""
+```julia 
+_likelihood(
+    response::AbstractResponse,
+    latent_val::Float64,
+    item::AbstractItem;
+    weight::Float64 = 1.0
+)
+```
+
+#Description
+
+It computes the likelihood for a latent value and item `item` with answer `response`.
+Optionally weights the result by setting `weight`, that is equal to 1.0 by default.
+"""
+function _likelihood(
+    response::AbstractResponse,
+    latent_val::Float64,
+    item::AbstractItem;
+    weight::Float64 = 1.0
+)
+    return __likelihood(response.val, latent_val, item.parameters; weight = weight)
+end
+
 
 """
 ```julia 
