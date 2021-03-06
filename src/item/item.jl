@@ -41,12 +41,12 @@ struct Item <: AbstractItem
     parameters::AbstractParameters
 
     # Factories
-    Item(idx, id, content, parameters) = new(idx, id, content, parameters)
-    Item(idx, id, parameters) = new(idx, id, "", parameters)
+    Item(idx::Int64, id::String, content::String, parameters::AbstractParameters) = new(idx, id, content, parameters)
+    Item(idx::Int64, id::String, parameters::AbstractParameters) = new(idx, id, "", parameters)
 
     # Random default initilizers
-    Item(idx, id) = new(idx, id, "", Parameters1PL())
-    Item(idx, id, content) = new(idx, id, content, Parameters1PL())
+    Item(idx::Int64, id::String) = new(idx, id, "", Parameters1PL())
+    Item(idx::Int64, id::String, content::String) = new(idx, id, content, Parameters1PL())
 end
 
 """
