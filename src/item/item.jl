@@ -22,6 +22,7 @@ An immutable containing information about an item (a question in a test), e.g. `
 
 # Factories
     Item(idx, id, content, parameters) = new(idx, id, content, parameters)
+    Item(idx, id, parameters) = new(idx, id, "", parameters)
 
 Creates a new generic item with custom index, id, content features and item parameters.
 
@@ -41,8 +42,9 @@ struct Item <: AbstractItem
 
     # Factories
     Item(idx, id, content, parameters) = new(idx, id, content, parameters)
+    Item(idx, id, parameters) = new(idx, id, "", parameters)
 
-    # Random initilizers
+    # Random default initilizers
     Item(idx, id) = new(idx, id, "", Parameters1PL())
     Item(idx, id, content) = new(idx, id, content, Parameters1PL())
 end
