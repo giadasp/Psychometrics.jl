@@ -19,9 +19,6 @@ end
 
 function online_calibrate()
     replications = 1:1
-
-
-
 I_operational = 1_000
 I_field = 25
 I_total = I_field + I_operational
@@ -41,6 +38,25 @@ items = load(string("examples/online-calibration/true values/true_items.jld2"), 
 examinees = load(string("examples/online-calibration/true values/true_examinees.jld2"), "examinees")[1:N]
 
 for rep in replications
+
+@sync @distributed for rep = 1:20
+
+    I_operational = 1000
+    I_field = 25
+    I_total = I_field + I_operational
+    N = 2_000
+    
+    test_operational  = 25
+    test_field = 5
+    test_length = test_field + test_operational
+    
+    iter_mcmc_latent = 2_000
+    iter_mcmc_item = 4_000
+    #after how many responses update item parameter estimates
+    batch_size = 5
+    N_T = 200
+    items = load(string("examples/online-calibration/true values/true_items.jld2"), "items")
+    examinees = load(string("examples/online-calibration/true values/true_examinees.jld2"), "examinees")
     
     retired_items = 0
     retired_items_vector= fill(0, N)
@@ -48,6 +64,7 @@ for rep in replications
     # RESPONSES
 
     responses_per_examinee = [Response[] for e in examinees];
+
 
     # INITIAL VALUES
 
@@ -76,7 +93,8 @@ for rep in replications
     end, items_est_field);
     # starting expected information matrices
     map( i -> begin
-        i.parameters.expected_information = Psychometrics._expected_information_item(i.parameters, Latent1D(0.0))
+
+    i.parameters.expected_information = Psychometrics._item_expected_information(i.parameters, Latent1D(0.0))
     end, items_est_field)
     # append not calibrated items 
     items_est = vcat(items_est_operational, items_est_field);
@@ -148,7 +166,8 @@ for rep in replications
                 #println("est_BIAS: ", examinees_est[n].latent.val - examinees[n].latent.val)
                 push!(responses_not_calibrated, resp)
                 item = copy(items_est[next_item_idx])
-                #item.parameters.expected_information += expected_information_item(item.parameters, examinee.latent)
+                #item.parameters.expected_information += item_expected_information(item.parameters, examinee.latent)
+
                 resp_item = get_responses_by_item_idx(item.idx, responses_not_calibrated)
             if mod(size(resp_item, 1), batch_size) == 0
 
@@ -161,20 +180,18 @@ for rep in replications
                     end
                     items_est_parameters[next_item_idx - I_operational][Int64(size(resp_item,1)/batch_size)] = [item.parameters.a, item.parameters.b]
                     if next_item_idx==1001
-                    println("est_BIAS a: ", sqrt((item.parameters.a - items[next_item_idx].parameters.a)^2))
-                    println("est_BIAS b: ", sqrt((item.parameters.b - items[next_item_idx].parameters.b)^2))
+                    println("est_BIAS a : ", sqrt((item.parameters.a - items[next_item_idx].parameters.a)^2))
+                    println("est_BIAS b : ", sqrt((item.parameters.b - items[next_item_idx].parameters.b)^2))
                     end
                     if size(resp_item, 1) >= N_T
                         item.parameters.calibrated = true
                         retired_items +=1
-                        #remove all responses from responses_not_calibrated
-                        responses_not_calibrated = filter( r -> r.item_idx != item.idx, responses_not_calibrated)
                     end
                     #update expected information
-                    item.parameters.expected_information = mapreduce(e -> Psychometrics._expected_information_item(item.parameters, e.latent), +, examinees_est_item)
+                    item.parameters.expected_information = mapreduce(e -> Psychometrics._item_expected_information(item.parameters, e.latent), +, examinees_est_item)
                 else
                     #update expected information
-                    item.parameters.expected_information += Psychometrics._expected_information_item(item.parameters, examinee.latent)
+                    item.parameters.expected_information += Psychometrics._item_expected_information(item.parameters, examinee.latent)
                 end
                 items_est[next_item_idx] = item
             end
@@ -195,14 +212,16 @@ for rep in replications
     @save string("examples/online-calibration/items_est_rep_",rep,".jld2") items_est
     @save string("examples/online-calibration/examinees_est_rep_",rep,".jld2") examinees_est
 
-    rmse_a =  sqrt(mean(map( (i, i_est)-> (i.parameters.a - i_est.parameters.a)^2, items[(I_operational+1):I_total], items_est[(I_operational+1):I_total]))) 
-    rmse_b = sqrt(mean(map( (i, i_est)-> (i.parameters.b - i_est.parameters.b)^2, items[(I_operational+1):I_total], items_est[(I_operational+1):I_total])))
+    rmse_a =  sqrt(mean(map( (i, i_est)-> (i.parameters.a - i_est.parameters.a)^2, items[I_operational:I_total], items_est[I_operational:I_total]))) 
+    rmse_b = sqrt(mean(map( (i, i_est)-> (i.parameters.b - i_est.parameters.b)^2, items[I_operational:I_total], items_est[I_operational:I_total])))
     rmse_theta = sqrt(mean(map( (e, e_est)-> (e.latent.val- e_est.latent.val)^2, examinees[1:(n-1)], examinees_est[1:(n-1)])))
     println( "avg RMSE a = ", rmse_a)
     println( "avg RMSE b = ", rmse_b)
     println( "avg RMSE tehta = ", rmse_theta)
     items_est_field = items_est[(I_operational+1):I_total]
     @save string("examples/online-calibration/rep_", rep, "_items_est_field.jld2") items_est_field
+    @save string("examples/online-calibration/rep_", rep, "_responses.jld2") responses_per_examinee
+    @save string("examples/online-calibration/rep_", rep, "_items_est.jld2") items_est
     @save string("examples/online-calibration/rep_", rep, "_responses.jld2") responses_per_examinee
 end
 # theta_sets = collect(-6.0:0.5:6.0)
@@ -218,6 +237,7 @@ end
 #         end
 # end
 # plot(theta_sets, rmse_theta)
+
 # rep=100
 
 # a_s = zeros(I_total,rep)
@@ -229,6 +249,16 @@ end
 #     b = map(i -> i.parameters.b, items_est)
 #     b_s[:, rep] = copy(b)
 # end
+a_s = zeros(1020,rep)
+b_s = zeros(1020,rep)
+for rep = 1:rep
+    @load string("examples/online-calibration/rep_", rep, "_items_est.jld2") items_est
+    a = map(i -> i.parameters.a, items_est)
+    a_s[:, rep] = copy(a)
+    b = map(i -> i.parameters.b, items_est)
+    b_s[:, rep] = copy(b)
+end
+
 
 # a_true = map(i -> i.parameters.a, items)
 # a_true = hcat([a_true for rep=1:rep]...)

@@ -35,5 +35,5 @@ _Example: `Item(1, "item_1")` generates an operational item with an empty `conte
 ## Basic functions
 
   - Item characteristic function (ICF): `probability`.
-  - Latent and item information function (IIF) (expected and observed are different for the 3PL model): `expected_information_item`,  `observed_information_item`, `information_latent`.
+  - Latent and item information function (IIF) (expected and observed are different for the 3PL model): `item_expected_information`,  `item_observed_information`, `latent_information`.
   - Likelihood function: `likelihood`, `log_likelihood`.

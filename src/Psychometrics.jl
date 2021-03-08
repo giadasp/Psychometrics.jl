@@ -26,9 +26,9 @@ Main module for `Psychometrics.jl` -- A Julia package that provides tools for ps
     probability
     log_likelihood
     likelihood
-    information_latent
-    observed_information_item
-    expected_information_item
+    latent_information
+    item_observed_information
+    item_expected_information
     add_prior!
     get_item_by_id
     get_parameters
@@ -81,7 +81,7 @@ include("probability.jl")
 include("likelihood.jl")
 include("utils/polyagamma/utils_pg.jl")
 include("posterior/posterior.jl")
-include("information.jl")
+include("information/information.jl")
 include("online/online.jl")
 include("utils/mmle/utils_mmle.jl")
 include("item/calibration/calibration.jl")
@@ -112,9 +112,9 @@ export
     probability,
     log_likelihood,
     likelihood,
-    information_latent,
-    observed_information_item,
-    expected_information_item,
+    latent_information,
+    item_observed_information,
+    item_expected_information,
     add_prior!,
     get_item_by_id,
     get_parameters,

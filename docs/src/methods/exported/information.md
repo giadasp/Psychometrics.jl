@@ -9,8 +9,8 @@
 ### Values in Matrix form
 
 ```@docs
-information_latent(latents_matrix::Matrix{Float64}, parameters_matrix::Matrix{Float64})
-information_latent_3PL(
+latent_information(latents_matrix::Matrix{Float64}, parameters_matrix::Matrix{Float64})
+latent_information_3PL(
     latents_matrix::Matrix{Float64},
     parameters_matrix::Matrix{Float64},
 )
@@ -19,9 +19,9 @@ information_latent_3PL(
 ### Using Structs
 
 ```@docs
-information_latent(examinee::AbstractExaminee, item::AbstractItem)
-information_latent(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
-information_latent(
+latent_information(examinee::AbstractExaminee, item::AbstractItem)
+latent_information(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
+latent_information(
     examinees::Vector{<:AbstractExaminee},
     items::Vector{<:AbstractItem},
 )
@@ -30,11 +30,11 @@ information_latent(
 ## Information wrt Item Parameters
 
 ```@docs
-expected_information_item(
+item_expected_information(
     items::Vector{<:AbstractItem},
     examinees::Vector{<:AbstractExaminee},
 )
-observed_information_item(
+item_observed_information(
     items::Vector{<:AbstractItem},
     examinees::Vector{<:AbstractExaminee},
     responses::Vector{<:AbstractResponse},

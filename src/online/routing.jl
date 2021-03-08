@@ -26,7 +26,7 @@ function find_best_item(
 )
     if method in ["max-info", "D-gain"]
         if method == "max-info"
-            infos = information_latent(examinee, items)
+            infos = latent_information(examinee, items)
         elseif method == "D-gain"
             infos = map(i -> D_gain_method(i, examinee), items)
         end

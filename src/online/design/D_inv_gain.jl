@@ -2,7 +2,7 @@
     _D_inv_gain_method(parameters::Parameters1PL, latent::Latent1D)
 """
 function _D_inv_gain_method(parameters::Parameters1PL, latent::Latent1D)
-    return 1 / _expected_information_item(parameters, latent)
+    return 1 / _item_expected_information(parameters, latent)
 end
 
 """
@@ -12,7 +12,7 @@ function _D_inv_gain_method(parameters::Parameters2PL, latent::Latent1D)
     old_exp_info = copy(parameters.expected_information)
     return LinearAlgebra.det(LinearAlgebra.inv(old_exp_info)) -
            LinearAlgebra.det(LinearAlgebra.inv(
-        old_exp_info + _expected_information_item(parameters, latent),
+        old_exp_info + _item_expected_information(parameters, latent),
     ))
 end
 

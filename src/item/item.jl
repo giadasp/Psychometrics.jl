@@ -21,14 +21,15 @@ An immutable containing information about an item (a question in a test), e.g. `
   - **`calibrated::Bool`**: Tells if the item has been already calibrated.
 
 # Factories
-    Item(idx, id, content, parameters) = new(idx, id, content, parameters)
+    Item(idx::Int64, id::String, content::Vector{String}, parameters::AbstractParameters) = new(idx, id, content, parameters)
+    Item(idx::Int64, id::String, parameters::AbstractParameters) = new(idx, id, String[], parameters)
+    Item(idx::Int64, parameters::AbstractParameters) = new(idx, string(idx), String[], parameters)
 
-Creates a new generic item with custom index, id, content features and item parameters.
+Creates a new generic item with custom index, id, (content features) and item parameters.
 
 # Random initilizers
-    Item(idx, id) = new(idx, id, "", Parameters1PL(), true)
-    Item(idx, id, content) = new(idx, id, content, Parameters1PL(), true)
-
+    Item(idx::Int64, id::String) = new(idx, id, String[], Parameters1PL())
+    Item(idx::Int64, id::String, content::String) = new(idx, id, content, Parameters1PL())
 
 Randomly generates a new generic calibrated item with custom index, id, content features and default 1PL item parameters 
 (Look at (`Parameters1PL`)[#Psychometrics.Parameters1PL] for the defaults).
@@ -40,11 +41,13 @@ struct Item <: AbstractItem
     parameters::AbstractParameters
 
     # Factories
-    Item(idx, id, content, parameters) = new(idx, id, content, parameters)
+    Item(idx::Int64, id::String, content::Vector{String}, parameters::AbstractParameters) = new(idx, id, content, parameters)
+    Item(idx::Int64, id::String, parameters::AbstractParameters) = new(idx, id, String[], parameters)
+    Item(idx::Int64, parameters::AbstractParameters) = new(idx, string(idx), String[], parameters)
 
-    # Random initilizers
-    Item(idx, id) = new(idx, id, "", Parameters1PL())
-    Item(idx, id, content) = new(idx, id, content, Parameters1PL())
+    # Random default initilizers
+    Item(idx::Int64, id::String) = new(idx, id, String[], Parameters1PL())
+    Item(idx::Int64, id::String, content::String) = new(idx, id, content, Parameters1PL())
 end
 
 """

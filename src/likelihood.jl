@@ -62,6 +62,7 @@ function _likelihood(
     return __likelihood(response_val, latent_val, item.parameters; weight = weight)
 end
 
+
 """
 ```julia 
 _likelihood(
@@ -162,7 +163,7 @@ log_likelihood(
 
 # Description
 
-It computes the log likelihood for a `response`. 
+It computes the log likelihood for a triplet `response`, `examinee`, `item`. 
 """
 function log_likelihood(
     response::AbstractResponse,
@@ -185,7 +186,7 @@ log_likelihood(
 
 # Description
 
-It computes the log likelihood for a response `response`. 
+It computes the log likelihood for a triplet `response`, `examinee`, `item`. 
 It updates also the gradient vectors.
 """
 function log_likelihood(
@@ -209,7 +210,7 @@ log_likelihood(
 
 # Description
 
-It computes the log likelihood for a vector of responses `responses`. 
+It computes the log likelihood for a vector of responses `responses`, and provided `examinees` and `items` vectors. 
 """
 function log_likelihood(
     responses::Vector{<:AbstractResponse},
@@ -232,7 +233,7 @@ log_likelihood(
 
 # Description
 
-It computes the log likelihood for a vector of responses `responses`. 
+It computes the log likelihood for a vector of responses `responses`, and provided `examinees` and `items` vectors. 
 It updates also the gradient vectors.
 """
 function log_likelihood(
@@ -253,8 +254,6 @@ function log_likelihood(
         responses,
     )
 end
-
-
 
 """
 ```julia 
@@ -288,7 +287,7 @@ likelihood(
 
 # Description
 
-It computes the log likelihood for a `response`. 
+It computes the likelihood for a triplet `response`, `examinee`, `item`. 
 """
 function likelihood(
     response::AbstractResponse,
@@ -309,7 +308,7 @@ likelihood(
 
 # Description
 
-It computes the log likelihood for a vector of responses `responses`. 
+It computes the likelihood for a vector of responses `responses`, and provided `examinees` and `items` vectors. 
 """
 function likelihood(
     responses::Vector{<:AbstractResponse},
