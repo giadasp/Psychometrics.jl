@@ -2,14 +2,14 @@
     _A_method(parameters::Parameters1PL, latent::Latent1D)
 """
 function _A_method(parameters::Parameters1PL, latent::Latent1D)
-    return _expected_information_item(parameters, latent)
+    return _item_expected_information(parameters, latent)
 end
 
 """
     _A_method(parameters::Parameters2PL, latent::Latent1D)
 """
 function _A_method(parameters::Parameters2PL, latent::Latent1D)
-    return LinearAlgebra.tr(_expected_information_item(parameters, latent))
+    return LinearAlgebra.tr(_item_expected_information(parameters, latent))
 end
 
 """

@@ -17,8 +17,9 @@ An immutable containing the information about the examinee (the test taker).
 
 # Factories
     Examinee(idx::Int64, id::String, latent::AbstractLatent) = new(idx, id, latent)
+    Examinee(idx::Int64, latent::AbstractLatent) = new(idx, string(idx), latent)
 
-Creates a new Examinee with custom index, id and a latent variable.
+Creates a new Examinee with custom index, (id) and a latent variable.
 
 # Random default initializers (1-D latent)
     Examinee(idx::Int64) = new(idx, string(idx), Latent1D())
@@ -36,11 +37,11 @@ struct Examinee <: AbstractExaminee
 
     # Factories
     Examinee(idx::Int64, id::String, latent::AbstractLatent) = new(idx, id, latent)
+    Examinee(idx::Int64, latent::AbstractLatent) = new(idx, string(idx), latent)
 
     # Random default initializers
     Examinee(idx::Int64) = new(idx, string(idx), Latent1D())
     Examinee(idx::Int64, id::String) = new(idx, id, Latent1D())
-
 end
 
 """

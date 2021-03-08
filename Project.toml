@@ -1,7 +1,7 @@
 name = "Psychometrics"
 uuid = "ce8202d9-98c3-4990-890a-8616ce2c06f9"
 authors = ["Giada Spaccapanico Proietti"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"

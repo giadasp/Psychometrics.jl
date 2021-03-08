@@ -76,7 +76,7 @@ for rep in replications
     end, items_est_field);
     # starting expected information matrices
     map( i -> begin
-        i.parameters.expected_information = Psychometrics._expected_information_item(i.parameters, Latent1D(0.0))
+        i.parameters.expected_information = Psychometrics._item_expected_information(i.parameters, Latent1D(0.0))
     end, items_est_field)
     # append not calibrated items 
     items_est = vcat(items_est_operational, items_est_field);
@@ -148,7 +148,7 @@ for rep in replications
                 #println("est_BIAS: ", examinees_est[n].latent.val - examinees[n].latent.val)
                 push!(responses_not_calibrated, resp)
                 item = copy(items_est[next_item_idx])
-                #item.parameters.expected_information += expected_information_item(item.parameters, examinee.latent)
+                #item.parameters.expected_information += item_expected_information(item.parameters, examinee.latent)
                 resp_item = get_responses_by_item_idx(item.idx, responses_not_calibrated)
             if mod(size(resp_item, 1), batch_size) == 0
 
@@ -171,10 +171,10 @@ for rep in replications
                         responses_not_calibrated = filter( r -> r.item_idx != item.idx, responses_not_calibrated)
                     end
                     #update expected information
-                    item.parameters.expected_information = mapreduce(e -> Psychometrics._expected_information_item(item.parameters, e.latent), +, examinees_est_item)
+                    item.parameters.expected_information = mapreduce(e -> Psychometrics._item_expected_information(item.parameters, e.latent), +, examinees_est_item)
                 else
                     #update expected information
-                    item.parameters.expected_information += Psychometrics._expected_information_item(item.parameters, examinee.latent)
+                    item.parameters.expected_information += Psychometrics._item_expected_information(item.parameters, examinee.latent)
                 end
                 items_est[next_item_idx] = item
             end

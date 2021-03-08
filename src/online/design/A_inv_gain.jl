@@ -2,7 +2,7 @@
     _A_inv_gain_method(parameters::Parameters1PL, latent::Latent1D)
 """
 function _A_inv_gain_method(parameters::Parameters1PL, latent::Latent1D)
-    return _expected_information_item(parameters, latent)
+    return _item_expected_information(parameters, latent)
 end
 
 """
@@ -11,7 +11,7 @@ end
 function _A_inv_gain_method(parameters::Parameters2PL, latent::Latent1D)
     old_exp_info = copy(parameters.expected_information)
     return LinearAlgebra.tr(
-        LinearAlgebra.inv(old_exp_info + _expected_information_item(parameters, latent)) -
+        LinearAlgebra.inv(old_exp_info + _item_expected_information(parameters, latent)) -
         LinearAlgebra.inv(old_exp_info),
     )
 end

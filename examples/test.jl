@@ -46,10 +46,10 @@ p_2 = probability(items, examinees)
 # ITEM INFORMATION FUNCTION (IIF)
 
 ## compute informations (IIF) by matrix (1PL or 2PL, latent 1D) using aθ - b parametrization
-information = information_latent(latents_matrix, parameters_matrix)
+information = latent_information(latents_matrix, parameters_matrix)
 
 ## compute informations (IIF) on vectors of examinees and items using a(θ - b) parametrization
-information_2 = information_latent(examinees, items)
+information_2 = latent_information(examinees, items)
 
 
 # LIKELIHOOD AND LOG-LIKELIHOOD
@@ -66,9 +66,9 @@ l_tot_per_item = [sum(log_likelihood(responses_per_item[i], examinees, items)) f
 #g_latent = zeros(N)
 #l_sum = log_likelihood(responses, examinees, items, g_item, g_latent);
 
-expected_information_item_val = expected_information_item(examinees, items);
+item_expected_information_val = item_expected_information(examinees, items);
 # only for 3PL the observed information
-#observed_information_item_val = map( r -> observed_information_item(r), responses);
+#item_observed_information_val = map( r -> item_observed_information(r), responses);
 
 ## Estimation
 

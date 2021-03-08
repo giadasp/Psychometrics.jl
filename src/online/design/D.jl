@@ -3,14 +3,14 @@
     _D_method(parameters::Parameters1PL, latent::Latent1D)
 """
 function _D_method(parameters::Parameters1PL, latent::Latent1D)
-    return _expected_information_item(parameters, latent)
+    return _item_expected_information(parameters, latent)
 end
 
 """
     _D_method(parameters::Parameters2PL, latent::Latent1D)
 """
 function _D_method(parameters::Parameters2PL, latent::Latent1D)
-    return LinearAlgebra.det(_expected_information_item(parameters, latent))
+    return LinearAlgebra.det(_item_expected_information(parameters, latent))
 end
 
 """
