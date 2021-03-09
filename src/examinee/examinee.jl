@@ -14,16 +14,18 @@ An immutable containing the information about the examinee (the test taker).
   - **`idx::Int64`**: An integer that identifies the Examinee in this session.
   - **`id::String`**: A string that identifies the Examinee.
   - **`latent::Latent`**: A mutable latent struct associated with the Examinee.
+  - **`assessed::Bool`**: If the examinee has already been assessed.
 
 # Factories
-    Examinee(idx::Int64, id::String, latent::AbstractLatent) = new(idx, id, latent)
-    Examinee(idx::Int64, latent::AbstractLatent) = new(idx, string(idx), latent)
+    Examinee(idx::Int64, id::String, latent::AbstractLatent, assessed::Bool) = new(idx, id, latent, assessed)
+    Examinee(idx::Int64, id::String, latent::AbstractLatent) = new(idx, id, latent, false)
+    Examinee(idx::Int64, latent::AbstractLatent) = new(idx, string(idx), latent, false)
 
 Creates a new Examinee with custom index, (id) and a latent variable.
 
 # Random default initializers (1-D latent)
-    Examinee(idx::Int64) = new(idx, string(idx), Latent1D())
-    Examinee(idx::Int64, id::String) = new(idx, id, Latent1D())
+    Examinee(idx::Int64) = new(idx, string(idx), Latent1D(), false)
+    Examinee(idx::Int64, id::String) = new(idx, id, Latent1D(), false)
 
 # Description
 
@@ -34,14 +36,16 @@ struct Examinee <: AbstractExaminee
     idx::Int64
     id::String
     latent::AbstractLatent
+    assessed::Bool
 
     # Factories
-    Examinee(idx::Int64, id::String, latent::AbstractLatent) = new(idx, id, latent)
-    Examinee(idx::Int64, latent::AbstractLatent) = new(idx, string(idx), latent)
+    Examinee(idx::Int64, id::String, latent::AbstractLatent, assessed::Bool) = new(idx, id, latent, assessed)
+    Examinee(idx::Int64, id::String, latent::AbstractLatent) = new(idx, id, latent, false)
+    Examinee(idx::Int64, latent::AbstractLatent) = new(idx, string(idx), latent, false)
 
     # Random default initializers
-    Examinee(idx::Int64) = new(idx, string(idx), Latent1D())
-    Examinee(idx::Int64, id::String) = new(idx, id, Latent1D())
+    Examinee(idx::Int64) = new(idx, string(idx), Latent1D(), false)
+    Examinee(idx::Int64, id::String) = new(idx, id, Latent1D(), false)
 end
 
 """
