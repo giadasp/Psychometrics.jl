@@ -1,5 +1,5 @@
 
-function joint_estimate_mmle_quick!(
+function joint_estimate_mmle_2pl_quick!(
     items::Vector{<:AbstractItem},
     examinees::Vector{<:AbstractExaminee},
     responses::Vector{<:AbstractResponse};
@@ -9,6 +9,9 @@ function joint_estimate_mmle_quick!(
     max_iter::Int64 = 10,
     x_tol_rel::Float64 = 0.001,
     f_tol_rel::Float64 = 0.0001,
+    int_opt_x_tol_rel::Float64 = 0.001,
+    int_opt_max_time::Float64 = 1000.0,
+    int_opt_f_tol_rel::Float64 = 0.00001,
     kwargs...
     )
 
@@ -29,7 +32,8 @@ function joint_estimate_mmle_quick!(
     old_pars = get_parameters_vals(items)
     start_time = time()
     response_matrix = get_response_matrix(responses, size(items,1), size(examinees,1));
-    parameters = SharedArrays.SharedMatrix(get_parameters_vals(items))
+    parameters = get_parameters_vals(items)
+    parameters = [parameters[i,:] for i in 1:I]
     bounds = map( i -> [i.parameters.bounds_a, i.parameters.bounds_b], items)
 
     #extract items idx per examinee and examinees idx per item
@@ -46,50 +50,49 @@ function joint_estimate_mmle_quick!(
     #update_posterior!(examinees, items, responses; already_sorted = false);
     likelihood = 0
     posterior = Vector{Vector{Float64}}(undef, N)
-    Distributed.@sync Distributed.@distributed  for n = 1 : size(examinees,1)
-        p = posterior_quick(parameters[i_index[n], :], response_matrix[:, n], X, W) #return a matrix N x K
+    for n = 1 : N
+        p = posterior_2pl_quick(parameters[i_index[n]], response_matrix[i_index[n], n], X, W) 
         normalizer = sum(p)
         if normalizer > typemin(Float64)
             posterior[n] = p ./ normalizer
-            likelihood += normalizer 
+            likelihood += _log_c(normalizer) 
         else
             posterior[n] = copy(p) 
         end
     end
+    old_likelihood = Inf
 
     #start
     iter = 1
+
+    #nl solver
+    opt = NLopt.Opt(:LD_SLSQP, 2)
+    opt.xtol_rel = int_opt_x_tol_rel
+    opt.maxtime = int_opt_max_time
+    opt.ftol_rel = int_opt_f_tol_rel
+
     while !stop
-        #calibrate items
-        #calibrate_item_mmle!(items, examinees, responses);
-        before_time = time()
-        old_parameters = copy(parameters)
-        Distributed.@sync Distributed.@distributed for i in 1:I
-            parameters[i, :] .= calibrate_item_mmle_quick(
-                old_parameters[i, :],
-                bounds[i],
+
+        for i in 1:I
+            opt.lower_bounds = [bounds[i][1][1], bounds[i][2][1]]
+            opt.upper_bounds = [bounds[i][1][2], bounds[i][2][2]]
+            calibrate_item_mmle_2pl_quick!(
+                parameters[i],
                 posterior[n_index[i]],
-                response_matrix[i, :],
-                X;
-                kwargs...
+                response_matrix[i, n_index[i]],
+                X,
+                opt
             )
-        end
-        Distributed.@sync Distributed.@distributed  for i in 1:I
-            parameters_i = copy(parameters[i,:])
-            items[i].parameters.a = parameters_i[1]
-            items[i].parameters.b = parameters_i[2]
+            items[i].parameters.a = parameters[i][1]
+            items[i].parameters.b = parameters[i][2]
         end
 
-        println("for cal items: ",time()-before_time)
-        before_time = time()
         #rescale dist
         rescale!(
             dist,
             examinees; 
             metric = [0.0, 1.0]
         )
-        println("for rescale: ",time()-before_time)
-        before_time = time()
 
         X = dist.support
         W = dist.p
@@ -97,29 +100,26 @@ function joint_estimate_mmle_quick!(
         #update posteriors
         likelihood = 0
         posterior = Vector{Vector{Float64}}(undef, N)
-        Distributed.@sync Distributed.@distributed for n = 1 : N
-            p = posterior_quick(parameters[i_index[n], :], response_matrix[:, n], X, W) #return a matrix N x K
+        for n = 1 : N
+            p = posterior_2pl_quick(parameters[i_index[n]], response_matrix[i_index[n], n], X, W) 
             normalizer = sum(p)
             if normalizer > typemin(Float64)
                 posterior[n] = p ./ normalizer
-                likelihood += normalizer 
+                likelihood += _log_c(normalizer)
             else
                 posterior[n] = copy(p) 
             end
         end
-        println("for update post: ",time()-before_time)
-
-        before_time = time()
         
         println("Likelihood: ", likelihood)
         if any([
             check_iter(iter; max_iter = max_iter),
             check_time(start_time; max_time = max_time),
-            # check_f_tol_rel!(
-            #     examinees,
-            #     old_likelihood;
-            #     f_tol_rel = f_tol_rel
-            #     ),
+            check_f_tol_rel!(
+                likelihood,
+                old_likelihood;
+                f_tol_rel = f_tol_rel
+                ),
             check_x_tol_rel!(
                 items,
                 old_pars;
@@ -128,13 +128,12 @@ function joint_estimate_mmle_quick!(
             )
             stop = true
         end
-        println("for conv check: ", time()-before_time)
-        before_time = time()
         iter += 1
-
     end
-    map( e -> e.latent.posterior = Distributions.DiscreteNonParametric(dist.support, posterior[n]), examinees);
-    map( e -> e.latent.val = e.latent.posterior.p' * e.latent.posterior.support, examinees);
-    
+    for n = 1:N
+        examinees[n].latent.posterior = Distributions.DiscreteNonParametric(dist.support, posterior[n]);
+        examinees[n].latent.val = examinees[n].latent.posterior.p' * examinees[n].latent.posterior.support;
+    end
+
     return nothing
 end

@@ -52,6 +52,26 @@ function check_f_tol_rel!(
     end
 end
    
+
+function check_f_tol_rel!(
+    new_likelihood::Float64,
+    old_likelihood::Float64;
+    f_tol_rel::Float64 = 0.000001
+    )
+    f_rel = abs((new_likelihood - old_likelihood) / old_likelihood)
+    println("Likelihood: ", new_likelihood)
+    if f_rel < f_tol_rel
+        println(
+            "f_tol_rel reached"
+        )
+        old_likelihood = copy(new_likelihood)
+        return true
+    else
+        old_likelihood = copy(new_likelihood)
+        return false
+    end
+end
+
 function check_x_tol_rel!(
     items::Vector{<:AbstractItem},
     old_pars::Matrix{Float64};

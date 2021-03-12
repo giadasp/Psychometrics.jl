@@ -4,6 +4,7 @@ function bootstrap!(
     examinees::Vector{Examinee},
     responses::Vector{Response};
     method = "mmle", #"polyagamma"
+    quick = false,
     replications = 100,
     type = "parametric",
     sample_fraction = 0.9,
@@ -75,10 +76,17 @@ function bootstrap!(
                 end
             end
 
-
             items_r = map(i -> i, items)
             n_not_sampled = setdiff(collect(1:N), n_sample)
-            joint_estimate_mmle_quick!(items_r, examinees_r, responses_r; kwargs...)
+            if quick
+                if items[1].parameters isa Parameters2PL
+                    joint_estimate_mmle_2pl_quick!(items_r, examinees_r, responses_r; kwargs...)
+                else
+                    error("Only 2pl items are supported in quick mode")
+                end
+            else
+                joint_estimate_mmle!(items_r, examinees_r, responses_r; kwargs...)
+            end
             map( ( i_r , i ) -> push!(i.parameters.chain, get_parameters_vals(i_r)), items_r, items)
         end    
         elseif method == "polyagamma"

@@ -1,11 +1,11 @@
-@everywhere using Distributions
-@everywhere using StatsBase
+using Distributions
+using StatsBase
 
-@everywhere using ATA
-@everywhere using DataFrames
-@everywhere using JuMP
-@everywhere using Cbc
-@everywhere using CSV
+using ATA
+using DataFrames
+using JuMP
+using Cbc
+using CSV
 
 function bs()
     I_total = 250
@@ -111,11 +111,10 @@ function bs()
             t = 1
         end
     end
-    responses =  vcat(map( e -> answer(e, items), examinees)...)
 
     #start points and probs
     prob = Distributions.pdf(Normal(metric[1], metric[2]), collect(-6.0:0.3:6.0))
-    prob = prob / sum(prob)
+    prob = prob ./ sum(prob)
     dist = Distributions.DiscreteNonParametric(collect(-6.0:0.3:6.0), prob)
 
     # initialize examinees
@@ -146,7 +145,7 @@ function bs()
     end, items_est);
 
     #start calibration
-    Psychometrics.joint_estimate_mmle_quick!(
+    Psychometrics.joint_estimate_mmle_2pl_quick!(
         items_est,
         examinees_est,
         responses;
@@ -156,6 +155,13 @@ function bs()
         x_tol_rel = 0.001,
         );
 
+        println("a RMSE")
+        println(sqrt(StatsBase.mean(map( (i, i_est) -> (i.parameters.a-i_est.parameters.a)^2, items, items_est))))
+        println("b RMSE")
+        println(sqrt(StatsBase.mean(map( (i, i_est) -> (i.parameters.b-i_est.parameters.b)^2, items, items_est))))
+        println("latent RMSE")
+        println(sqrt(StatsBase.mean(map( (i, i_est) -> (i.latent.val-i_est.latent.val)^2, examinees, examinees_est))))
+
     items_est_bs = map(i -> i, items_est)
     examinees_est_bs = map(e -> e, examinees_est)
 
@@ -164,20 +170,15 @@ function bs()
         examinees_est_bs,
         responses;
         method="mmle",
+        quick = false,
         metric = metric,
         max_iter = 500,
+        max_time = 100,
         x_tol_rel = 0.001,
         replications = 100,
         type = "parametric",
         sample_fraction = 1.0
         )
-
-        println("a RMSE")
-        println(sqrt(StatsBase.mean(map( (i, i_est) -> (i.parameters.a-i_est.parameters.a)^2, items, items_est))))
-        println("b RMSE")
-        println(sqrt(StatsBase.mean(map( (i, i_est) -> (i.parameters.b-i_est.parameters.b)^2, items, items_est))))
-        println("latent RMSE")
-        println(sqrt(StatsBase.mean(map( (i, i_est) -> (i.latent.val-i_est.latent.val)^2, examinees, examinees_est))))
     return examinees, examinees_est, items, items_est, responses, items_est_bs, examinees_est_bs
 end
  examinees, examinees_est, items, items_est, responses, items_est_bs, examinees_est_bs = bs();

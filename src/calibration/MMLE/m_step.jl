@@ -34,10 +34,10 @@ function calibrate_item_mmle!(
     examinees::Vector{<:AbstractExaminee},
     responses::Vector{Response};
     int_opt_x_tol_rel::Float64 = 0.0001,
-    int_opt_time_limit::Float64 = 10.0,
+    int_opt_max_time::Float64 = 10.0,
     int_opt_f_tol_rel::Float64 = 0.00001,
 )
-    Distributed.pmap( i -> calibrate_item_mmle!(i, examinees, responses; int_opt_x_tol_rel =int_opt_x_tol_rel, int_opt_time_limit = int_opt_time_limit, int_opt_f_tol_rel = int_opt_f_tol_rel), items)
+    Distributed.pmap( i -> calibrate_item_mmle!(i, examinees, responses; int_opt_x_tol_rel =int_opt_x_tol_rel, int_opt_max_time = int_opt_max_time, int_opt_f_tol_rel = int_opt_f_tol_rel), items)
     return nothing
 end
 
@@ -46,7 +46,7 @@ function calibrate_item_mmle!(
     examinees::Vector{<:AbstractExaminee},
     responses::Vector{Response};
     int_opt_x_tol_rel::Float64 = 0.0001,
-    int_opt_time_limit::Float64 = 10.0,
+    int_opt_max_time::Float64 = 10.0,
     int_opt_f_tol_rel::Float64 = 0.00001,
 )
     responses_1 = filter(r -> r.item_idx == item.idx, responses)
@@ -56,7 +56,7 @@ function calibrate_item_mmle!(
         examinees_1,
         responses_1;
         int_opt_x_tol_rel = int_opt_x_tol_rel,
-        int_opt_time_limit = int_opt_time_limit,
+        int_opt_max_time = int_opt_max_time,
         int_opt_f_tol_rel = int_opt_f_tol_rel
     )
     return nothing
@@ -67,7 +67,7 @@ function _calibrate_item_mmle!(
     examinees::Vector{<:AbstractExaminee}, #only those who answered to item 
     responses::Vector{Response}; #sorted by examinee_idx
     int_opt_x_tol_rel::Float64 = 0.00001,
-    int_opt_time_limit::Float64 = 1000.0,
+    int_opt_max_time::Float64 = 1000.0,
     int_opt_f_tol_rel::Float64 = 0.00001
 )
     sumpk_i = mapreduce( e -> e.latent.posterior.p, +, examinees)
@@ -77,7 +77,7 @@ function _calibrate_item_mmle!(
     opt.lower_bounds = [parameters.bounds_b[1], parameters.bounds_a[1]]
     opt.upper_bounds = [parameters.bounds_b[2], parameters.bounds_a[2]]
     opt.xtol_rel = int_opt_x_tol_rel
-    opt.maxtime = int_opt_time_limit
+    opt.maxtime = int_opt_max_time
     opt.ftol_rel = int_opt_f_tol_rel
     pars_i = max_i(examinees[1].latent.posterior.support, sumpk_i, r1_i, [parameters.b, parameters.a], opt)
     parameters.a = clamp(pars_i[2], parameters.bounds_a[1], parameters.bounds_a[2])

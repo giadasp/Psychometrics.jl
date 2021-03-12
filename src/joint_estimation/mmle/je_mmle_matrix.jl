@@ -1,5 +1,5 @@
 
-function joint_estimate_mmle_matrix!(
+function joint_estimate_mmle!(
     items::Vector{<:AbstractItem},
     examinees::Vector{<:AbstractExaminee},
     responses::Vector{<:AbstractResponse};
@@ -9,6 +9,9 @@ function joint_estimate_mmle_matrix!(
     max_iter::Int64 = 10,
     x_tol_rel::Float64 = 0.001,
     f_tol_rel::Float64 = 0.00001,
+    int_opt_x_tol_rel::Float64 = 0.001,
+    int_opt_max_time::Float64 = 100.0,
+    int_opt_f_tol_rel::Float64 = 0.00001,
     kwargs...
     )
     #start points and probs
@@ -41,11 +44,16 @@ function joint_estimate_mmle_matrix!(
         end
     end #15ms
     iter = 1
+
+    opt = NLopt.Opt(:LD_SLSQP, 2)
+    opt.xtol_rel = int_opt_x_tol_rel
+    opt.maxtime = int_opt_max_time
+    opt.ftol_rel = int_opt_f_tol_rel
     while !stop
         #calibrate items
         #calibrate_item_mmle!(items, examinees, responses);
         for i in 1 : size(items, 1)
-            calibrate_item_mmle!(items[i], examinees[n_index[i]], response_matrix[i, :]);
+            calibrate_item_mmle!(items[i], examinees[n_index[i]], response_matrix[i, n_index[i]], opt);
         end
         #calibrate_item_mmle!(items, examinees, response_matrix);
         #rescale dist
@@ -62,7 +70,7 @@ function joint_estimate_mmle_matrix!(
         #update posteriors
         #update_posterior!(examinees, items, response_matrix; already_sorted = false);
         for n in 1 : size(examinees, 1)
-            update_posterior!(examinees[n], items[i_index[n]], response_matrix[:, n]);
+            update_posterior!(examinees[n], items[i_index[n]], response_matrix[i_index[n], n]);
         end
         if any([
             check_iter(iter; max_iter = max_iter),
