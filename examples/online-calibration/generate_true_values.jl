@@ -9,11 +9,11 @@
  using FileIO
 
 
- function online_calibrate()
+ function generate_true_values()
 I_operational = 1000
 I_field = 25
 I_total = I_field + I_operational
-N = 3_000
+N = 4_000
 
 test_operational  = 25
 test_field = 5
@@ -23,7 +23,7 @@ iter_mcmc_latent = 2_000
 iter_mcmc_item = 4_000
 #after how many responses update item parameter estimates
 batch_size = 5
-N_T = 200
+N_T = 500
 
     # TRUE VALUES
     
@@ -61,10 +61,7 @@ N_T = 200
     items = vcat(items_operational, items_field)
 
     @save "examples/online-calibration/true values/true_items.jld2" items
-
     @save "examples/online-calibration/settings.jld2" I_total  I_field N test_length test_field test_operational iter_mcmc_latent iter_mcmc_item batch_size N_T
-
-    
 
     # ## EXAMINEES
     
@@ -78,5 +75,6 @@ N_T = 200
     
     @save "examples/online-calibration/true values/true_examinees.jld2" examinees
 
-    return examinees, items, responses, examinees_est, items_est
 end
+
+generate_true_values()

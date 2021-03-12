@@ -49,7 +49,7 @@ A `Float64` scalar.
 """
 function _latent_information(latent::Latent1D, parameters::Parameters2PL)
     p = _probability(latent, parameters)
-    return p * (1 - p) * parameters.a^2::Float64
+    return Float64(p * (1 - p) * parameters.a^2)::Float64
 end
 
 ########################################################################

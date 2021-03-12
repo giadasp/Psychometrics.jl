@@ -47,11 +47,11 @@ println(true_examinees[1].latent.posterior)
 println(true_examinees[1].latent.val)
 ```
 
-The method `get_latents()` can be used to extract the latents of all the examinees in a vector. While, `get_latent_vals()` produces a matrix with ``N`` rows and ``L`` columns, where ``L`` is the maximum latent dimension among the examinees (1 in our example, since all the examinees have a latent of type `Latent1D`). Let's look at how they work on the first 10 respondents:
+The method `get_latents()` can be used to extract the latents of all the examinees in a vector. While, `get_latents_vals()` produces a matrix with ``N`` rows and ``L`` columns, where ``L`` is the maximum latent dimension among the examinees (1 in our example, since all the examinees have a latent of type `Latent1D`). Let's look at how they work on the first 10 respondents:
 
 ```@example basic-tools-examinees; continued = true
 println(get_latents(true_examinees[1:10]))
-println(get_latent_vals(true_examinees[1:10]))
+println(get_latents_vals(true_examinees[1:10]))
 ```
 
 ## Basic Tools for Items

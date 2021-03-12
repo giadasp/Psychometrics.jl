@@ -104,3 +104,11 @@ function  set_prior!(
     _set_prior!(examinee.latent, prior)
     return nothing
 end
+
+function get_latents(examinee::AbstractExaminee)
+    return examinee.latent::AbstractLatent
+end
+
+function get_latents_vals(examinee::AbstractExaminee)
+    return examinee.latent.val
+end

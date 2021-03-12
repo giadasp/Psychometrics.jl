@@ -10,7 +10,7 @@ abstract type AbstractItem end
 
 # Description
 
-An immutable containing information about an item (a question in a test), e.g. `id::String` the item identifier, `calibrated::Bool` says if it is a field item (`false`) or an operational item (`true`), and the field `parameters::AbstractParameter` which accepts a mutable item parameter object
+An immutable containing information about an item (a question in a test), e.g. `id::String` the item identifier, and the field `parameters::AbstractParameter` which accepts a mutable item parameter object
 
 # Fields
 
@@ -18,7 +18,6 @@ An immutable containing information about an item (a question in a test), e.g. `
   - **`id::String`**: A string that identifies the examinee.
   - **`content::Vector{String}`**: A string vector containing the content features of an item.
   - **`parameters::AbstractParameters`**: A generic item parameters object.
-  - **`calibrated::Bool`**: Tells if the item has been already calibrated.
 
 # Factories
     Item(idx::Int64, id::String, content::Vector{String}, parameters::AbstractParameters) = new(idx, id, content, parameters)

@@ -13,9 +13,11 @@ The field `val::Float64` holds the estimate of the ability of the examinee, like
 - **`likelihood::Float64`**
 - **`chain::Vector{Float64}`**
 - **`expected_information::Float64`**
+- **`assessed::Bool`**
+
 
 # Factories
-    Latent1D(val, bounds, prior, posterior, chain, expected_information) = new(val, bounds, prior, posterior, chain, expected_information)
+    Latent1D(val, bounds, prior, posterior, chain, expected_information, assessed) = new(val, bounds, prior, posterior, chain, expected_information, assessed)
 Creates a new 1-dimensional latent variable with custom fields.
 
 # Random Initializers
@@ -37,15 +39,17 @@ mutable struct Latent1D <: AbstractLatent
     likelihood::Float64
     chain::Vector{Float64}
     expected_information::Float64
-    Latent1D(val, bounds, prior, posterior, likelihood, chain, expected_information) =
-        new(val, bounds, prior, posterior, likelihood, chain, expected_information)
+    assessed::Bool
+
+    Latent1D(val, bounds, prior, posterior, likelihood, chain, expected_information, assessed) =
+        new(val, bounds, prior, posterior, likelihood, chain, expected_information, assessed)
 
     # Random Initializers
     function Latent1D()
         bounds = [-6.0, 6.0]
         dist = Distributions.Normal(0.0, 1.0)
         val = truncate_rand(dist, bounds)[1]
-        new(val, bounds, dist, dist, 0.0, [val], 1.0)
+        new(val, bounds, dist, dist, 0.0, [val], 1.0, false)
     end
     function Latent1D(val::Float64)
         latent = Latent1D()
@@ -54,7 +58,7 @@ mutable struct Latent1D <: AbstractLatent
     end
     function Latent1D(dist::Union{Distributions.ContinuousUnivariateDistribution, Distributions.DiscreteUnivariateDistribution}, bounds::Vector{Float64})
         val = truncate_rand(dist, bounds)[1]
-        new(val, bounds, dist, dist, 0.0, [val], 1.0)
+        new(val, bounds, dist, dist, 0.0, [val], 1.0, false)
     end
 end
 

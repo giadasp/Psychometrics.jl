@@ -9,6 +9,9 @@ function joint_estimate_mmle!(
     max_iter::Int64 = 10,
     x_tol_rel::Float64 = 0.001,
     f_tol_rel::Float64 = 0.00001,
+    int_opt_x_tol_rel::Float64 = 0.001,
+    int_opt_max_time::Float64 = 100.0,
+    int_opt_f_tol_rel::Float64 = 0.00001,
     kwargs...
     )
     #start points and probs
@@ -31,12 +34,28 @@ function joint_estimate_mmle!(
     start_time = time()
     response_matrix = get_response_matrix(responses, size(items,1), size(examinees,1));
 
+    #extract items per examinee and examinees per item indices
+    n_index = Vector{Vector{Int64}}(undef, size(items, 1))
+    i_index = Array{Array{Int64,1},1}(undef, size(examinees, 1))
+    for n = 1: size(examinees,1)
+        i_index[n] = findall(.!ismissing.(response_matrix[:, n]))
+        if n <= size(items, 1)
+            n_index[n] = findall(.!ismissing.(response_matrix[n, :]))
+        end
+    end #15ms
     iter = 1
-    while !stop
 
+    opt = NLopt.Opt(:LD_SLSQP, 2)
+    opt.xtol_rel = int_opt_x_tol_rel
+    opt.maxtime = int_opt_max_time
+    opt.ftol_rel = int_opt_f_tol_rel
+    while !stop
         #calibrate items
         #calibrate_item_mmle!(items, examinees, responses);
-        calibrate_item_mmle!(items, examinees, response_matrix);
+        for i in 1 : size(items, 1)
+            calibrate_item_mmle!(items[i], examinees[n_index[i]], response_matrix[i, n_index[i]], opt);
+        end
+        #calibrate_item_mmle!(items, examinees, response_matrix);
         #rescale dist
         rescale!(
             dist,
@@ -49,8 +68,10 @@ function joint_estimate_mmle!(
         map( e -> e.latent.prior = dist, examinees)
 
         #update posteriors
-        update_posterior!(examinees, items, response_matrix; already_sorted = false);
-
+        #update_posterior!(examinees, items, response_matrix; already_sorted = false);
+        for n in 1 : size(examinees, 1)
+            update_posterior!(examinees[n], items[i_index[n]], response_matrix[i_index[n], n]);
+        end
         if any([
             check_iter(iter; max_iter = max_iter),
             check_time(start_time; max_time = max_time),

@@ -271,6 +271,7 @@ A non given answer has value `0.0`.
 """
 function get_response_matrix(responses::Vector{Response}, I::Int64, N::Int64)
     response_matrix = Matrix{Union{Missing, Float64}}(missing .* ones(Float64, I, N))
+    
     map(r -> response_matrix[CartesianIndex(r.item_idx, r.examinee_idx)] = r.val, responses)
     return response_matrix::Matrix{Union{Missing, Float64}}
 end

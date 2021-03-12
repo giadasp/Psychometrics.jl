@@ -72,7 +72,7 @@ for rep in replications
     a_operational = map(i -> i.parameters.a, items_est_operational)
     b_operational = map(i -> i.parameters.b, items_est_operational)
     a_est_prior = TruncatedNormal(mean(a_operational), std(a_operational), 0,  Inf);
-    println(params(a_est_prior))
+    println(Distributions.params(a_est_prior))
     a_est_bounds = [1e-5, 5.0];
     b_est_prior = Normal(mean(b_operational), std(b_operational));
     b_est_bounds = [-6.0, 6.0];
@@ -90,8 +90,7 @@ for rep in replications
     end, items_est_field);
     # starting expected information matrices
     map( i -> begin
-
-    i.parameters.expected_information = Psychometrics._item_expected_information(i.parameters, Latent1D(0.0))
+        i.parameters.expected_information = Psychometrics._item_expected_information(i.parameters, Latent1D(0.0))
     end, items_est_field)
     # append not calibrated items 
     items_est = vcat(items_est_operational, items_est_field);
@@ -117,8 +116,8 @@ for rep in replications
 
     # START ONLINE-CALIBRATION
 
-    global n=1
-    while retired_items < I_field #size(filter(i -> i.parameters.calibrated == false, items_est),1) > 0   
+    n=1
+    while retired_items < I_field  
         examinee = copy(examinees_est[n])
         examinee_true = copy(examinees[n])
         idx_n = examinee.idx
@@ -162,6 +161,7 @@ for rep in replications
                 push!(responses_not_calibrated, resp)
                 item = copy(items_est[next_item_idx])
                 #item.parameters.expected_information += item_expected_information(item.parameters, examinee.latent)
+
                 resp_item = get_responses_by_item_idx(item.idx, responses_not_calibrated)
                 if mod(size(resp_item, 1), batch_size) == 0
                     examinees_est_item = examinees_est[map( r -> r.examinee_idx, resp_item)]

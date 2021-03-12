@@ -51,6 +51,16 @@ function update_posterior!(
 end
 
 function update_posterior!(
+    examinee::AbstractExaminee,
+    items::Vector{<:AbstractItem},
+    responses::Vector{Union{Missing, Float64}};
+    kwargs...
+    )   
+    _update_posterior!(examinee.latent, items, responses)
+    return nothing
+end
+
+function update_posterior!(
     examinees::Vector{<:AbstractExaminee},
     items::Vector{<:AbstractItem},
     responses::Matrix{Union{Missing, Float64}};
