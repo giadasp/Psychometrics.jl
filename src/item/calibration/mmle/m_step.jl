@@ -49,7 +49,7 @@ function calibrate_item_mmle!(
     int_opt_time_limit::Float64 = 10.0,
     int_opt_f_tol_rel::Float64 = 0.00001,
 )
-    if !item.calibrated
+    if !item.parameters.calibrated
         responses_1 = filter(r -> r.item_idx == item.idx, responses)
         examinees_1 = examinees[map(r -> r.examinee_idx, responses_1)]
 

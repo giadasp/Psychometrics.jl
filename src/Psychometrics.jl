@@ -52,7 +52,7 @@ Main module for `Psychometrics.jl` -- A Julia package that provides tools for ps
     update_estimate!
     posterior
     update_posterior!
-    get_latent_vals
+    get_latents_vals
     get_latents
     find_best_item
     find_best_examinee
@@ -64,10 +64,12 @@ module Psychometrics
 
 import Distributions
 import Distributed
+import SharedArrays
 import Dates
 import LinearAlgebra
 import Interpolations
 import NLopt
+
 using Requires
 
 include("utils/math/utils_math.jl")
@@ -87,6 +89,7 @@ include("utils/mmle/utils_mmle.jl")
 include("item/calibration/calibration.jl")
 include("examinee/assessment/assessment.jl")
 include("joint_estimation/joint_estimation.jl")
+include("bootstrap/bootstrap.jl")
 
 export 
     TruncatedInverseGaussian,
@@ -140,5 +143,6 @@ export
     calibrate_item!,
     assess_examinee!,
     joint_estimate!,
-    rescale!
+    rescale!,
+    bootstrap!
 end # module

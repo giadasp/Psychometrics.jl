@@ -7,7 +7,11 @@ function _calibrate_item_mmle!(
     int_opt_f_tol_rel::Float64 = 0.00001
 )
     sumpk_i = mapreduce( e -> e.latent.posterior.p, +, examinees)
-    r1_i =  mapreduce(e -> e.latent.posterior.p, +, examinees[responses .> 0])
+    if sum(responses)>0
+        r1_i = mapreduce(e -> e.latent.posterior.p, +, examinees[responses .> 0])
+    else
+        r1_i = [0.0]
+    end
     opt = NLopt.Opt(:LD_SLSQP, 2)
     opt.lower_bounds = [parameters.bounds_b[1], parameters.bounds_a[1]]
     opt.upper_bounds = [parameters.bounds_b[2], parameters.bounds_a[2]]
@@ -31,14 +35,14 @@ function calibrate_item_mmle!(
 )
     if !already_sorted 
         responses_filtered = responses[item.idx,:]
-        items_filtered = examinees[.!ismissing.(responses_filtered)]
+        examinees_filtered = examinees[.!ismissing.(responses_filtered)]
     else
         responses_filtered = responses
-        items_filtered = items
+        examinees_filtered = examinees
     end
 
     _calibrate_item_mmle!(item.parameters,
-        items_filtered,
+        examinees_filtered,
         responses_filtered;
         int_opt_x_tol_rel = int_opt_x_tol_rel,
         int_opt_time_limit = int_opt_time_limit,
@@ -47,6 +51,17 @@ function calibrate_item_mmle!(
     return nothing
 end
 
+function calibrate_item_mmle!(
+    item::AbstractItem,
+    examinees::Vector{<:AbstractExaminee},
+    responses::Vector{Union{Missing, Float64}};
+    int_opt_x_tol_rel::Float64 = 0.0001,
+    int_opt_time_limit::Float64 = 10.0,
+    int_opt_f_tol_rel::Float64 = 0.00001,
+)
+    _calibrate_item_mmle!(item.parameters, examinees, responses; int_opt_x_tol_rel = int_opt_x_tol_rel, int_opt_time_limit = int_opt_time_limit, int_opt_f_tol_rel = int_opt_f_tol_rel)
+    return nothing
+end
 
 function calibrate_item_mmle!(
     items::Vector{<:AbstractItem},
@@ -60,3 +75,4 @@ function calibrate_item_mmle!(
     map( i -> calibrate_item_mmle!(i, examinees, responses; int_opt_x_tol_rel = int_opt_x_tol_rel, int_opt_time_limit = int_opt_time_limit, int_opt_f_tol_rel = int_opt_f_tol_rel), items)
     return nothing
 end
+

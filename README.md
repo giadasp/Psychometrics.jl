@@ -7,7 +7,7 @@ The documentation is still in progress. Nevertheless, some functions have detail
 
 ## Structs
 
-- `Item`: an immutable containing information about an item (a question in a test), e.g. `id::String` the item identifier, `calibrated::Bool` says if it is a field item (`false`) or an operational item (`true`), and the field `parameters::AbstractParameter` which accepts a mutable item parameter object (see below).
+- `Item`: an immutable containing information about an item (a question in a test), e.g. `id::String` the item identifier, and the field `parameters::AbstractParameter` which accepts a mutable item parameter object (see below).
  - `Examinee`: an immutable containing the information about the examinee (the test taker).
  The field `latent::AbstractLatent` accepts a mutable latent variable (see below).
  - `AbstractParameters`: an abstract type which, at the moment, has only the abstract `AbstractParametersBinary` as subtype.

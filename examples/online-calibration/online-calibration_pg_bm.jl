@@ -72,7 +72,7 @@ for rep in replications
     a_operational = map(i -> i.parameters.a, items_est_operational)
     b_operational = map(i -> i.parameters.b, items_est_operational)
     a_est_prior = TruncatedNormal(mean(a_operational), std(a_operational), 0,  Inf);
-    println(params(a_est_prior))
+    println(Distributions.params(a_est_prior))
     a_est_bounds = [1e-5, 5.0];
     b_est_prior = Normal(mean(b_operational), std(b_operational));
     b_est_bounds = [-6.0, 6.0];
@@ -116,8 +116,8 @@ for rep in replications
 
     # START ONLINE-CALIBRATION
 
-    global n=1
-    while retired_items < I_field #size(filter(i -> i.parameters.calibrated == false, items_est),1) > 0   
+    n=1
+    while retired_items < I_field  
         examinee = copy(examinees_est[n])
         examinee_true = copy(examinees[n])
         idx_n = examinee.idx

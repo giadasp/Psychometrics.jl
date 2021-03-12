@@ -8,7 +8,7 @@ using Psychometrics
 
 function est()
     I_total = 40
-    N = 500
+    N = 200
     test_length = 40
     metric = [0.0, 1.0]
 

@@ -11,28 +11,34 @@ end
 
 
 """
-    get_latent_vals(examinees::Vector{<:AbstractExaminee})
+    get_latents_vals(examinees::Vector{<:AbstractExaminee})
 
     #Description 
 
 Returns a matrix with latent values displayed by row.
 """
-function get_latent_vals(examinees::Vector{<:AbstractExaminee})
+function get_latents_vals(examinees::Vector{<:AbstractExaminee})
     ret = Vector{Vector{Float64}}(undef, size(examinees, 1))
-    max_length = 1
+    max_length = size(get_latents_vals(examinees[1]), 1)
     e_2 = 0
     #compute maximum latent dimension
     for e in examinees
         e_2 += 1
-        local latents = e.latent.val
-        ret[e_2] = copy(latents)
-        max_length = (max_length < size(latents, 1)) ? size(latents, 1) : max_length
-    end
-    #create vectors
-    for e_3 = 1:e_2
-        local length_i = size(ret[e_3], 1)
-        if length_i < max_length
-            ret[e_3] = vcat(ret[e_3], zeros(Float64, max_length - length_i))
+        local latents = get_latents_vals(e)
+        if size(latents, 1) == 1
+            ret[e_2] = [latents]
+        else
+            ret[e_2] = latents
+        end
+        #create vectors
+        if size(latents, 1) > max_length
+            max_length = size(latents, 1)
+            for e_3 = 1:(e_2-1)
+                local length_i = size(ret[e_3], 1)
+                if length_i < max_length
+                    ret[e_3] .= vcat(ret[e_3], zeros(Float64, max_length - length_i))
+                end
+            end
         end
     end
     #hcat vectors

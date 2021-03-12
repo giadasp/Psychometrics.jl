@@ -11,7 +11,7 @@ function assess_examinee_mmle!(
     x_tol_rel::Float64 = 0.001,
     f_tol_rel::Float64 = 0.00001,
     kwargs...)
-    if !examinee.assessed
+    if !examinee.latent.assessed
         #start points and probs
         probs = Distributions.pdf(Distributions.Normal(metric[1], metric[2]), collect(-6.0:0.3:6.0))
         probs = probs / sum(probs)
