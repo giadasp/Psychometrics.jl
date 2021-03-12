@@ -3,6 +3,7 @@ using StatsBase
 
 using ATA
 using DataFrames
+using DelimitedFiles
 using JuMP
 using Cbc
 using CSV
@@ -56,6 +57,14 @@ function bs()
     )
     CSV.write("item_bank.csv", item_bank)
 
+    op = [ 0 10 0 0 0 0, 
+          10 0 10 0 0 0,
+          0 10 0 10 0 0,
+          0 0 10 0 10 0,
+          0 0 0 10 0 10,
+          0 0 0 0 10 0 ]
+    DelimitedFiles.writedlm(op, "op.csv", delim = ",")
+    
     #write constraints and save in csv
     constraints = DataFrame(
         group = [1, 1, 1],
