@@ -1,3 +1,41 @@
+## for parameters
+
+function _posterior(
+    prior::Distributions.DiscreteNonParametric,
+    parameters::Vector{<:AbstractParameters},
+    responses::Vector{Union{Missing, Float64}},
+    )   
+    return map( (x, w) ->  
+            mapreduce( (par, r) -> 
+            __likelihood(r, x, par)
+            ,
+            *,
+            parameters,
+            responses,
+            )*w,
+        prior.support,
+        prior.p
+        ) 
+end
+
+function _update_posterior!(
+    latent::Latent1D,
+    parameters::Vector{<:AbstractParameters},
+    responses::Vector{Union{Missing, Float64}},
+    )   
+    likelihood = _posterior(latent.prior, parameters, responses)
+    normalizer = sum(likelihood)
+    if normalizer > typemin(Float64)
+        latent.posterior = Distributions.DiscreteNonParametric(latent.prior.support, likelihood ./ normalizer; check_args = false);
+        latent.likelihood = normalizer 
+    else
+        latent.posterior = Distributions.DiscreteNonParametric(latent.prior.support, likelihood; check_args = false);
+    end
+    return nothing
+end 
+
+## for items
+
 function _posterior(
     prior::Distributions.DiscreteNonParametric,
     items::Vector{<:AbstractItem},

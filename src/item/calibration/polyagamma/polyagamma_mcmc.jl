@@ -1,5 +1,18 @@
 include("polyagamma_sampler.jl")
 #update the posterior, append sample to chain and set the value as a sample from the posterior
+function _mcmc_iter_pg!(
+    parameters::AbstractParameters,
+    latents::Vector{<:AbstractLatent},
+    responses_val::Vector{Union{Missing,Float64}},
+    W_val::Vector{Float64};
+    sampling = true,
+    )
+    parameters.posterior = __posterior(parameters, latents, responses_val, W_val) 
+    vals = _chain_append!(parameters; sampling = sampling)
+    _set_val!(parameters, vals)
+    return nothing
+end
+
 function mcmc_iter_pg!(
     item::AbstractItem,
     examinees::Vector{<:AbstractExaminee},
@@ -15,7 +28,6 @@ function mcmc_iter_pg!(
     update_posterior!(item, examinees, responses, W; already_sorted = true)
     set_val_from_posterior!(item; sampling = sampling)
 end
-
 
 function calibrate_item_pg!(
     item::AbstractItem,

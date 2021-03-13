@@ -1,4 +1,4 @@
-
+include("polyagamma_mcmc_quick.jl")
 function joint_estimate_pg!(
     items::Vector{<:AbstractItem},
     examinees::Vector{<:AbstractExaminee},
@@ -6,8 +6,8 @@ function joint_estimate_pg!(
     max_time::Int64 = 100,
     mcmc_iter::Int64 = 10,
     x_tol_rel::Float64 = 0.001,
-    sampling_item::Bool = false,
-    sampling_examinee::Bool = false,
+    item_sampling::Bool = false,
+    examinee_sampling::Bool = false,
     kwargs...
     )
     
@@ -51,7 +51,7 @@ function joint_estimate_pg!(
                     examinees[examinees_idx_per_item[i.idx]],
                     responses_per_item[i.idx],
                     filter(w -> w.i_idx == i.idx, W);
-                    sampling = sampling_item,
+                    sampling = item_sampling,
                     already_sorted = true,
                 ),
                 items,
@@ -62,7 +62,7 @@ function joint_estimate_pg!(
                     items[items_idx_per_examinee[e.idx]],
                     responses_per_examinee[e.idx],
                     filter(w -> w.e_idx == e.idx, W);
-                    sampling = sampling_examinee,
+                    sampling = examinee_sampling,
                     already_sorted = true,
                 ),
                 examinees,

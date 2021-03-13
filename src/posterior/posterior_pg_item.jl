@@ -1,6 +1,9 @@
+
+
 ##############################################################
 #          single quadruplet (item, examinee, response, w)
 ##############################################################
+
 function _posterior(
     parameters::Parameters2PL,
     latent::Latent1D,
@@ -38,6 +41,35 @@ function posterior(
     return _posterior(item.parameters, examinee.latent, response, w)
 end
 
+function __posterior(
+    parameters::Parameters2PL,
+    latents::Vector{Latent1D},
+    responses::Vector{Union{Missing, Float64}}, 
+    W::Vector{Float64},
+)
+    prior = parameters.prior.v
+    a = parameters.a
+    b = parameters.b
+    sigma_2_prior = 1 ./ Distributions.var.(prior)
+    #W = map( e -> Distributions.rand(PolyaGammaDevRoye1Sampler(1.0, item.parameters.a *(e.latent.val - item.parameters.b))), examinees)
+    sigma2 = mapreduce((e, w) -> [(e.val - b)^2, a^2] .* w, +, latents, W)
+    sigma2 = 1 ./ (sigma2 + sigma_2_prior)
+    mu = mapreduce(
+        (e, w, r) -> [
+            (e.val - b) * (r - 0.5),
+            - a * ((r - 0.5) - (a * e.val * w))
+        ],
+        +,
+        latents,
+        W,
+        responses,
+    )
+    mu = sigma2 .* (mu + (Distributions.mean.(prior) .* sigma_2_prior))
+    return Distributions.Product([
+        Distributions.TruncatedNormal(mu[1], sqrt(sigma2[1]), 0.0, Inf),
+        Distributions.Normal(mu[2], sqrt(sigma2[2])),
+    ])
+end
 
 function _posterior(
     parameters::Parameters2PL,

@@ -4,7 +4,7 @@ using Pkg
 Pkg.activate(".")
 using Psychometrics
 
-function est()
+function est_pg()
     I_total = 40
     N = 500
 
@@ -57,11 +57,12 @@ function est()
         items_est,
         examinees_est,
         responses;
-        method="pg",
+        method = "pg",
+        quick = true,
         mcmc_iter = 4000,
         max_time = 400,
-        sampling_item = false,
-        sampling_examinee = false
+        item_sampling = true,
+        examinee_sampling = true
         );
 
     println("a RMSE")
@@ -72,5 +73,5 @@ function est()
     println(sqrt(mean(map( (i, i_est) -> (i.latent.val-i_est.latent.val)^2, examinees, examinees_est))))
     return examinees, examinees_est, items, items_est, responses
 end
-examinees, examinees_est, items, items_est, responses = est();
+examinees, examinees_est, items, items_est, responses = est_pg();
 

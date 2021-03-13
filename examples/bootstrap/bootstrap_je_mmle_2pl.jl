@@ -1,13 +1,20 @@
-using Distributions
-using StatsBase
+@everywhere begin
+    using Distributions
+    using StatsBase
 
-using ATA
-using DataFrames
-using DelimitedFiles
-using JuMP
-using Cbc
-using CSV
+    using ATA
+    using DataFrames
+    using DelimitedFiles
+    using JuMP
+    using Cbc
+    using CSV
+    
+    using Pkg
+    Pkg.activate(".")
+    using Psychometrics
 
+end
+cd("examples/bootstrap")
 function bs()
     I_total = 250
     N = 3_000
@@ -57,13 +64,13 @@ function bs()
     )
     CSV.write("item_bank.csv", item_bank)
 
-    op = [ 0 10 0 0 0 0, 
-          10 0 10 0 0 0,
-          0 10 0 10 0 0,
-          0 0 10 0 10 0,
-          0 0 0 10 0 10,
+    op = [ 0 10 0 0 0 0; 
+          10 0 10 0 0 0;
+          0 10 0 10 0 0;
+          0 0 10 0 10 0;
+          0 0 0 10 0 10;
           0 0 0 0 10 0 ]
-    DelimitedFiles.writedlm(op, "op.csv", delim = ",")
+    DelimitedFiles.writedlm("op.csv", op, ',')
     
     #write constraints and save in csv
     constraints = DataFrame(
@@ -154,10 +161,11 @@ function bs()
     end, items_est);
 
     #start calibration
-    Psychometrics.joint_estimate_mmle_2pl_quick!(
+    joint_estimate!(
         items_est,
         examinees_est,
         responses;
+        method = "mmle",
         metric = metric,
         max_iter = 500,
         max_time = 500,
@@ -184,12 +192,12 @@ function bs()
         max_iter = 500,
         max_time = 100,
         x_tol_rel = 0.001,
-        replications = 100,
+        replications = 500,
         type = "parametric",
         sample_fraction = 1.0
         )
     return examinees, examinees_est, items, items_est, responses, items_est_bs, examinees_est_bs
 end
- examinees, examinees_est, items, items_est, responses, items_est_bs, examinees_est_bs = bs();
+examinees, examinees_est, items, items_est, responses, items_est_bs, examinees_est_bs = bs();
 @everywhere using JLD2
 @save items_est_bs "items.jld2s"

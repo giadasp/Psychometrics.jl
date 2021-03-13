@@ -73,7 +73,7 @@ function joint_estimate_mmle_2pl_quick!(
 
     while !stop
 
-        for i in 1:I
+        Distributed.@sync Distributed.@distributed for i in 1:I
             opt.lower_bounds = [bounds[i][1][1], bounds[i][2][1]]
             opt.upper_bounds = [bounds[i][1][2], bounds[i][2][2]]
             calibrate_item_mmle_2pl_quick!(
@@ -100,7 +100,7 @@ function joint_estimate_mmle_2pl_quick!(
         #update posteriors
         likelihood = 0
         posterior = Vector{Vector{Float64}}(undef, N)
-        for n = 1 : N
+        Distributed.@sync Distributed.@distributed for n = 1 : N
             p = posterior_2pl_quick(parameters[i_index[n]], response_matrix[i_index[n], n], X, W) 
             normalizer = sum(p)
             if normalizer > typemin(Float64)

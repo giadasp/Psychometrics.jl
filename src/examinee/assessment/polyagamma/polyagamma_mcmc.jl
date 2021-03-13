@@ -1,4 +1,18 @@
 include("polyagamma_sampler.jl")
+
+function _mcmc_iter_pg!(
+    latent::AbstractLatent,
+    parameters::Vector{<:AbstractParameters},
+    responses_val::Vector{Union{Missing,Float64}},
+    W_val::Vector{Float64};
+    sampling = true
+    )
+    latent.posterior = __posterior(latent, parameters, responses_val, W_val) 
+    vals = _chain_append!(latent; sampling = sampling)
+    _set_val!(latent, vals)
+    return nothing
+end
+
 function mcmc_iter_pg!(
     examinee::AbstractExaminee,
     items::Vector{<:AbstractItem},

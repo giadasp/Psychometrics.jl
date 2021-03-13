@@ -6,12 +6,21 @@ function joint_estimate!(
     examinees::Vector{<:AbstractExaminee},
     responses::Vector{Response};
     method = "mmle",
+    quick = false,
     kwargs...
     )
     if method == "pg"
-        return joint_estimate_pg!(items, examinees, responses; kwargs...)
+        if quick
+            return joint_estimate_pg_quick!(items, examinees, responses; kwargs...)
+        else
+            return joint_estimate_pg!(items, examinees, responses; kwargs...)
+        end
     elseif method =="mmle"
-        return joint_estimate_mmle!(items, examinees, responses; kwargs...)
+        if quick
+            return joint_estimate_mmle!(items, examinees, responses; kwargs...)
+        else
+            return joint_estimate_mmle_quick!(items, examinees, responses; kwargs...)
+        end
     end
 end
 

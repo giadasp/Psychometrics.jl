@@ -1,6 +1,6 @@
 """
 ```julia 
-log_likelihood(
+__log_likelihood(
     response_val::Float64,
     latent_val::Float64,
     parameters::AbstractParametersBinary,
@@ -11,7 +11,7 @@ log_likelihood(
 
 It computes the log likelihood for a latent value and item parameters `parameters` with answer `response_val`.
 """
-function log_likelihood(
+function __log_likelihood(
     response_val::Float64,
     latent_val::Float64,
     parameters::AbstractParametersBinary,

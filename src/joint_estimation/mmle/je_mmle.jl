@@ -47,7 +47,7 @@ include("je_mmle_quick.jl")
 #     while !stop
 #         #calibrate items
 #         #calibrate_item_mmle!(items, examinees, responses);
-#         for i in 1 : size(items, 1)
+#         Distributed.@sync Distributed.@distributed for i in 1 : size(items, 1)
 #             calibrate_item_mmle!(items[i], examinees, responses);
 #         end
 #         #calibrate_item_mmle!(items, examinees, response_matrix);
@@ -64,7 +64,7 @@ include("je_mmle_quick.jl")
 
 #         #update posteriors
 #         #update_posterior!(examinees, items, response_matrix; already_sorted = false);
-#         for n in 1 : size(examinees, 1)
+#         Distributed.@sync Distributed.@distributed for n in 1 : size(examinees, 1)
 #             update_posterior!(examinees[n], items, responses);
 #         end
 #         if any([

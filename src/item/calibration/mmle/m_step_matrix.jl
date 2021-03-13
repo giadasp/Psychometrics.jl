@@ -1,3 +1,28 @@
+## for 2PL parameters and latents
+
+function _calibrate_item_mmle!(
+    parameters::Parameters2PL,
+    latents::Vector{<:AbstractLatent}, #only those who answered to item 
+    responses::Vector{Union{Missing, Float64}},
+    opt::NLopt.Opt
+)
+    opt.lower_bounds = [parameters.bounds_b[1], parameters.bounds_a[1]]
+    opt.upper_bounds = [parameters.bounds_b[2], parameters.bounds_a[2]]
+    sumpk_i = mapreduce( l -> l.posterior.p, +, latents)
+    if sum(responses)>0
+        r1_i = mapreduce(l -> l.posterior.p, +, latents[responses .> 0])
+    else
+        r1_i = [0.0]
+    end
+    pars_i = max_i(latents[1].prior.support, sumpk_i, r1_i, [parameters.b, parameters.a], opt)
+
+    parameters.a = pars_i[2]
+    parameters.b = pars_i[1]
+    return nothing
+end
+
+## for 2PL parameters and examinees
+
 function _calibrate_item_mmle!(
     parameters::Parameters2PL,
     examinees::Vector{<:AbstractExaminee}, #only those who answered to item 
@@ -12,11 +37,13 @@ function _calibrate_item_mmle!(
     else
         r1_i = [0.0]
     end
-    pars_i = max_i(examinees[1].latent.posterior.support, sumpk_i, r1_i, [parameters.b, parameters.a], opt)
+    pars_i = max_i(examinees[1].latent.prior.support, sumpk_i, r1_i, [parameters.b, parameters.a], opt)
     parameters.a = pars_i[2]
     parameters.b = pars_i[1]
     return nothing
 end
+
+## for item and examinees
 
 function calibrate_item_mmle!(
     item::AbstractItem,
