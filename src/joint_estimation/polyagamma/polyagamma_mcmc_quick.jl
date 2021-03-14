@@ -56,7 +56,7 @@ function joint_estimate_pg_quick!(
             Distributed.@sync Distributed.@distributed for n in 1:N
                 latent_n = latents[n]
                 if !latent_n.assessed
-                    _mcmc_iter_pg!(latent_n, parameters[i_index[n]], responses_nx[n], W[i_index[n], n]; sampling = examinee_sampling)
+                    _mcmc_iter_pg!(latent_n, parameters[i_index[n]], responses_n[n], W[i_index[n], n]; sampling = examinee_sampling)
                 end
             end
             if (iter % 200) == 0
