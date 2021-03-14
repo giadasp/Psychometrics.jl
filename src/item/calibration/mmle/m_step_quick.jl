@@ -1,7 +1,7 @@
 function calibrate_item_mmle_2pl_quick!(
     parameters::Vector{Float64},
     posterior::Vector{Vector{Float64}},
-    responses::Vector{Union{Missing, Float64}},
+    responses::Vector{Float64}
     X::Vector{Float64},
     opt::NLopt.Opt
     )

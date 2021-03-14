@@ -19,11 +19,11 @@ mutable struct Parameters1PL <: AbstractParametersBinary
     # Random Initializers
     function Parameters1PL(dist::Distributions.UnivariateDistribution, bounds_b)
         pars = truncate_rand(dist, bounds_b)
-        new(pars[1][1], bounds_b, dist, dist, [pars[1]], 1.0, true)
+        new(pars[1][1], bounds_b, dist, dist, [pars[1]], 1.0, false)
     end
 
     function Parameters1PL()
-        Parameters1PL(Distributions.Normal(0, 1), [-6.0, 6.0], true)
+        Parameters1PL(Distributions.Normal(0, 1), [-6.0, 6.0], false)
     end
 end
 

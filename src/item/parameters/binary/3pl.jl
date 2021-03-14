@@ -63,7 +63,7 @@ mutable struct Parameters3PL <: AbstractParametersBinary
             trivariate_dist,
             [pars[1]],
             [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0],
-            true,
+            false,
         )
     end
 

@@ -12,6 +12,7 @@ function joint_estimate_mmle!(
     int_opt_x_tol_rel::Float64 = 0.001,
     int_opt_max_time::Float64 = 100.0,
     int_opt_f_tol_rel::Float64 = 0.00001,
+    rescale_latent = true,
     kwargs...
     )
     I = size(items, 1)
@@ -49,7 +50,11 @@ function joint_estimate_mmle!(
         if n <= I
             n_index[n] = findall(.!ismissing.(response_matrix[n, :]))
         end
-    end #15ms
+    end 
+
+    responses_i = [ Vector{Float64}(response_matrix[i, n_index[i]]) for i = 1 : I]
+    responses_n = [ Vector{Float64}(response_matrix[i_index[n], n]) for n = 1 : N]
+
     iter = 1
 
     opt = NLopt.Opt(:LD_SLSQP, 2)
@@ -59,29 +64,25 @@ function joint_estimate_mmle!(
     while !stop
         #calibrate items
         #before_time = time()
-        Distributed.@sync Distributed.@distributed for i in 1 : I
-            if !parameters[i].calibrated
-                _calibrate_item_mmle!(parameters[i], latents[n_index[i]], response_matrix[i, n_index[i]], opt);
-            end
-        end
+        map( (p, idx, r) -> p.calibrated || _calibrate_item_mmle!(p, latents[idx], r), parameters, n_index, responses_i)
+
         #println("calibration took ", time() - before_time)
         #before_time = time()
         #rescale dist
-        _rescale!(
-            dist,
-            latents;
-            metric = [0.0, 1.0]
-        )
+        if rescale_latent
+            _rescale!(
+                dist,
+                latents;
+                metric = [0.0, 1.0]
+            )
+            Distributed.@sync Distributed.@distributed for n in 1 : N
+                latents[n].prior = dist
+            end
+        end
         #println("rescale took ", time() - before_time)
         #before_time = time()
         #update posteriors
-        #update_posterior!(examinees, items, response_matrix; already_sorted = false);
-        Distributed.@sync Distributed.@distributed for n in 1 : N
-            latents[n].prior = dist
-            if !latents[n].assessed
-                _update_posterior!(latents[n], parameters[i_index[n]], response_matrix[i_index[n], n]);
-            end
-        end
+        map( (l, idx, r) -> l.assessed || _update_posterior!(l, parameters[idx], r), latents, i_index, responses_n)
         #println("post took ", time() - before_time)
         #before_time = time()
         if any([

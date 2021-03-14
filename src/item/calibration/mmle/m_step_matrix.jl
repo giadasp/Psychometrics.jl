@@ -3,7 +3,7 @@
 function _calibrate_item_mmle!(
     parameters::Parameters2PL,
     latents::Vector{<:AbstractLatent}, #only those who answered to item 
-    responses::Vector{Union{Missing, Float64}},
+    responses::Vector{Float64},
     opt::NLopt.Opt
 )
     opt.lower_bounds = [parameters.bounds_b[1], parameters.bounds_a[1]]
@@ -26,7 +26,7 @@ end
 function _calibrate_item_mmle!(
     parameters::Parameters2PL,
     examinees::Vector{<:AbstractExaminee}, #only those who answered to item 
-    responses::Vector{Union{Missing, Float64}},
+    responses::Vector{Float64},
     opt::NLopt.Opt
 )
     opt.lower_bounds = [parameters.bounds_b[1], parameters.bounds_a[1]]
@@ -48,7 +48,7 @@ end
 function calibrate_item_mmle!(
     item::AbstractItem,
     examinees::Vector{<:AbstractExaminee},
-    responses::Vector{Union{Missing, Float64}},
+    responses::Vector{Float64},
     opt::NLopt.Opt
 )
     _calibrate_item_mmle!(item.parameters,

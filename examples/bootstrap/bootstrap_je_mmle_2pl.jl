@@ -186,7 +186,7 @@ function bs()
         items_est_bs,
         examinees_est_bs,
         responses;
-        method="mmle",
+        method ="mmle",
         quick = false,
         metric = metric,
         max_iter = 500,

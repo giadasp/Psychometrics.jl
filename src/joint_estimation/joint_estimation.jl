@@ -17,9 +17,9 @@ function joint_estimate!(
         end
     elseif method =="mmle"
         if quick
-            return joint_estimate_mmle!(items, examinees, responses; kwargs...)
-        else
             return joint_estimate_mmle_quick!(items, examinees, responses; kwargs...)
+        else
+            return joint_estimate_mmle!(items, examinees, responses; kwargs...)
         end
     end
 end

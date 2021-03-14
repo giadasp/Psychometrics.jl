@@ -22,6 +22,7 @@ function joint_estimate_pg_quick!(
         response_matrix = get_response_matrix(responses, size(items,1), size(examinees,1));
         parameters = get_parameters(items)
         latents = get_latents(examinees)
+
     
         #extract items per examinee and examinees per item indices
         n_index = Vector{Vector{Int64}}(undef, I)
@@ -32,7 +33,8 @@ function joint_estimate_pg_quick!(
                 n_index[n] = findall(.!ismissing.(response_matrix[n, :]))
             end
         end #15ms
-    
+        responses_i = [ Vector{Float64}(response_matrix[i, n_index[i]]) for i = 1 : I]
+        responses_n = [ Vector{Float64}(response_matrix[i_index[n], n]) for n = 1 : N]
         #set starting chain
         map(
             p -> begin
@@ -45,22 +47,28 @@ function joint_estimate_pg_quick!(
         for i in 1:I, n in n_index[i]
             W[i, n] =  _generate_w(latents[n], parameters[i])
         end
-            map( i ->
-                _mcmc_iter_pg!(parameters[i], latents[n_index[i]], response_matrix[i, n_index[i]], W[i, n_index[i]]; sampling = item_sampling),
-            1 : I)
-            map( n ->
-                _mcmc_iter_pg!(latents[n], parameters[i_index[n]], response_matrix[i_index[n], n], W[i_index[n], n]; sampling = examinee_sampling),
-            1 : N)
+            Distributed.@sync Distributed.@distributed for i in 1:I
+                parameters_i = parameters[i]
+                if !parameters_i.calibrated
+                    _mcmc_iter_pg!(parameters_i, latents[n_index[i]], response_i[i], W[i, n_index[i]]; sampling = item_sampling)
+                end
+            end
+            Distributed.@sync Distributed.@distributed for n in 1:N
+                latent_n = latents[n]
+                if !latent_n.assessed
+                    _mcmc_iter_pg!(latent_n, parameters[i_index[n]], responses_nx[n], W[i_index[n], n]; sampling = examinee_sampling)
+                end
+            end
             if (iter % 200) == 0
                 #map(i -> update_estimate!(i), items);
                 if any([
                     check_iter(iter; max_iter = mcmc_iter),
                     check_time(start_time; max_time = max_time),
-                    check_x_tol_rel!(
-                        items,
-                        old_pars;
-                        x_tol_rel = x_tol_rel
-                    )
+                    # check_x_tol_rel!(
+                    #     items,
+                    #     old_pars;
+                    #     x_tol_rel = x_tol_rel
+                    # )
                     ])       
                     stop = true
                 end

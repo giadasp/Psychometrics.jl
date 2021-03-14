@@ -12,6 +12,7 @@ function joint_estimate_mmle_2pl_quick!(
     int_opt_x_tol_rel::Float64 = 0.001,
     int_opt_max_time::Float64 = 1000.0,
     int_opt_f_tol_rel::Float64 = 0.00001,
+    rescale_latent = true,
     kwargs...
     )
 
@@ -31,9 +32,12 @@ function joint_estimate_mmle_2pl_quick!(
     old_likelihood = 0.0
     old_pars = get_parameters_vals(items)
     start_time = time()
+    
     response_matrix = get_response_matrix(responses, size(items,1), size(examinees,1));
-    parameters = get_parameters_vals(items)
-    parameters = [parameters[i,:] for i in 1:I]
+    parameters = get_parameters(items)
+    parameters_matrix = get_parameters_vals(items)
+    parameters_vectors = [parameters[i,:] for i in 1:I]
+    latents = get_latents(examinees)
     bounds = map( i -> [i.parameters.bounds_a, i.parameters.bounds_b], items)
 
     #extract items idx per examinee and examinees idx per item
@@ -47,11 +51,10 @@ function joint_estimate_mmle_2pl_quick!(
     end #15ms
 
     #update posterior
-    #update_posterior!(examinees, items, responses; already_sorted = false);
     likelihood = 0
     posterior = Vector{Vector{Float64}}(undef, N)
     for n = 1 : N
-        p = posterior_2pl_quick(parameters[i_index[n]], response_matrix[i_index[n], n], X, W) 
+        p = posterior_2pl_quick(parameters_vectors[i_index[n]], response_matrix[i_index[n], n], X, W) 
         normalizer = sum(p)
         if normalizer > typemin(Float64)
             posterior[n] = p ./ normalizer
@@ -77,22 +80,24 @@ function joint_estimate_mmle_2pl_quick!(
             opt.lower_bounds = [bounds[i][1][1], bounds[i][2][1]]
             opt.upper_bounds = [bounds[i][1][2], bounds[i][2][2]]
             calibrate_item_mmle_2pl_quick!(
-                parameters[i],
+                parameters_vectors[i],
                 posterior[n_index[i]],
                 response_matrix[i, n_index[i]],
                 X,
                 opt
             )
-            items[i].parameters.a = parameters[i][1]
-            items[i].parameters.b = parameters[i][2]
+            parameters[i].a = parameters_vectors[i][1]
+            parameters[i].b = parameters_vectors[i][2]
         end
 
         #rescale dist
-        rescale!(
-            dist,
-            examinees; 
-            metric = [0.0, 1.0]
-        )
+        if rescale_latent
+            _rescale!(
+                dist,
+                latents; 
+                metric = [0.0, 1.0]
+            )
+        end
 
         X = dist.support
         W = dist.p
@@ -101,7 +106,7 @@ function joint_estimate_mmle_2pl_quick!(
         likelihood = 0
         posterior = Vector{Vector{Float64}}(undef, N)
         Distributed.@sync Distributed.@distributed for n = 1 : N
-            p = posterior_2pl_quick(parameters[i_index[n]], response_matrix[i_index[n], n], X, W) 
+            p = posterior_2pl_quick(parameters_vectors[i_index[n]], response_matrix[i_index[n], n], X, W) 
             normalizer = sum(p)
             if normalizer > typemin(Float64)
                 posterior[n] = p ./ normalizer

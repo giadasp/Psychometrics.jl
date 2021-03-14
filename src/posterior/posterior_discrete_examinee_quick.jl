@@ -1,6 +1,6 @@
 function posterior_2pl_quick(
     parameters::Vector{Vector{Float64}},
-    responses::Vector{Union{Missing, Float64}},
+    responses::Vector{Float64},
     X::Vector{Float64},
     W::Vector{Float64}
     )   

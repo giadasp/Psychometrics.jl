@@ -80,17 +80,17 @@ function bootstrap!(
             n_not_sampled = setdiff(collect(1:N), n_sample)
             if quick
                 if items[1].parameters isa Parameters2PL
-                    joint_estimate_mmle_2pl_quick!(items_r, examinees_r, responses_r; kwargs...)
+                    joint_estimate_mmle_2pl_quick!(items_r, examinees_r, responses_r; rescale_latent = false, kwargs...)
                 else
                     error("Only 2pl items are supported in quick mode")
                 end
             else
-                joint_estimate_mmle!(items_r, examinees_r, responses_r; kwargs...)
+                joint_estimate_mmle!(items_r, examinees_r, responses_r; rescale_latent = false, kwargs...)
             end
             map( ( i_r , i ) -> push!(i.parameters.chain, get_parameters_vals(i_r)), items_r, items)
         end    
         elseif method == "polyagamma"
-        
+
         if type == "parametric"
 
         elseif type == "nonparametric"

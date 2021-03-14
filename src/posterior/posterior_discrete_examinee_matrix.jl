@@ -3,7 +3,7 @@
 function _posterior(
     prior::Distributions.DiscreteNonParametric,
     parameters::Vector{<:AbstractParameters},
-    responses::Vector{Union{Missing, Float64}},
+    responses::Vector{Float64},
     )   
     return map( (x, w) ->  
             mapreduce( (par, r) -> 
@@ -21,7 +21,7 @@ end
 function _update_posterior!(
     latent::Latent1D,
     parameters::Vector{<:AbstractParameters},
-    responses::Vector{Union{Missing, Float64}},
+    responses::Vector{Float64}
     )   
     likelihood = _posterior(latent.prior, parameters, responses)
     normalizer = sum(likelihood)
@@ -39,7 +39,7 @@ end
 function _posterior(
     prior::Distributions.DiscreteNonParametric,
     items::Vector{<:AbstractItem},
-    responses::Vector{Union{Missing, Float64}},
+    responses::Vector{Float64}
     )   
     return map( (x, w) ->  
             mapreduce( (i, r) -> 
@@ -57,7 +57,7 @@ end
 function _update_posterior!(
     latent::Latent1D,
     items::Vector{<:AbstractItem},
-    responses::Vector{Union{Missing, Float64}},
+    responses::Vector{Float64}
     )   
     likelihood = _posterior(latent.prior, items, responses)
     normalizer = sum(likelihood)
