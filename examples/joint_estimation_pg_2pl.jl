@@ -1,12 +1,14 @@
 using Dates
 using Distributions
 using Pkg
+@everywhere begin
+    using Pkg
 Pkg.activate(".")
 using Psychometrics
-
+end
 function est_pg()
-    I_total = 40
-    N = 500
+    I_total = 50
+    N = 3000
 
     # ITEM PARAMETERS AND LATENTS 
 
@@ -22,8 +24,8 @@ function est_pg()
             ),
         ) for i = 1:I_total
     ];
-    examinees = [Examinee(e, string("examinee_", e), Latent1D()) for e = 1:N];
-
+    examinees = [Examinee(e, string("examinee_", e), Latent1D(LogNormal(0, 0.5), [-6.0, 6.0])) for e = 1:N];
+    map( e -> e.latent.val = e.latent.val - 1, examinees)
     # RESPONSES
     responses = answer(examinees, items);
 
@@ -40,7 +42,6 @@ function est_pg()
             ),
         ) for i = 1:I_total
     ];
-    map(i -> i.parameters.calibrated = false, items_est);
     map(i -> i.parameters.a = 1.0, items_est);
     map(i -> i.parameters.b = 0.0, items_est);
 
