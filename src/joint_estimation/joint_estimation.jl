@@ -1,4 +1,4 @@
-include("polyagamma/polyagamma_mcmc.jl")
+include("polyagamma/je_polyagamma.jl")
 include("mmle/je_mmle.jl")
 
 function joint_estimate!(
@@ -17,7 +17,7 @@ function joint_estimate!(
         end
     elseif method =="mmle"
         if quick
-            return joint_estimate_mmle_quick!(items, examinees, responses; kwargs...)
+            return joint_estimate_mmle_2pl_quick!(items, examinees, responses; kwargs...)
         else
             return joint_estimate_mmle!(items, examinees, responses; kwargs...)
         end

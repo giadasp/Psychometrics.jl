@@ -301,3 +301,5 @@ function _matrix_rows_vec(A::Matrix{Float64}, v::Vector{Float64}, fun::Function)
     # end 
     r::Matrix{Float64}
 end
+
+Base.copy(x::T) where {T} = T([getfield(x, k) for k ∈ fieldnames(T)]...)

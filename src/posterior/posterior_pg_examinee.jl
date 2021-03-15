@@ -26,7 +26,7 @@ end
 function __posterior(
     latent::Latent1D,
     parameters::Vector{Parameters2PL},
-    responses_val::Vector{Union{Missing,Float64}},
+    responses_val::Vector{Float64},
     W_val::Vector{Float64},
 )
     prior = latent.prior

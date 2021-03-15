@@ -23,6 +23,28 @@ function posterior_2pl_quick(
         ) 
 end
 
+function posterior_2pl_quick!(
+    posteriors::Vector{Vector{Float64}},
+    i_index::Vector{Vector{Int64}},
+    parameters_vectors::Vector{Vector{Float64}},
+    responses::Vector{Vector{Float64}},
+    X::Vector{Float64},
+    W::Vector{Float64}
+    ) 
+    likelihood = zero(Float64)
+    for n = 1 : size(posteriors, 1)
+        p = posterior_2pl_quick(parameters_vectors[i_index[n]], responses[n], X, W) 
+        normalizer = sum(p)
+        if normalizer > typemin(Float64)
+            posteriors[n] = p ./ normalizer
+            likelihood += _log_c(normalizer)
+        else
+            posteriors[n] = copy(p) 
+        end
+    end
+    return likelihood
+end
+
 # function posterior_quick(
 #     responses::Vector{Union{Missing, Float64}},
 #     sig_phi::Matrix{Float64},

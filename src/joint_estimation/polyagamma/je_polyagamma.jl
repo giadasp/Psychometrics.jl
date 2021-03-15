@@ -1,4 +1,5 @@
-include("polyagamma_mcmc_quick.jl")
+include("je_polyagamma_struct.jl")
+include("je_polyagamma_quick.jl")
 function joint_estimate_pg!(
     items::Vector{<:AbstractItem},
     examinees::Vector{<:AbstractExaminee},

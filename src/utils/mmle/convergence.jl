@@ -75,7 +75,7 @@ end
 function check_f_tol_rel!(
     new_likelihood::Float64,
     old_likelihood::Float64;
-    f_tol_rel::Float64 = 0.000001
+    f_tol_rel::Float64 = 0.01
     )
     f_rel = abs((new_likelihood - old_likelihood) / old_likelihood)
     println("Likelihood: ", new_likelihood)
@@ -87,6 +87,26 @@ function check_f_tol_rel!(
         return true
     else
         old_likelihood = copy(new_likelihood)
+        return false
+    end
+end
+
+function check_x_tol_rel!(
+    parameters::Vector{<:AbstractParameters},
+    old_pars::Matrix{Float64};
+    x_tol_rel::Float64 = 0.0001
+)
+    new_pars = hcat(_get_parameters_vals.(parameters)...)
+    delta_pars =  maximum(abs.((new_pars - old_pars) ./ old_pars))
+    println("x_rel max: ", delta_pars)
+    if delta_pars <= x_tol_rel
+        println(
+           "X ToL reached"
+        )
+        old_pars .= new_pars
+        return true
+    else
+        old_pars .= new_pars
         return false
     end
 end

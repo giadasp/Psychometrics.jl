@@ -1,24 +1,47 @@
 ## for 2PL parameters and latents
 
-function _calibrate_item_mmle!(
+function _calibrate_item_mmle(
     parameters::Parameters2PL,
     latents::Vector{<:AbstractLatent}, #only those who answered to item 
     responses::Vector{Float64},
-    opt::NLopt.Opt
+    opt_settings::Vector{Float64}
 )
-    opt.lower_bounds = [parameters.bounds_b[1], parameters.bounds_a[1]]
-    opt.upper_bounds = [parameters.bounds_b[2], parameters.bounds_a[2]]
+    opt = NLopt.Opt(:LD_SLSQP, 2)
+    opt.maxtime = opt_settings[1]
+    opt.xtol_rel = opt_settings[2]
+    opt.ftol_rel = opt_settings[3]
+    opt.lower_bounds = [parameters.bounds_a[1], parameters.bounds_b[1]]
+    opt.upper_bounds = [parameters.bounds_a[2], parameters.bounds_b[2]]
     sumpk_i = mapreduce( l -> l.posterior.p, +, latents)
-    if sum(responses)>0
+    X = latents[1].prior.support
+    if sum(responses) > 0
         r1_i = mapreduce(l -> l.posterior.p, +, latents[responses .> 0])
     else
-        r1_i = [0.0]
+        r1_i = zeros(Float64, size(X, 1))
     end
-    pars_i = max_i(latents[1].prior.support, sumpk_i, r1_i, [parameters.b, parameters.a], opt)
-
-    parameters.a = pars_i[2]
-    parameters.b = pars_i[1]
-    return nothing
+    function myf(x::Vector, grad::Vector)
+        phi = x[1] .* (X .- x[2])
+        if size(grad, 1) > 0
+            p = (r1_i - (sumpk_i .* _sig_c.(phi)))
+            grad[1] = sum((X .- x[2]) .* p)
+            grad[2] = sum(-x[1] .* p)
+        end
+        return sum(r1_i .* phi - (sumpk_i .* _log_c.( 1 .+ _exp_c.(phi))))
+    end
+    opt.max_objective = myf
+    pars_i = [copy(parameters.a), copy(parameters.b)]
+    opt_f = Array{Cdouble}(undef, 1)
+    ccall(
+        (:nlopt_optimize, NLopt.libnlopt),
+        NLopt.Result,
+        (NLopt._Opt, Ptr{Cdouble}, Ptr{Cdouble}),
+        opt,
+        pars_i,
+        opt_f,
+    )
+    parameters.a = pars_i[1]
+    parameters.b = pars_i[2]
+    return parameters::Parameters2PL
 end
 
 ## for 2PL parameters and examinees
@@ -35,7 +58,7 @@ function _calibrate_item_mmle!(
     if sum(responses)>0
         r1_i = mapreduce(e -> e.latent.posterior.p, +, examinees[responses .> 0])
     else
-        r1_i = [0.0]
+        r1_i = zeros(Float64, size(examinees[1].latent.posterior.p, 1))
     end
     pars_i = max_i(examinees[1].latent.prior.support, sumpk_i, r1_i, [parameters.b, parameters.a], opt)
     parameters.a = pars_i[2]

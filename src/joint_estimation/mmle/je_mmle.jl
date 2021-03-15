@@ -1,4 +1,4 @@
-
+include("je_mmle_struct.jl")
 include("je_mmle_matrix.jl")
 include("je_mmle_quick.jl")
 #too slow!

@@ -1,4 +1,3 @@
-@everywhere begin
     using Distributions
     using StatsBase
 
@@ -12,8 +11,6 @@
     using Pkg
     Pkg.activate(".")
     using Psychometrics
-
-end
 cd("examples/bootstrap")
 function bs()
     I_total = 250
@@ -166,6 +163,8 @@ function bs()
         examinees_est,
         responses;
         method = "mmle",
+        quick = false,
+        dist = dist,
         metric = metric,
         max_iter = 500,
         max_time = 500,
@@ -186,8 +185,9 @@ function bs()
         items_est_bs,
         examinees_est_bs,
         responses;
-        method ="mmle",
+        method = "mmle",
         quick = false,
+        dist = dist,
         metric = metric,
         max_iter = 500,
         max_time = 100,

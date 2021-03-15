@@ -3,7 +3,7 @@ include("polyagamma_sampler.jl")
 function _mcmc_iter_pg!(
     parameters::AbstractParameters,
     latents::Vector{<:AbstractLatent},
-    responses_val::Vector{Union{Missing,Float64}},
+    responses_val::Vector{Float64},
     W_val::Vector{Float64};
     sampling = true,
     )

@@ -63,11 +63,11 @@ Main module for `Psychometrics.jl` -- A Julia package that provides tools for ps
 module Psychometrics
 
 import Distributions
-import Distributed
-import Dates
-import LinearAlgebra
-import Interpolations
-import NLopt
+using Distributed
+using Dates
+using LinearAlgebra
+using Interpolations
+using NLopt
 
 using Requires
 

@@ -1,11 +1,10 @@
 using Dates
 using Distributions
 using Pkg
-@everywhere begin
-    using Pkg
+
 Pkg.activate(".")
 using Psychometrics
-end
+
 function est_pg()
     I_total = 50
     N = 3000
@@ -24,8 +23,7 @@ function est_pg()
             ),
         ) for i = 1:I_total
     ];
-    examinees = [Examinee(e, string("examinee_", e), Latent1D(LogNormal(0, 0.5), [-6.0, 6.0])) for e = 1:N];
-    map( e -> e.latent.val = e.latent.val - 1, examinees)
+    examinees = [Examinee(e, string("examinee_", e), Latent1D(Normal(0.0, 1.0), [-6.0, 6.0])) for e = 1:N];
     # RESPONSES
     responses = answer(examinees, items);
 
@@ -60,10 +58,10 @@ function est_pg()
         responses;
         method = "pg",
         quick = true,
-        mcmc_iter = 4000,
+        mcmc_iter = 2000,
         max_time = 400,
-        item_sampling = true,
-        examinee_sampling = true
+        item_sampling = false,
+        examinee_sampling = false
         );
 
     println("a RMSE")

@@ -8,12 +8,13 @@ function max_i(
     new_pars_i = copy(pars_i)
     function myf(x::Vector, grad::Vector)
         phi = x[2] .* (X .- x[1])
+        e_phi =  _exp_c.(phi)
         if size(grad, 1) > 0
-            p = (r1_i - (sumpk_i .* _sig_c.(phi)))
+            p = (r1_i - (sumpk_i .* (1 .- (1 ./ (1 .+ e_phi)))))
             grad[1] = sum(-x[2] .* p)
             grad[2] = sum((X .- x[1]) .* p)
         end
-        return sum(r1_i .* phi - (sumpk_i .* _log_c.( 1 .+ _exp_c.(phi))))
+        return sum(r1_i .* phi - (sumpk_i .* _log_c.( 1 .+ e_phi)))
     end
     opt.max_objective = myf
     opt_f = Array{Cdouble}(undef, 1)

@@ -7,9 +7,9 @@ Pkg.activate(".");
 using Psychometrics
 
 function est()
-    I_total = 40
-    N = 200
-    test_length = 40
+    I_total = 50
+    N = 3000
+    test_length = 50
     metric = [0.0, 1.0]
 
     ### generate true items
@@ -22,22 +22,18 @@ function est()
 
     ## generate true examinees
         
-    latent_dist = LogNormal(0, 0.5)
+    latent_dist = Normal(0.0, 1.0)
     latent_bounds = [-4.0, 4.0]
     examinees = Psychometrics.Examinee[]
     for n in 1:N
         push!(examinees,  Examinee(n, string("examinee_", n), Latent1D(latent_dist, latent_bounds))) 
     end
-    for n in 1:N
-        examinees[n].latent.val = examinees[n].latent.val -1
-    end
-
     ## generate responses
     responses =  vcat(map( e -> answer(e, items), examinees)...)
 
     #start points and probs
     prob = Distributions.pdf(Normal(metric[1], metric[2]), collect(-6.0:0.3:6.0))
-    prob = prob / sum(prob)
+    prob = prob ./ sum(prob)
     dist = Distributions.DiscreteNonParametric(collect(-6.0:0.3:6.0), prob)
 
     # initialize examinees
@@ -50,7 +46,7 @@ function est()
             e.latent.val = 0.0
         end,
     examinees_est)
-
+    println(examinees_est[1].latent.prior)
     #initalize items estimates
     a_est_bounds = [1e-5, 5.0];
     b_est_bounds = [-4.0, 4.0];
@@ -72,9 +68,13 @@ function est()
         items_est,
         examinees_est,
         responses;
-        method="mmle",
+        dist = dist,
+        method = "mmle",
+        quick = false,
+        rescale_latent = true,
         metric = metric,
         max_iter = 500,
+        max_time = 100,
         x_tol_rel = 0.001,
         );
         println("a RMSE")

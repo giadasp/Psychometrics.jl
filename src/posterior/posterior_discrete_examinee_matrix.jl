@@ -18,7 +18,7 @@ function _posterior(
         ) 
 end
 
-function _update_posterior!(
+function _update_posterior(
     latent::Latent1D,
     parameters::Vector{<:AbstractParameters},
     responses::Vector{Float64}
@@ -31,7 +31,7 @@ function _update_posterior!(
     else
         latent.posterior = Distributions.DiscreteNonParametric(latent.prior.support, likelihood; check_args = false);
     end
-    return nothing
+    return latent::Latent1D
 end 
 
 ## for items
