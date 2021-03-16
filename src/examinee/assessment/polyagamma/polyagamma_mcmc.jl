@@ -1,16 +1,18 @@
 include("polyagamma_sampler.jl")
 
-function _mcmc_iter_pg!(
+function _mcmc_iter_pg(
     latent::AbstractLatent,
     parameters::Vector{<:AbstractParameters},
     responses_val::Vector{Float64},
     W_val::Vector{Float64};
     sampling = true
     )
-    latent.posterior = __posterior(latent, parameters, responses_val, W_val) 
-    vals = _chain_append!(latent; sampling = sampling)
-    _set_val!(latent, vals)
-    return nothing
+    if !latent.assessed
+        latent.posterior = __posterior(latent, parameters, responses_val, W_val) 
+        vals = _chain_append!(latent; sampling = sampling)
+        _set_val!(latent, vals)
+    end
+    return latent::AbstractLatent
 end
 
 function mcmc_iter_pg!(
@@ -33,6 +35,21 @@ function update_estimate!(item::AbstractItem; sampling = true)
     _update_estimate!(item.parameters; sampling = sampling)
 end
 
+function _assess_examinee_pg(
+    latent::AbstractLatent,
+    parameters::Vector{<:AbstractParameters},
+    responses::Vector{Float64};
+    mcmc_iter = 2_000,
+    sampling = true
+    )
+    # same as, but without val update (faster)
+    for iter = 1:mcmc_iter
+        W = map( p -> _generate_w(latent, p), parameters)
+        latent = _mcmc_iter_pg(latent, parameters, responses, W; sampling = sampling)
+    end
+    return latent::AbstractLatent
+end
+
 function assess_examinee_pg!(
     examinee::AbstractExaminee,
     items::Vector{<:AbstractItem},
@@ -46,7 +63,8 @@ function assess_examinee_pg!(
         sort!(responses, by = r -> r.item_idx)
         sort!(items, by = i -> i.idx)
     end
-    empty_chain!(examinee)
+    latent = examinee.latent
+    _empty_chain!(latent)
     # chain = SharedArrays.SharedArray{Float64}(mcmc_iter)
     # # extract `mcmc_iter` samples from the polyagamma and from theta conditional posterior
     # Distributed.@sync Distributed.@distributed for iter in 1:mcmc_iter
@@ -56,10 +74,13 @@ function assess_examinee_pg!(
     # examinee.latent.chain = copy(chain)
 
     # same as, but without val update (faster)
-    for iter = 1:mcmc_iter
-        W = generate_w(examinee, items)
-        mcmc_iter_pg!(examinee, items, responses, W; sampling = sampling, already_sorted = already_sorted)
-    end
+    latent = _assess_examinee_pg(
+        latent,
+        get_parameters(items),
+        map( r -> r.val, responses),
+        mcmc_iter = mcmc_iter,
+        sampling = sampling,
+        )
     update_estimate!(examinee; sampling = sampling)
     return nothing
 end

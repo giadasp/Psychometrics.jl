@@ -49,6 +49,11 @@ struct Item <: AbstractItem
     Item(idx::Int64, id::String, content::String) = new(idx, id, content, Parameters1PL())
 end
 
+function Base.copy(item::Item) 
+    i = Item(item.idx, item.id, item.parameters)
+    return i::Item
+end
+
 """
     get_parameters(item::AbstractItem)
 """

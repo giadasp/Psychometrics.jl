@@ -19,7 +19,7 @@ function rescale!(
     return nothing
 end
 
-function _rescale!(
+function _rescale(
     dist::Distributions.DiscreteNonParametric,
     latents::Vector{<:AbstractLatent};
     metric::Vector{Float64} = [0.0, 1.0]
@@ -36,6 +36,5 @@ function _rescale!(
     ]
     Xk2, Wk2 = my_rescale(Xk, Wk, observed)
     Wk = cubic_spline_int(Xk, Xk2, Wk2)
-    dist = Distributions.DiscreteNonParametric(Xk2[2:(end-1)], Wk; check_args=false)
-    return nothing
+    return Distributions.DiscreteNonParametric(Xk2[2:(end-1)], Wk; check_args=false)::Distributions.DiscreteUnivariateDistribution
 end

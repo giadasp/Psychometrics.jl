@@ -1,21 +1,16 @@
+using Distributed
 @everywhere using Pkg
-@everywhere Pkg.instantiate()
 @everywhere Pkg.activate(".")
 @everywhere using Psychometrics
-@everywhere using JLD2
-@everywhere using Statistics
-@everywhere using DelimitedFiles
-@everywhere using FileIO
-@everywhere using StatsBase
-@everywhere using Distributions
+using JLD2
+using Statistics
+using DelimitedFiles
+using FileIO
+using StatsBase
+using Distributions
 
 
-import Base.copy
 
-function Base.copy(examinee::Examinee) 
-    e = Examinee(examinee.idx, examinee.id, examinee.latent)
-    return e::Examinee
-end
 
 function online_calibrate()
 replications = 1:1
@@ -42,7 +37,7 @@ for rep in replications
     I_operational = 1000
     I_field = 25
     I_total = I_field + I_operational
-    N = 2_000
+    N = 3_000
     
     test_operational  = 25
     test_field = 5
@@ -117,7 +112,7 @@ for rep in replications
 
     # START ONLINE-CALIBRATION
 
-    global n=1
+    n=1
     while retired_items < I_field #size(filter(i -> i.parameters.calibrated == false, items_est),1) > 0   
         examinee = copy(examinees_est[n])
         examinee_true = copy(examinees[n])
@@ -194,9 +189,9 @@ for rep in replications
         responses_per_examinee[n] = copy(responses_n)
         items_idx_per_examinee[n] = copy(items_idx_n)
         retired_items_vector[n] = copy(retired_items)
-        global n+=1
+        n += 1
     end
-    global n-=1
+    n -= 1
     @save string("examples/online-calibration/how_many_examinees_rep_",rep,".jld2") n
     @save string("examples/online-calibration/retired_items_vector_rep_",rep,".jld2") retired_items_vector
     @save string("examples/online-calibration/examinees_est_theta_rep_",rep,".jld2") examinees_est_theta

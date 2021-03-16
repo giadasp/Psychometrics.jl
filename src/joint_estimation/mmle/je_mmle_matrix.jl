@@ -1,6 +1,7 @@
-function optimize!(je_mmle_model::JointEstimationMMLEModel)
+function optimize(je_mmle_model::JointEstimationMMLEModel)
     parameters = je_mmle_model.parameters
     latents = je_mmle_model.latents
+    dist = je_mmle_model.dist
 
     I = size(parameters, 1)
     N = size(latents, 1)
@@ -50,13 +51,13 @@ function optimize!(je_mmle_model::JointEstimationMMLEModel)
 
         #rescale dist
         if je_mmle_model.rescale_latent
-            _rescale!(
-                je_mmle_model.dist,
+            dist = _rescale(
+                dist,
                 latents;
                 metric = je_mmle_model.metric
             )
-            for n in 1 : N
-                latents[n].prior = je_mmle_model.dist
+            for n = 1:N
+                latents[n].prior = dist
             end
         end
 
@@ -96,7 +97,7 @@ function optimize!(je_mmle_model::JointEstimationMMLEModel)
         iter += 1
     end
     
-    return nothing
+    return parameters::Vector{<:AbstractParameters}, latents::Vector{<:AbstractLatent}, dist::Distributions.DiscreteUnivariateDistribution
 end
 
 function joint_estimate_mmle!(
@@ -152,16 +153,16 @@ function joint_estimate_mmle!(
         [Float64(max_iter), Float64(max_time), x_tol_rel, f_tol_rel],
         [int_opt_max_time, int_opt_x_tol_rel, int_opt_f_tol_rel]
     )
-    optimize!(je_mmle_model)
+    parameters, latents, dist = optimize(je_mmle_model)
 
     for n in 1 : N
-        l = copy(je_mmle_model.latents[n])
+        l = copy(latents[n])
         l.prior = dist
         l.posterior = Distributions.DiscreteNonParametric(dist.support, l.posterior.p)
         l.val = l.posterior.p'*l.posterior.support
         examinees[n] = Examinee(examinees[n].idx, examinees[n].id, l)
         if n<=I
-            p = copy(je_mmle_model.parameters[n])
+            p = copy(parameters[n])
             items[n] = Item(items[n].idx, items[n].id, p)
         end
     end

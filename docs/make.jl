@@ -9,18 +9,23 @@ makedocs(
     format = Documenter.HTML(),
     modules = [Psychometrics],
     doctest = true,
-    
     pages = [
         "index.md",
-        hide("lib/public.md", map(
-            s -> "methods/exported/$(s)",
-            sort(readdir(joinpath(@__DIR__, "src/methods/exported")))
-        )),
-        hide("lib/internals.md", map(
-            s -> "methods/internals/$(s)",
-            sort(readdir(joinpath(@__DIR__, "src/methods/internals")))
-        ))
-    ]
+        hide(
+            "lib/public.md",
+            map(
+                s -> "methods/exported/$(s)",
+                sort(readdir(joinpath(@__DIR__, "src/methods/exported"))),
+            ),
+        ),
+        hide(
+            "lib/internals.md",
+            map(
+                s -> "methods/internals/$(s)",
+                sort(readdir(joinpath(@__DIR__, "src/methods/internals"))),
+            ),
+        ),
+    ],
 )
 
 deploydocs(repo = ENV["REPO"], devurl = "docs", devbranch = ENV["DEVBRANCH"])

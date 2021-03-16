@@ -1,6 +1,6 @@
-function optimize!(je_pg_model::JointEstimationPolyaGammaModel)
-    parameters = je_pg_model.parameters
-    latents = je_pg_model.latents
+function optimize(je_pg_model::JointEstimationPolyaGammaModel)
+    parameters = map(p -> copy(p), je_pg_model.parameters)
+    latents =  map(p -> copy(p), je_pg_model.latents)
 
     I = size(parameters, 1)
     N = size(latents, 1)
@@ -14,16 +14,10 @@ function optimize!(je_pg_model::JointEstimationPolyaGammaModel)
             W[i, n] =  _generate_w(latents[n], parameters[i])
         end
             for i in 1:I
-                parameters_i = parameters[i]
-                if !parameters_i.calibrated
-                    _mcmc_iter_pg!(parameters_i, latents[je_pg_model.n_index[i]], je_pg_model.responses_per_item[i], W[i, je_pg_model.n_index[i]]; sampling = je_pg_model.item_sampling)
-                end
+                parameters[i] = _mcmc_iter_pg(parameters[i], latents[je_pg_model.n_index[i]], je_pg_model.responses_per_item[i], W[i, je_pg_model.n_index[i]]; sampling = je_pg_model.item_sampling)
             end
             for n in 1:N
-                latent_n = latents[n]
-                if !latent_n.assessed
-                    _mcmc_iter_pg!(latent_n, parameters[je_pg_model.i_index[n]], je_pg_model.responses_per_examinee[n], W[je_pg_model.i_index[n], n]; sampling = je_pg_model.examinee_sampling)
-                end
+                latents[n] = _mcmc_iter_pg(latents[n], parameters[je_pg_model.i_index[n]], je_pg_model.responses_per_examinee[n], W[je_pg_model.i_index[n], n]; sampling = je_pg_model.examinee_sampling)
             end
             if (iter % 200) == 0
                 if any([
@@ -41,7 +35,7 @@ function optimize!(je_pg_model::JointEstimationPolyaGammaModel)
 
         iter += 1
     end
-    return nothing
+    return parameters, latents
 end
 
 function joint_estimate_pg_quick!(
@@ -95,14 +89,14 @@ function joint_estimate_pg_quick!(
         item_sampling,
         examinee_sampling
         ) 
-    optimize!(je_pg_model)
+    parameters, latents = optimize(je_pg_model)
     Distributed.@sync Distributed.@distributed for n in 1 : N
         e = examinees[n]
-        l = je_pg_model.latents[n]
+        l = latents[n]
         examinees[n] = Examinee(e.idx, e.id, l)
         if n<=I
             i = items[n]
-            p = je_pg_model.parameters[n]
+            p = parameters[n]
             items[n] = Item(i.idx, i.id, p)
         end
     end

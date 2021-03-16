@@ -1,16 +1,18 @@
 include("polyagamma_sampler.jl")
 #update the posterior, append sample to chain and set the value as a sample from the posterior
-function _mcmc_iter_pg!(
+function _mcmc_iter_pg(
     parameters::AbstractParameters,
     latents::Vector{<:AbstractLatent},
     responses_val::Vector{Float64},
     W_val::Vector{Float64};
     sampling = true,
     )
-    parameters.posterior = __posterior(parameters, latents, responses_val, W_val) 
-    vals = _chain_append!(parameters; sampling = sampling)
-    _set_val!(parameters, vals)
-    return nothing
+    if !parameters.calibrated
+        parameters.posterior = __posterior(parameters, latents, responses_val, W_val) 
+        vals = _chain_append!(parameters; sampling = sampling)
+        _set_val!(parameters, vals)
+    end
+    return parameters::AbstractParameters
 end
 
 function mcmc_iter_pg!(
@@ -27,6 +29,20 @@ function mcmc_iter_pg!(
     end
     update_posterior!(item, examinees, responses, W; already_sorted = true)
     set_val_from_posterior!(item; sampling = sampling)
+end
+
+function _calibrate_item_pg(
+    parameters::AbstractParameters,
+    latents::Vector{<:AbstractLatent},
+    response_vals::Vector{Float64};
+    mcmc_iter::Int64 = 4_000,
+    sampling::Bool = true,
+    )
+    for iter = 1:mcmc_iter
+        W = map( l -> _generate_w(parameters, l), latents)
+        parameters = _mcmc_iter_pg(parameters, latents, response_vals, W; sampling = sampling)
+    end
+    return parameters::AbstractParameters
 end
 
 function calibrate_item_pg!(
@@ -52,11 +68,15 @@ function calibrate_item_pg!(
     # end
     # item.parameters.chain = [c[:] for c in eachcol(chain)]
     # same as, but without val update (faster)
-    for iter = 1:mcmc_iter
-        W = generate_w(item, examinees)
-        mcmc_iter_pg!(item, examinees, responses, W; sampling = sampling, already_sorted = already_sorted)
-    end
+    parameters = _calibrate_item_pg(
+        item.parameters,
+        get_latents(examinees),
+        map( r -> r.val, responses),
+        mcmc_iter = mcmc_iter,
+        sampling = sampling
+        )
     update_estimate!(item; sampling = sampling)
+    return nothing
 end
 
 

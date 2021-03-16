@@ -39,6 +39,7 @@ N_T = 500
     map(i ->
         begin 
             i.parameters.a = exp(i.parameters.a)
+            i.parameters.calibrated = true
         end,
     items_operational)
 

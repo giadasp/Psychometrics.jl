@@ -68,7 +68,7 @@ using Dates
 using LinearAlgebra
 using Interpolations
 using NLopt
-
+import Base.copy
 using Requires
 
 include("utils/math/utils_math.jl")

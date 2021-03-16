@@ -44,6 +44,11 @@ struct Examinee <: AbstractExaminee
     Examinee(idx::Int64, id::String) = new(idx, id, Latent1D())
 end
 
+function Base.copy(examinee::Examinee) 
+    e = Examinee(examinee.idx, examinee.id, examinee.latent)
+    return e::Examinee
+end
+
 """
     get_examinee_by_id(examinee_id::String, examinees::Vector{<:AbstractExaminee})
 
