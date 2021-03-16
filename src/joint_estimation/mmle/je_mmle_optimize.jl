@@ -26,7 +26,7 @@ function optimize(je_mmle_model::JointEstimationMMLEModel)
         je_mmle_model.i_index,
         je_mmle_model.responses_per_examinee,
         batch_size = batch_size_N,
-        distributed = false
+        distributed = true
     )
     # Threads.@threads for n in 1:N
     #     latents[n] = latents[n].assessed || _update_posterior(latents[n], parameters[je_mmle_model.i_index[n]], je_mmle_model.responses_per_examinee[n])
@@ -49,7 +49,7 @@ function optimize(je_mmle_model::JointEstimationMMLEModel)
              je_mmle_model.n_index,
              je_mmle_model.responses_per_item,
              batch_size = batch_size_I,
-             distributed = false
+             distributed = true
         )
 
         #rescale dist
@@ -80,7 +80,7 @@ function optimize(je_mmle_model::JointEstimationMMLEModel)
             je_mmle_model.i_index,
             je_mmle_model.responses_per_examinee,
             batch_size = batch_size_N,
-            distributed = false
+            distributed = true
         )
         if any([
             check_iter(iter; max_iter = Int64(je_mmle_model.ext_opt_settings[1])),
