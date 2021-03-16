@@ -39,14 +39,7 @@ function m_step(
         pars_i,
         opt_f,
     )
-    println(ccall(
-        (:nlopt_optimize, NLopt.libnlopt),
-        NLopt.Result,
-        (NLopt._Opt, Ptr{Cdouble}, Ptr{Cdouble}),
-        opt,
-        pars_i,
-        opt_f,
-    ))
+    println(pars_i)
     parameters.a = pars_i[1]
     parameters.b = pars_i[2]
     return parameters::Parameters2PL
