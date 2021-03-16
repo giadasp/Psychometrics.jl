@@ -5,6 +5,7 @@ function m_step(
     responses::Vector{Float64},
     opt_settings::Vector{Float64}
 )
+    myid()
     opt = NLopt.Opt(:LD_SLSQP, 2)
     opt.maxtime = opt_settings[1]
     opt.xtol_rel = opt_settings[2]
