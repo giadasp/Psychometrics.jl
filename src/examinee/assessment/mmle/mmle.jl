@@ -87,7 +87,7 @@ function assess_examinee_mmle!(
             e,
             items,
             responses;
-            clean = clean, 
+            clean = false, 
             max_time = max_time, 
             max_iter = max_iter, 
             x_tol_rel = x_tol_rel,

@@ -43,7 +43,7 @@ function optimize(je_mmle_model::JointEstimationMMLEModel)
         # end
         parameters = pmap(
              (p, idx, r) ->
-                 p.calibrated || _calibrate_item_mmle(p, latents[idx], r, je_mmle_model.int_opt_settings),
+                 p.calibrated || m_step(p, latents[idx], r, je_mmle_model.int_opt_settings),
              parameters,
              je_mmle_model.n_index,
              je_mmle_model.responses_per_item,
