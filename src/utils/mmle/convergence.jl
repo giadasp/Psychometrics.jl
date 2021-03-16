@@ -130,3 +130,23 @@ function check_x_tol_rel!(
         return false
     end
 end
+
+function check_x_tol_rel!(
+    latents::Vector{<:AbstractLatent},
+    old_latents::Matrix{Float64};
+    x_tol_rel::Float64 = 0.0001
+)
+    new_latents = hcat(_get_latents.(latents)...)
+    delta_latents =  maximum(abs.((new_latents - old_latents) ./ old_latents))
+    println("x_rel max: ", delta_latents)
+    if delta_latents <= x_tol_rel
+        println(
+           "X ToL reached"
+        )
+        old_latents .= new_latents
+        return true
+    else
+        old_latents .= new_latents
+        return false
+    end
+end

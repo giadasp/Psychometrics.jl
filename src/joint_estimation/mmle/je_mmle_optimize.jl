@@ -6,8 +6,8 @@ function optimize(je_mmle_model::JointEstimationMMLEModel)
     I = size(parameters, 1)
     N = size(latents, 1)
 
-    batch_size_N = Int(ceil(N/nprocs()))
-    batch_size_I = Int(ceil(I/nprocs()))
+    batch_size_N = Int(ceil(N/(nprocs()-1)))
+    batch_size_I = Int(ceil(I/(nprocs()-1)))
 
     iter = 1
 
@@ -24,7 +24,8 @@ function optimize(je_mmle_model::JointEstimationMMLEModel)
         latents,
         je_mmle_model.i_index,
         je_mmle_model.responses_per_examinee,
-        batch_size = batch_size_N
+        batch_size = batch_size_N,
+        distributed = false
     )
     # Threads.@threads for n in 1:N
     #     latents[n] = latents[n].assessed || _update_posterior(latents[n], parameters[je_mmle_model.i_index[n]], je_mmle_model.responses_per_examinee[n])
@@ -47,6 +48,7 @@ function optimize(je_mmle_model::JointEstimationMMLEModel)
              je_mmle_model.n_index,
              je_mmle_model.responses_per_item,
              batch_size = batch_size_I,
+             distributed = false
         )
 
         #rescale dist
@@ -76,7 +78,8 @@ function optimize(je_mmle_model::JointEstimationMMLEModel)
             latents,
             je_mmle_model.i_index,
             je_mmle_model.responses_per_examinee,
-            batch_size = batch_size_N
+            batch_size = batch_size_N,
+            distributed = false
         )
         if any([
             check_iter(iter; max_iter = Int64(je_mmle_model.ext_opt_settings[1])),
@@ -98,73 +101,4 @@ function optimize(je_mmle_model::JointEstimationMMLEModel)
     end
     
     return parameters::Vector{<:AbstractParameters}, latents::Vector{<:AbstractLatent}, dist::Distributions.DiscreteUnivariateDistribution
-end
-
-function joint_estimate_mmle!(
-    items::Vector{<:AbstractItem},
-    examinees::Vector{<:AbstractExaminee},
-    responses::Vector{<:AbstractResponse};
-    dist::Distributions.DiscreteUnivariateDistribution = Distributions.DiscreteNonParametric([0.0,1.0], [0.5, 0.5]),
-    metric::Vector{Float64} = [0.0, 1.0],
-    max_iter::Int64 = 10,
-    max_time::Int64 = 100,
-    x_tol_rel::Float64 = 0.0001,
-    f_tol_rel::Float64 = 0.000001,
-    int_opt_max_time::Float64 = 100.0,
-    int_opt_x_tol_rel::Float64 = 0.0001,
-    int_opt_f_tol_rel::Float64 = 0.000001,
-    rescale_latent::Bool = true,
-    kwargs...
-    )
-    I = size(items, 1)
-    N = size(examinees, 1)
-
-    #set priors 
-    set_prior!(examinees, dist);
-
-    #from now we work only on these, the algorithm is dependent on the type of latents and parameters.
-    response_matrix = get_response_matrix(responses, size(items,1), size(examinees,1));
-    parameters = map( i -> copy(get_parameters(i)), items)
-    latents = map( e -> copy(get_latents(e)), examinees)
-
-    #extract items per examinee and examinees per item indices
-    n_index = Vector{Vector{Int64}}(undef, I)
-    i_index = Array{Array{Int64,1},1}(undef, N)
-    for n = 1 : N
-        i_index[n] = findall(.!ismissing.(response_matrix[:, n]))
-        if n <= I
-            n_index[n] = findall(.!ismissing.(response_matrix[n, :]))
-        end
-    end 
-
-    responses_per_item = [Vector{Float64}(response_matrix[i, n_index[i]]) for i = 1 : I]
-    responses_per_examinee = [Vector{Float64}(response_matrix[i_index[n], n]) for n = 1 : N]
-
-    je_mmle_model = JointEstimationMMLEModel(
-        parameters,
-        latents,
-        responses_per_item,
-        responses_per_examinee,
-        n_index,
-        i_index,
-        copy(dist),
-        metric,
-        rescale_latent,
-        [Float64(max_iter), Float64(max_time), x_tol_rel, f_tol_rel],
-        [int_opt_max_time, int_opt_x_tol_rel, int_opt_f_tol_rel]
-    )
-    parameters, latents, dist = optimize(je_mmle_model)
-
-    for n in 1 : N
-        l = copy(latents[n])
-        l.prior = dist
-        l.posterior = Distributions.DiscreteNonParametric(dist.support, l.posterior.p)
-        l.val = l.posterior.p'*l.posterior.support
-        examinees[n] = Examinee(examinees[n].idx, examinees[n].id, l)
-        if n<=I
-            p = copy(parameters[n])
-            items[n] = Item(items[n].idx, items[n].id, p)
-        end
-    end
-    return nothing
 end
