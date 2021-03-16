@@ -1,7 +1,7 @@
 using Distributed
 using Distributions
-@everywhere using Pkg;
-Pkg.activate(".");
+# @everywhere using Pkg;
+# Pkg.activate(".");
 @everywhere using Psychometrics
 
 function est_pg()

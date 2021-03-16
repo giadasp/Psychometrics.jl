@@ -13,11 +13,15 @@ function optimize(je_pg_model::JointEstimationPolyaGammaModel)
         for i in 1:I, n in je_pg_model.n_index[i]
             W[i, n] =  _generate_w(latents[n], parameters[i])
         end
-            for i in 1:I
-                parameters[i] = _mcmc_iter_pg(parameters[i], latents[je_pg_model.n_index[i]], je_pg_model.responses_per_item[i], W[i, je_pg_model.n_index[i]]; sampling = je_pg_model.item_sampling)
+            @sync @distributed for i in 1:I
+                if !inparameters[i].calibrated 
+                    parameters[i] = _mcmc_iter_pg(parameters[i], latents[je_pg_model.n_index[i]], je_pg_model.responses_per_item[i], W[i, je_pg_model.n_index[i]]; sampling = je_pg_model.item_sampling)
+                end
             end
-            for n in 1:N
-                latents[n] = _mcmc_iter_pg(latents[n], parameters[je_pg_model.i_index[n]], je_pg_model.responses_per_examinee[n], W[je_pg_model.i_index[n], n]; sampling = je_pg_model.examinee_sampling)
+            @sync @distributed for n in 1:N
+                if !latents[n].assessed
+                    latents[n] = _mcmc_iter_pg(latents[n], parameters[je_pg_model.i_index[n]], je_pg_model.responses_per_examinee[n], W[je_pg_model.i_index[n], n]; sampling = je_pg_model.examinee_sampling)
+                end
             end
             if (iter % 200) == 0
                 if any([

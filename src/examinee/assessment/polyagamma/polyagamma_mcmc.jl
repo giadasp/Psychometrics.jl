@@ -7,11 +7,9 @@ function _mcmc_iter_pg(
     W_val::Vector{Float64};
     sampling = true
     )
-    if !latent.assessed
         latent.posterior = __posterior(latent, parameters, responses_val, W_val) 
         vals = _chain_append!(latent; sampling = sampling)
         _set_val!(latent, vals)
-    end
     return latent::AbstractLatent
 end
 

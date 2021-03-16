@@ -7,11 +7,9 @@ function _mcmc_iter_pg(
     W_val::Vector{Float64};
     sampling = true,
     )
-    if !parameters.calibrated
         parameters.posterior = __posterior(parameters, latents, responses_val, W_val) 
         vals = _chain_append!(parameters; sampling = sampling)
         _set_val!(parameters, vals)
-    end
     return parameters::AbstractParameters
 end
 
