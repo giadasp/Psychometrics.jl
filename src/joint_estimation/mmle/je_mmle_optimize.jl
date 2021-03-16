@@ -6,8 +6,9 @@ function optimize(je_mmle_model::JointEstimationMMLEModel)
     I = size(parameters, 1)
     N = size(latents, 1)
 
-    batch_size_N = Int(ceil(N/(nprocs()-1)))
-    batch_size_I = Int(ceil(I/(nprocs()-1)))
+    batch_den = max(1,(nprocs()-1))
+    batch_size_N = Int(ceil(N/batch_den))
+    batch_size_I = Int(ceil(I/batch_den))
 
     iter = 1
 
