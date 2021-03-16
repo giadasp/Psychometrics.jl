@@ -38,7 +38,6 @@ function optimize(je_mmle_model::JointEstimationMMLEModel)
     while !stop
         # calibrate items
         @distributed for i in 1:I
-            println(i)
            parameters[i] = parameters[i].calibrated || m_step(parameters[i], latents[je_mmle_model.n_index[i]], je_mmle_model.responses_per_item[i], je_mmle_model.int_opt_settings)
         end
         # Threads.@threads for i in 1:I

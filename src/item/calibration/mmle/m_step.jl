@@ -5,7 +5,7 @@ function m_step(
     responses::Vector{Float64},
     opt_settings::Vector{Float64}
 )
-println(myid())
+    println(myid())
     opt = NLopt.Opt(:LD_SLSQP, 2)
     opt.maxtime = opt_settings[1]
     opt.xtol_rel = opt_settings[2]
@@ -29,7 +29,7 @@ println(myid())
         return sum(r1_i .* phi - (sumpk_i .* _log_c.( 1 .+ _exp_c.(phi))))
     end
     opt.max_objective = myf
-    pars_i = [copy(parameters.a), copy(parameters.b)]
+    pars_i = [parameters.a, parameters.b]
     opt_f = Array{Cdouble}(undef, 1)
     ccall(
         (:nlopt_optimize, NLopt.libnlopt),
@@ -39,6 +39,14 @@ println(myid())
         pars_i,
         opt_f,
     )
+    println(ccall(
+        (:nlopt_optimize, NLopt.libnlopt),
+        NLopt.Result,
+        (NLopt._Opt, Ptr{Cdouble}, Ptr{Cdouble}),
+        opt,
+        pars_i,
+        opt_f,
+    ))
     parameters.a = pars_i[1]
     parameters.b = pars_i[2]
     return parameters::Parameters2PL
