@@ -1,6 +1,11 @@
 using Distributed
 using Distributions
-#@everywhere using Pkg; Pkg.activate(".");
+using Pkg
+Pkg.activate(".")
+using Psychometrics
+
+@everywhere using Pkg
+@everywhere Pkg.activate(".")
 @everywhere using Psychometrics
 
 function est()
@@ -79,7 +84,6 @@ function est()
         responses;
         dist = dist,
         method = "mmle",
-        quick = false,
         rescale_latent = true,
         metric = metric,
         max_iter = 500,

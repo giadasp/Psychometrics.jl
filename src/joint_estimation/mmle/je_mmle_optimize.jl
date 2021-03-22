@@ -1,7 +1,12 @@
 function optimize(je_mmle_model::JointEstimationMMLEModel)
-    parameters = je_mmle_model.parameters
-    latents = je_mmle_model.latents
-    dist = je_mmle_model.dist
+    local parameters = je_mmle_model.parameters
+    local latents = je_mmle_model.latents
+    local dist = je_mmle_model.dist
+    local n_index = je_mmle_model.n_index
+    local i_index = je_mmle_model.i_index
+    local responses_per_item = je_mmle_model.responses_per_item
+    local responses_per_examinee = je_mmle_model.responses_per_examinee
+
 
     I = size(parameters, 1)
     N = size(latents, 1)
@@ -19,39 +24,47 @@ function optimize(je_mmle_model::JointEstimationMMLEModel)
     old_pars = hcat(_get_parameters_vals.(parameters)...)
     start_time = time()
 
-    # latents = pmap(
-    #     (l, idx, r) -> 
-    #         l.assessed || _update_posterior(l, parameters[idx], r),
-    #     latents,
-    #     je_mmle_model.i_index,
-    #     je_mmle_model.responses_per_examinee,
-    #     batch_size = batch_size_N,
-    #     distributed = true
-    # )
+    latents = pmap(
+        (l, idx, r) -> 
+            l.assessed || _update_posterior(l, parameters[idx], r),
+        latents,
+        i_index,
+        responses_per_examinee,
+        batch_size = batch_size_N,
+        distributed = true
+    )
     # Threads.@threads for n in 1:N
-    #     latents[n] = latents[n].assessed || _update_posterior(latents[n], parameters[je_mmle_model.i_index[n]], je_mmle_model.responses_per_examinee[n])
+    #     latents[n] = latents[n].assessed || _update_posterior(latents[n], parameters[i_index[n]], responses_per_examinee[n])
     # end
-    @sync @distributed for n in 1:N
-        latents[n] = latents[n].assessed || _update_posterior(latents[n], parameters[je_mmle_model.i_index[n]], je_mmle_model.responses_per_examinee[n])
-    end
-
+    # latents = @sync @distributed (vcat) for n in 1:N
+    #     if latents[n].assessed 
+    #         latents[n]
+    #     else
+    #         _update_posterior(latents[n], parameters[i_index[n]], responses_per_examinee[n])
+    #     end
+    # end
     while !stop
         # calibrate items
-        @distributed for i in 1:I
-           parameters[i] = parameters[i].calibrated || m_step(parameters[i], latents[je_mmle_model.n_index[i]], je_mmle_model.responses_per_item[i], je_mmle_model.int_opt_settings)
-        end
-        # Threads.@threads for i in 1:I
-        #     parameters[i] = parameters[i].calibrated || _calibrate_item_mmle(parameters[i], latents[je_mmle_model.n_index[i]], je_mmle_model.responses_per_item[i], je_mmle_model.int_opt_settings)
+
+        # parameters = @sync @distributed (vcat) for i in 1:I
+        #     if parameters[i].calibrated
+        #         parameters[i]
+        #     else
+        #         m_step(parameters[i], latents[n_index[i]], responses_per_item[i], je_mmle_model.int_opt_settings)
+        #     end
         # end
-        # parameters = pmap(
-        #      (p, idx, r) ->
-        #          p.calibrated || m_step(p, latents[idx], r, je_mmle_model.int_opt_settings),
-        #      parameters,
-        #      je_mmle_model.n_index,
-        #      je_mmle_model.responses_per_item,
-        #      batch_size = batch_size_I,
-        #      distributed = true
-        # )
+        # Threads.@threads for i in 1:I
+        #     parameters[i] = parameters[i].calibrated || _calibrate_item_mmle(parameters[i], latents[n_index[i]], responses_per_item[i], je_mmle_model.int_opt_settings)
+        # end
+        parameters = pmap(
+             (p, idx, r) ->
+                 p.calibrated || m_step(p, latents[idx], r, je_mmle_model.int_opt_settings),
+             parameters,
+             n_index,
+             responses_per_item,
+             batch_size = batch_size_I,
+             distributed = true
+        )
 
         #rescale dist
         if je_mmle_model.rescale_latent
@@ -66,23 +79,27 @@ function optimize(je_mmle_model::JointEstimationMMLEModel)
         end
 
         # #update posteriors
-        Distributed.@sync Distributed.@distributed for n in 1:N
-           latents[n] = latents[n].assessed || _update_posterior(latents[n], parameters[je_mmle_model.i_index[n]], je_mmle_model.responses_per_examinee[n])
-        end
-
+ 
+        # latents = @sync @distributed (vcat) for n in 1:N
+        #     if latents[n].assessed 
+        #         latents[n]
+        #     else
+        #         _update_posterior(latents[n], parameters[i_index[n]], responses_per_examinee[n])
+        #     end
+        # end
         # Threads.@threads for n in 1:N
-        #     latents[n] = latents[n].assessed || _update_posterior(latents[n], parameters[je_mmle_model.i_index[n]], je_mmle_model.responses_per_examinee[n])
+        #     latents[n] = latents[n].assessed || _update_posterior(latents[n], parameters[i_index[n]], responses_per_examinee[n])
         # end
 
-        # latents = pmap(
-        #     (l, idx, r) -> 
-        #         l.assessed || _update_posterior(l, parameters[idx], r),
-        #     latents,
-        #     je_mmle_model.i_index,
-        #     je_mmle_model.responses_per_examinee,
-        #     batch_size = batch_size_N,
-        #     distributed = true
-        # )
+        latents = pmap(
+            (l, idx, r) -> 
+                l.assessed || _update_posterior(l, parameters[idx], r),
+            latents,
+            i_index,
+            responses_per_examinee,
+            batch_size = batch_size_N,
+            distributed = true
+        )
         if any([
             check_iter(iter; max_iter = Int64(je_mmle_model.ext_opt_settings[1])),
             check_time(start_time; max_time = Int64(je_mmle_model.ext_opt_settings[2])),

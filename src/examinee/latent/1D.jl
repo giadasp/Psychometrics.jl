@@ -108,7 +108,21 @@ function _chain_append!(latent::Latent1D; sampling = false)
     else
         push!(latent.chain, val)
     end
-    return val::Float64
+    return nothing
+end
+
+"""
+    _chain_append_and_set_val!(latent::Latent1D; sampling = false)
+"""
+function _chain_append_and_set_val!(latent::Latent1D; sampling = false)
+    val = Distributions.rand(latent.posterior)
+    if (sampling && size(latent.chain, 1) >= 1000)
+        latent.chain[Random.rand(1:1_000)] = val
+    else
+        push!(latent.chain, val)
+    end
+    latent.val = val
+    return nothing
 end
 
 

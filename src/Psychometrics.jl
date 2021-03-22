@@ -64,6 +64,7 @@ module Psychometrics
 
 import Distributions
 using Distributed
+using SharedArrays
 using Dates
 using LinearAlgebra
 using Interpolations

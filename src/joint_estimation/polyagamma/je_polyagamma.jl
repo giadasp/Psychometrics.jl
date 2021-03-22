@@ -32,13 +32,13 @@ function joint_estimate_pg!(
         end #15ms
         responses_per_item = [ Vector{Float64}(response_matrix[i, n_index[i]]) for i = 1 : I]
         responses_per_examinee = [ Vector{Float64}(response_matrix[i_index[n], n]) for n = 1 : N]
-        #set starting chain
-        map(
-            p -> begin
-                p.chain = [[p.a, p.b] for j = 1:1000]
-            end,
-            parameters,
-        );
+        # #set starting chain
+        # map(
+        #     p -> begin
+        #         p.chain = [[p.a, p.b] for j = 1:1000]
+        #     end,
+        #     parameters,
+        # );
 
     je_pg_model =  JointEstimationPolyaGammaModel(
         parameters,
@@ -53,7 +53,7 @@ function joint_estimate_pg!(
         examinee_sampling
         ) 
     parameters, latents = optimize(je_pg_model)
-    @sync @distributed for n in 1 : N
+    for n in 1 : N
         e = examinees[n]
         l = latents[n]
         examinees[n] = Examinee(e.idx, e.id, l)
@@ -63,6 +63,7 @@ function joint_estimate_pg!(
             items[n] = Item(i.idx, i.id, p)
         end
     end
+
     map(i -> update_estimate!(i), items);
     map(e -> update_estimate!(e), examinees);
     return nothing

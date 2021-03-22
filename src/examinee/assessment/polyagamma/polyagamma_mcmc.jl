@@ -8,8 +8,18 @@ function _mcmc_iter_pg(
     sampling = true
     )
         latent.posterior = __posterior(latent, parameters, responses_val, W_val) 
-        vals = _chain_append!(latent; sampling = sampling)
-        _set_val!(latent, vals)
+        _chain_append_and_set_val!(latent; sampling = sampling)
+    return latent::AbstractLatent
+end
+function _mcmc_iter_pg(
+    latent::AbstractLatent,
+    parameters::Vector{<:AbstractParameters},
+    responses_val::Vector{Float64},
+    W_val::SharedVector{Float64};
+    sampling = true
+    )
+        latent.posterior = __posterior(latent, parameters, responses_val, W_val) 
+        _chain_append_and_set_val!(latent; sampling = sampling)
     return latent::AbstractLatent
 end
 

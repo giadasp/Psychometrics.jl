@@ -8,9 +8,14 @@ using Distributed
 @everywhere using JuMP
 @everywhere using Cbc
 @everywhere using CSV
-@everywhere using Pkg; Pkg.activate("."); 
+@everywhere using Pkg
+@everywhere Pkg.activate(".")
+
 @everywhere using Psychometrics
 
+using Pkg
+Pkg.activate(".")
+using Psychometrics
 
 cd("examples/bootstrap")
 function bs()
@@ -164,7 +169,6 @@ function bs()
         examinees_est,
         responses;
         method = "mmle",
-        quick = false,
         dist = dist,
         metric = metric,
         max_iter = 500,
@@ -187,13 +191,12 @@ function bs()
         examinees_est_bs,
         responses;
         method = "mmle",
-        quick = false,
         dist = dist,
         metric = metric,
         max_iter = 500,
         max_time = 100,
-        x_tol_rel = 0.001,
-        f_tol_rel = 0.00001,
+        x_tol_rel = 0.01,
+        f_tol_rel = 0.0001,
         replications = 500,
         type = "nonparametric",
         sample_fraction = 1.0,
@@ -202,4 +205,4 @@ function bs()
 end
 examinees, examinees_est, items, items_est, responses, items_est_bs, examinees_est_bs = bs();
 @everywhere using JLD2
-@save items_est_bs "items.jld2s"
+@save items_est_bs "items_est_bs.jld2"

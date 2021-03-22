@@ -16,15 +16,15 @@ mutable struct Parameters2PL <: AbstractParametersBinary
     calibrated::Bool
 
     Parameters2PL(
-        a,
-        bounds_a,
-        b,
-        bounds_b,
-        prior,
-        posterior,
-        chain,
-        expected_information,
-        calibrated,
+        a::Float64,
+        bounds_a::Vector{Float64},
+        b::Float64,
+        bounds_b::Vector{Float64},
+        prior::Distributions.MultivariateDistribution,
+        posterior::Distributions.MultivariateDistribution,
+        chain::Vector{Vector{Float64}},
+        expected_information::Matrix{Float64},
+        calibrated::Bool,
     ) = new(
         a,
         bounds_a,
@@ -40,8 +40,8 @@ mutable struct Parameters2PL <: AbstractParametersBinary
     # Random Initializers
     function Parameters2PL(
         bivariate_dist::Distributions.MultivariateDistribution,
-        bounds_a,
-        bounds_b,
+        bounds_a::Vector{Float64},
+        bounds_b::Vector{Float64},
     )
         pars = truncate_rand(bivariate_dist, [bounds_a, bounds_b])
         return Parameters2PL(
@@ -74,7 +74,6 @@ mutable struct Parameters2PL <: AbstractParametersBinary
         par.bounds_b = bounds_b
         return par::Parameters2PL
     end
-
 end
 
 """
@@ -90,6 +89,7 @@ end
 function _set_val!(parameters::Parameters2PL, vals::Vector{Float64})
     parameters.a = vals[1]
     parameters.b = vals[2]
+    return nothing
 end
 
 """
@@ -98,6 +98,7 @@ end
 function _set_val_from_chain!(parameters::Parameters2PL)
     parameters.a = parameters.chain[end][1]
     parameters.b = parameters.chain[end][2]
+    return nothing
 end
 
 """
@@ -114,6 +115,7 @@ function _update_estimate!(parameters::Parameters2PL; sampling = true)
     end
     parameters.a = clamp(vals[1], parameters.bounds_a[1], parameters.bounds_a[2])
     parameters.b = clamp(vals[2], parameters.bounds_b[1], parameters.bounds_b[2])
+    return nothing
 end
 
 """

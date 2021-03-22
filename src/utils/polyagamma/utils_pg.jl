@@ -6,13 +6,11 @@ struct PolyaGammaSample
 end
 #extract a random value from posterior and set it as value
 function set_val_from_posterior!(item::AbstractItem; sampling = true)
-    vals = _chain_append!(item.parameters; sampling = sampling)
-    _set_val!(item.parameters, vals)
+    _chain_append_and_set_val!(item.parameters; sampling = sampling)
 end
 
 function set_val_from_posterior!(examinee::AbstractExaminee; sampling = true)
-    val = _chain_append!(examinee.latent; sampling = sampling)
-    _set_val!(examinee.latent, val)
+    _chain_append_and_set_val!(examinee.latent; sampling = sampling)
 end
 
 #take the last value of the chain and set it as value

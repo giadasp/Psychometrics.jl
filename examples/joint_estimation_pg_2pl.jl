@@ -1,8 +1,15 @@
 using Distributed
 using Distributions
-# @everywhere using Pkg;
-# Pkg.activate(".");
+
+@everywhere using Pkg
+@everywhere Pkg.activate(".")
+
 @everywhere using Psychometrics
+
+using Pkg
+Pkg.activate(".")
+using Psychometrics
+
 
 function est_pg()
     I_total = 50
@@ -44,7 +51,7 @@ function est_pg()
     ]
     map(i -> i.parameters.a = 1.0, items_est)
     map(i -> i.parameters.b = 0.0, items_est)
-
+    map(i -> empty_chain!(i), items_est)
 
     examinees_est = [
         Examinee(e, string("examinee_", e), Latent1D(Normal(0, 1), [-6.0, 6.0])) for
@@ -55,14 +62,14 @@ function est_pg()
         examinees_est[n].latent.val = 0.0
         #examinees_est[n].latent.prior = Normal(examinees[n].latent.val, 0.3)
     end
+    map(i -> empty_chain!(i), examinees_est)
 
     joint_estimate!(
         items_est,
         examinees_est,
         responses;
         method = "pg",
-        quick = true,
-        mcmc_iter = 2000,
+        mcmc_iter = 4000,
         max_time = 400,
         item_sampling = false,
         examinee_sampling = false,

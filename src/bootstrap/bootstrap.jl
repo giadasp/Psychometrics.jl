@@ -4,7 +4,6 @@ function bootstrap!(
     examinees::Vector{Examinee},
     responses::Vector{Response};
     method = "mmle", #"polyagamma"
-    quick = false,
     replications = 100,
     type = "parametric",
     sample_fraction = 0.9,
@@ -19,8 +18,8 @@ function bootstrap!(
     starting_latents = get_latents_vals(examinees)
     N = size(starting_latents, 2)
     n_latents = size(starting_latents, 1)
-
-    for r = 1:replications
+    chain = SharedVector{Vector{Vector{Float64}}}(undef, replications)
+    @sync @distributed for r = 1 : replications
         println("Replication: ", r)
         if type == "nonparametric"
             n_sample = non_parametric_sample(N, sample_fraction)
@@ -75,25 +74,14 @@ function bootstrap!(
         items_r = map(i -> i, items)
         n_not_sampled = setdiff(collect(1:N), n_sample)
         if method == "mmle"
-            if quick
-                if items[1].parameters isa Parameters2PL
-                    joint_estimate_mmle_2pl_quick!(items_r, examinees_r, responses_r; rescale_latent = false, kwargs...)
-                else
-                    error("Only 2pl items are supported in quick mode")
-                end
-            else
-                joint_estimate_mmle!(items_r, examinees_r, responses_r; rescale_latent = false, kwargs...)
-            end
+            joint_estimate_mmle!(items_r, examinees_r, responses_r; rescale_latent = false, kwargs...)
         elseif method == "polyagamma"
-            if quick
-                joint_estimate_pg_quick!(items_r, examinees_r, responses_r; kwargs...)
-            else
-                joint_estimate_pg!(items_r, examinees_r, responses_r; kwargs...)
-            end
+            joint_estimate_pg!(items_r, examinees_r, responses_r; kwargs...)
         else
             error("Estimation method can be \"mmle\" or \"polyagamma\".")
         end
-        map( ( i_r , i ) -> push!(i.parameters.chain, get_parameters_vals(i_r)), items_r, items)  
+        chain[r] = map(i_r -> get_parameters_vals(i_r), items_r)
     end  
+    map(i -> items[i].parameters.chain = map(c_r -> Vector{Float64}(c_r[i]), chain), 1 : I_total)
     return items, examinees
 end

@@ -8,8 +8,19 @@ function _mcmc_iter_pg(
     sampling = true,
     )
         parameters.posterior = __posterior(parameters, latents, responses_val, W_val) 
-        vals = _chain_append!(parameters; sampling = sampling)
-        _set_val!(parameters, vals)
+        _chain_append_and_set_val!(parameters; sampling = sampling)
+    return parameters::AbstractParameters
+end
+
+function _mcmc_iter_pg(
+    parameters::AbstractParameters,
+    latents::Vector{<:AbstractLatent},
+    responses_val::Vector{Float64},
+    W_val::SharedVector{Float64};
+    sampling = true,
+    )
+        parameters.posterior = __posterior(parameters, latents, responses_val, W_val) 
+        _chain_append_and_set_val!(parameters; sampling = sampling)
     return parameters::AbstractParameters
 end
 
@@ -26,7 +37,8 @@ function mcmc_iter_pg!(
         sort!(responses, by = r -> r.examinee_idx)
     end
     update_posterior!(item, examinees, responses, W; already_sorted = true)
-    set_val_from_posterior!(item; sampling = sampling)
+    _chain_append_and_set_val!(item.parameters; sampling = sampling)
+    return nothing
 end
 
 function _calibrate_item_pg(

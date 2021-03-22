@@ -99,5 +99,38 @@ function _chain_append!(parameters::Union{Parameters2PL,Parameters3PL}; sampling
     else
         push!(parameters.chain, val)
     end
-    return val::Vector{Float64}
+    return nothing
 end
+
+
+"""
+    _chain_append_and_set_val!(parameters::Parameters3PL; sampling = false)
+"""
+function _chain_append_and_set_val!(parameters::Parameters3PL; sampling = false)
+    val = Distributions.rand(parameters.posterior)
+    if (sampling && size(parameters.chain, 1) >= 1000)
+        parameters.chain[Random.rand(1:1000)] = val
+    else
+        push!(parameters.chain, val)
+    end
+    parameters.a = val[1]
+    parameters.b = val[2]
+    parameters.c = val[3]
+    return nothing
+end
+
+"""
+    _chain_append_and_set_val!(parameters::Parameters2PL; sampling = false)
+"""
+function _chain_append_and_set_val!(parameters::Parameters2PL; sampling = false)
+    val = Distributions.rand(parameters.posterior)
+    if (sampling && size(parameters.chain, 1) >= 1000)
+        parameters.chain[Random.rand(1:1000)] = val
+    else
+        push!(parameters.chain, val)
+    end
+    parameters.a = val[1]
+    parameters.b = val[2]
+    return nothing
+end
+
