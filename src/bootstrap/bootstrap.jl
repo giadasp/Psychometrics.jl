@@ -18,7 +18,7 @@ function bootstrap!(
     starting_latents = get_latents_vals(examinees)
     N = size(starting_latents, 2)
     n_latents = size(starting_latents, 1)
-    chain = SharedVector{Vector{Vector{Float64}}}(undef, replications)
+    chain = Vector{Vector{Vector{Float64}}}(undef, replications)
     @sync @distributed for r = 1 : replications
         println("Replication: ", r)
         if type == "nonparametric"
