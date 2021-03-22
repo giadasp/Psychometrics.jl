@@ -89,6 +89,7 @@ function est()
         max_iter = 500,
         max_time = 100,
         x_tol_rel = 0.001,
+        super_fast_2pl_1d = true
     )
     println("a RMSE")
     println(

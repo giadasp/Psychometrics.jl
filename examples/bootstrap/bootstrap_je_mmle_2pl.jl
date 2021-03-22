@@ -7,12 +7,12 @@ using DelimitedFiles
 using JuMP
 using Cbc
 using CSV
-@everywhere using Pkg; Pkg.activate(".")
+# @everywhere using Pkg; Pkg.activate(".")
 
+# @everywhere using Psychometrics
+
+#using Pkg; Pkg.activate(".")
 @everywhere using Psychometrics
-
-using Pkg; Pkg.activate(".")
-using Psychometrics
 
 cd("examples/bootstrap")
 function bs()

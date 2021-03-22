@@ -64,10 +64,14 @@ function max_i(
     sumpk_i::Vector{Float64},
     r1_i::Vector{Float64},
     pars_i::Vector{Float64},
-    opt::NLopt.Opt,
     bounds::Vector{Vector{Float64}},
+    opt_settings::Vector{Float64}
 )
     new_pars_i = copy(pars_i)
+    opt = NLopt.Opt(:LD_SLSQP, 2)
+    opt.maxtime = opt_settings[1]
+    opt.xtol_rel = opt_settings[2]
+    opt.ftol_rel = opt_settings[3]
     function myf(x::Vector, grad::Vector)
         n_par = size(x, 1)
         if n_par == 2
@@ -135,14 +139,10 @@ function max_LH_MMLE!(
         zero(Float64),
         r1,
     )# r1 KxI
-    opt = NLopt.Opt(:LD_SLSQP, 2)
-    opt.maxtime = opt_settings[1]
-    opt.xtol_rel = opt_settings[2]
-    opt.ftol_rel = opt_settings[3]
 
     #opt.maxeval=50
     pars_start = Distributed.@sync Distributed.@distributed (hcat) for i = 1:n_items
-        max_i(X, sumpk[:, i], r1[:, i], pars_start[:, i], opt, bounds[i])
+        max_i(X, sumpk[:, i], r1[:, i], pars_start[:, i], bounds[i], opt_settings)
     end
     LinearAlgebra.BLAS.gemm!('N', 'N', one(Float64), X, pars_start, zero(Float64), phi)# phi=New_pars*X1', if A'*B then 'T', 'N'
     return nothing
