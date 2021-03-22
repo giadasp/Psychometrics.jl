@@ -1,11 +1,11 @@
 using Distributed
 using Distributions
-using Pkg
-Pkg.activate(".")
-using Psychometrics
+# using Pkg
+# Pkg.activate(".")
+# using Psychometrics
 
-@everywhere using Pkg
-@everywhere Pkg.activate(".")
+# @everywhere using Pkg
+# @everywhere Pkg.activate(".")
 @everywhere using Psychometrics
 
 function est()

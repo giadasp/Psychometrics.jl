@@ -89,6 +89,7 @@ function max_i(
         return sum(r1_i .* y - (sumpk_i .* _log_c.( 1 .+ _exp_c.(y))))
     end
     opt.max_objective = myf
+    println(bounds)
     opt.lower_bounds = [bounds[1][1], bounds[2][1]]
     opt.upper_bounds = [bounds[1][2], bounds[2][2]]
     opt_f = Array{Cdouble}(undef, 1)
