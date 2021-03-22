@@ -72,6 +72,8 @@ function max_i(
     opt.maxtime = opt_settings[1]
     opt.xtol_rel = opt_settings[2]
     opt.ftol_rel = opt_settings[3]
+    opt.lower_bounds = [bounds[1][1], bounds[2][1]]
+    opt.upper_bounds = [bounds[1][2], bounds[2][2]]
     function myf(x::Vector, grad::Vector)
         n_par = size(x, 1)
         if n_par == 2
@@ -89,9 +91,6 @@ function max_i(
         return sum(r1_i .* y - (sumpk_i .* _log_c.( 1 .+ _exp_c.(y))))
     end
     opt.max_objective = myf
-    println(bounds)
-    opt.lower_bounds = [bounds[1][1], bounds[2][1]]
-    opt.upper_bounds = [bounds[1][2], bounds[2][2]]
     opt_f = Array{Cdouble}(undef, 1)
     ccall(
         (:nlopt_optimize, NLopt.libnlopt),
@@ -146,7 +145,7 @@ function max_LH_MMLE!(
         max_i(X, sumpk[:, i], r1[:, i], pars_start[:, i], bounds[i], opt_settings)
     end
     LinearAlgebra.BLAS.gemm!('N', 'N', one(Float64), X, pars_start, zero(Float64), phi)# phi=New_pars*X1', if A'*B then 'T', 'N'
-    return nothing
+    return pars_start::Matrix{Float64}
 end
 
 function optimize_2pl_1d_super_fast(je_mmle_model::JointEstimationMMLEModel)
@@ -174,7 +173,7 @@ function optimize_2pl_1d_super_fast(je_mmle_model::JointEstimationMMLEModel)
     old_likelihood = -Inf
     old_pars = hcat(_get_parameters_vals.(parameters)...)
     #change parametrization form a(t-b) to b+at
-    old_pars[2, :] = .-old_pars[2, :] ./ old_pars[1, :]
+    old_pars[2, :] = .-old_pars[2, :] .* old_pars[1, :]
     old_pars_2 = copy(old_pars)
     old_pars[1, :] = copy(old_pars_2[2, :])
     old_pars[2, :] = copy(old_pars_2[1, :])
@@ -214,7 +213,7 @@ function optimize_2pl_1d_super_fast(je_mmle_model::JointEstimationMMLEModel)
 
     while !stop
         # calibrate items
-        max_LH_MMLE!(
+        new_pars = max_LH_MMLE!(
             new_pars,
             phi,
             posterior,
@@ -249,7 +248,7 @@ function optimize_2pl_1d_super_fast(je_mmle_model::JointEstimationMMLEModel)
                 observed[2] / je_mmle_model.metric[2],
             ]
             #check mean
-            if  (abs(observed[1]) > 1e-4 ) || (abs(observed[2] -1.0) < 0.9999)
+            if  (abs(observed[1]) > 1e-4 ) || (abs(observed[2] - 1.0) > 1e-4)
                 Xk2, Wk2 = my_rescale(Xk, Wk, observed)
                 Wk = cubic_spline_int(Xk, Xk2, Wk2)
             end
@@ -274,17 +273,17 @@ function optimize_2pl_1d_super_fast(je_mmle_model::JointEstimationMMLEModel)
         iter += 1
     end
     #change parametrization form a(t-b) to b+at
-    new_pars[:, 2] = -new_pars[:, 2]*new_pars[:, 1]
+    new_pars[1, :] = .-new_pars[1, :] ./ new_pars[2, :]
     map(i -> begin
             parameters[i].a = new_pars[2, i]
-            parameters[i].b = new_pars[2, i]
+            parameters[i].b = new_pars[1, i]
         end
         ,1 : I)
 
     map(n -> begin
-            latents[n].posterior = posterior[n, :]
+            latents[n].posterior = Distributions.DiscreteNonParametric(Xk, posterior[n, :])
         end
-        ,1 : I)
-    dist = DiscreteNonParametric(Xk, Wk)
+        ,1 : N)
+    dist = Distributions.DiscreteNonParametric(Xk, Wk)
     return parameters::Vector{<:AbstractParameters}, latents::Vector{<:AbstractLatent}, dist::Distributions.DiscreteUnivariateDistribution
 end
