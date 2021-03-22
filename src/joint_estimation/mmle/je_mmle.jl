@@ -1,5 +1,7 @@
 include("je_mmle_struct.jl")
 include("je_mmle_optimize.jl")
+include("je_mmle_optimize_2pl_1d_super_fast.jl")
+
 
 function joint_estimate_mmle!(
     items::Vector{<:AbstractItem},
@@ -15,6 +17,7 @@ function joint_estimate_mmle!(
     int_opt_x_tol_rel::Float64 = 0.0001,
     int_opt_f_tol_rel::Float64 = 0.000001,
     rescale_latent::Bool = true,
+    super_fast_2pl_1d = false,
     kwargs...
     )
     I = size(items, 1)
@@ -54,7 +57,12 @@ function joint_estimate_mmle!(
         [Float64(max_iter), Float64(max_time), x_tol_rel, f_tol_rel],
         [int_opt_max_time, int_opt_x_tol_rel, int_opt_f_tol_rel]
     )
-    parameters, latents, dist = optimize(je_mmle_model)
+
+    if !super_fast_2pl_1d
+        parameters, latents, dist = optimize(je_mmle_model)
+    else
+        parameters, latents, dist = optimize_2pl_1d_super_fast(je_mmle_model)
+    end
 
     for n in 1 : N
         l = copy(latents[n])

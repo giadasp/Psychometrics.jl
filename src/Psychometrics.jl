@@ -61,35 +61,37 @@ Main module for `Psychometrics.jl` -- A Julia package that provides tools for ps
     joint_estimation!
 """
 module Psychometrics
+import Distributed
+   using NLopt
 
-import Distributions
-using Distributed
-using SharedArrays
-using Dates
-using LinearAlgebra
-using Interpolations
-using NLopt
-import Base.copy
-using Requires
+    import Distributions
+    import SharedArrays
+    import Dates
+    import LinearAlgebra
+    import Interpolations
+    import Random
+    import SpecialFunctions
+    import Base.copy
+    using Requires
 
-include("utils/math/utils_math.jl")
-include("distributions/distributions.jl")
-include("examinee/examinee.jl")
-include("examinee/examinees.jl")
-include("item/item.jl")
-include("item/items.jl")
-include("response.jl")
-include("probability.jl")
-include("likelihood.jl")
-include("utils/polyagamma/utils_pg.jl")
-include("posterior/posterior.jl")
-include("information/information.jl")
-include("online/online.jl")
-include("utils/mmle/utils_mmle.jl")
-include("item/calibration/calibration.jl")
-include("examinee/assessment/assessment.jl")
-include("joint_estimation/joint_estimation.jl")
-include("bootstrap/bootstrap.jl")
+    include("utils/math/utils_math.jl")
+    include("distributions/distributions.jl")
+    include("examinee/examinee.jl")
+    include("examinee/examinees.jl")
+    include("item/item.jl")
+    include("item/items.jl")
+    include("response.jl")
+    include("probability.jl")
+    include("likelihood.jl")
+    include("utils/polyagamma/utils_pg.jl")
+    include("posterior/posterior.jl")
+    include("information/information.jl")
+    include("online/online.jl")
+    include("utils/mmle/utils_mmle.jl")
+    include("item/calibration/calibration.jl")
+    include("examinee/assessment/assessment.jl")
+    include("joint_estimation/joint_estimation.jl")
+    include("bootstrap/bootstrap.jl")
 
 export 
     TruncatedInverseGaussian,

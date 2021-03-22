@@ -19,7 +19,7 @@ function bootstrap!(
     N = size(starting_latents, 2)
     n_latents = size(starting_latents, 1)
     chain = Vector{Vector{Vector{Float64}}}(undef, replications)
-    @sync @distributed for r = 1 : replications
+    Distributed.@sync  Distributed.@distributed for r = 1 : replications
         println("Replication: ", r)
         if type == "nonparametric"
             n_sample = non_parametric_sample(N, sample_fraction)

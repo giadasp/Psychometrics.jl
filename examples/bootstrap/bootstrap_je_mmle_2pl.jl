@@ -1,20 +1,17 @@
-using Distributed
-@everywhere using Distributions
-@everywhere using StatsBase
-@everywhere using Interpolations
-@everywhere using ATA
-@everywhere using DataFrames
-@everywhere using DelimitedFiles
-@everywhere using JuMP
-@everywhere using Cbc
-@everywhere using CSV
-@everywhere using Pkg
-@everywhere Pkg.activate(".")
+using Distributions
+using StatsBase
+using Interpolations
+using ATA
+using DataFrames
+using DelimitedFiles
+using JuMP
+using Cbc
+using CSV
+@everywhere using Pkg; Pkg.activate(".")
 
 @everywhere using Psychometrics
 
-using Pkg
-Pkg.activate(".")
+using Pkg; Pkg.activate(".")
 using Psychometrics
 
 cd("examples/bootstrap")
@@ -174,6 +171,8 @@ function bs()
         max_iter = 500,
         max_time = 500,
         x_tol_rel = 0.0001,
+        super_fast_2pl_1d = true,
+
         );
 
         println("a RMSE")
@@ -200,6 +199,7 @@ function bs()
         replications = 500,
         type = "nonparametric",
         sample_fraction = 1.0,
+        super_fast_2pl_1d = true,
         )
     return examinees, examinees_est, items, items_est, responses, items_est_bs, examinees_est_bs
 end

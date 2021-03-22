@@ -51,6 +51,7 @@ function check_f_tol_rel!(
         return false
     end
 end
+
 function check_f_tol_rel!(
     latents::Vector{<:AbstractLatent},
     old_likelihood::Float64;
@@ -87,6 +88,25 @@ function check_f_tol_rel!(
         return true
     else
         old_likelihood = copy(new_likelihood)
+        return false
+    end
+end
+
+function check_x_tol_rel!(
+    new_pars::Matrix{Float64},
+    old_pars::Matrix{Float64};
+    x_tol_rel::Float64 = 0.0001
+)
+    delta_pars =  maximum(abs.((new_pars - old_pars) ./ old_pars))
+    println("x_rel max: ", delta_pars)
+    if delta_pars <= x_tol_rel
+        println(
+           "X ToL reached"
+        )
+        old_pars .= new_pars
+        return true
+    else
+        old_pars .= new_pars
         return false
     end
 end

@@ -16,7 +16,7 @@ function _mcmc_iter_pg(
     parameters::AbstractParameters,
     latents::Vector{<:AbstractLatent},
     responses_val::Vector{Float64},
-    W_val::SharedVector{Float64};
+    W_val::SharedArrays.SharedVector{Float64};
     sampling = true,
     )
         parameters.posterior = __posterior(parameters, latents, responses_val, W_val) 
