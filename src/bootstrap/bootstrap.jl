@@ -22,13 +22,13 @@ function bootstrap!(
     Distributed.@sync  Distributed.@distributed for r = 1 : replications
         println("Replication: ", r)
         if type == "nonparametric"
-            n_sample = non_parametric_sample(N, sample_fraction)
-            #loop until all items have at least a response
-            examinees_sampled = examinees[n_sample]
-            responses_sampled = vcat(map( e -> get_responses_by_examinee_id(e.id, responses), examinees_sampled)...)
-            n_responses_sampled_per_item = map( i -> size(get_responses_by_item_id(i.id, responses_sampled), 1), items)
-            while minimum(n_responses_sampled_per_item) < I
+            n_responses_sampled_per_item = zeros(I)
+            while minimum(n_responses_sampled_per_item) < 1
                 n_sample = non_parametric_sample(N, sample_fraction)
+                #loop until all items have at least a response
+                examinees_sampled = examinees[n_sample]
+                responses_sampled = vcat(map( e -> get_responses_by_examinee_id(e.id, responses), examinees_sampled)...)
+                n_responses_sampled_per_item = map( i -> size(get_responses_by_item_id(i.id, responses_sampled), 1), items)
             end
         elseif type == "parametric" && method == "mmle"
             #discrete ability distribution
@@ -45,18 +45,18 @@ function bootstrap!(
                 return_breaks = false,
                 return_mid_points = true,
             )
-            n_sample = parametric_sample(N, sample_fraction, bins, dist)
-            #loop until all items have at least a response
-            examinees_sampled = examinees[n_sample]
-            responses_sampled = vcat(map( e -> get_responses_by_examinee_id(e.id, responses), examinees_sampled)...)
-            n_responses_sampled_per_item = map( i -> size(get_responses_by_item_id(i.id, responses_sampled), 1), items)
-            while minimum(n_responses_sampled_per_item) < I
+            n_responses_sampled_per_item = zeros(I)
+            while minimum(n_responses_sampled_per_item) < 1
                 n_sample = parametric_sample(N, sample_fraction, bins, dist)
+                #loop until all items have at least a response
+                examinees_sampled = examinees[n_sample]
+                responses_sampled = vcat(map( e -> get_responses_by_examinee_id(e.id, responses), examinees_sampled)...)
+                n_responses_sampled_per_item = map( i -> size(get_responses_by_item_id(i.id, responses_sampled), 1), items)
             end
-                println("Number of examinees sample in replication ",r," : ", size(n_sample, 1))
             else
             error("Bootstrap type can be \"parametric\" (only mmle) or \"nonparametric\".") 
         end
+        println("Number of examinees sample in replication ",r," : ", size(n_sample, 1))
         #must change examinees idx and examinee_idx ow get_response_matrix does not work well
         examinees_r = Examinee[]
         responses_r = Response[]
