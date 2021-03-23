@@ -53,7 +53,7 @@ function bootstrap!(
                 responses_sampled = vcat(map( e -> get_responses_by_examinee_id(e.id, responses), examinees_sampled)...)
                 n_responses_sampled_per_item = map( i -> size(get_responses_by_item_id(i.id, responses_sampled), 1), items)
             end
-            else
+        else
             error("Bootstrap type can be \"parametric\" (only mmle) or \"nonparametric\".") 
         end
         println("Number of examinees sample in replication ",r," : ", size(n_sample, 1))
