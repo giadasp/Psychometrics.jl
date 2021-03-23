@@ -16,6 +16,7 @@ function joint_estimate_mmle!(
     int_opt_max_time::Float64 = 100.0,
     int_opt_x_tol_rel::Float64 = 0.00001,
     int_opt_f_tol_rel::Float64 = 0.0000001,
+    verbosity::Int64 = 2,
     rescale_latent::Bool = true,
     super_fast_2pl_1d = false,
     kwargs...
@@ -54,7 +55,7 @@ function joint_estimate_mmle!(
         copy(dist),
         metric,
         rescale_latent,
-        [Float64(max_iter), Float64(max_time), x_tol_rel, f_tol_rel],
+        [Float64(max_iter), Float64(max_time), x_tol_rel, f_tol_rel, Float64(verbosity)],
         [int_opt_max_time, int_opt_x_tol_rel, int_opt_f_tol_rel]
     )
 

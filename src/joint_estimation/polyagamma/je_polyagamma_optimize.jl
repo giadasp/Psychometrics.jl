@@ -56,8 +56,8 @@ function optimize(je_pg_model::JointEstimationPolyaGammaModel)
             end
             if (iter % 200) == 0
                 if any([
-                    check_iter(iter; max_iter = je_pg_model.mcmc_iterations),
-                    check_time(start_time; max_time = je_pg_model.max_time),
+                    check_iter(iter; max_iter = Int(ext_opt_settings[1]), verbosity = Int(ext_opt_settings[5])),
+                    check_time(start_time; max_time = Int(ext_opt_settings[2]), verbosity = Int(ext_opt_settings[5])),
                     # check_x_tol_rel!(
                     #     items,
                     #     old_pars;

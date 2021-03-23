@@ -47,10 +47,9 @@ function joint_estimate_pg!(
         responses_per_examinee,
         n_index,
         i_index,
-        mcmc_iter,
-        max_time,
         item_sampling,
-        examinee_sampling
+        examinee_sampling,
+        [Float64(mcmc_iter), Float64(mcmc_iter), Float64(verbosity)]
         ) 
     parameters, latents = optimize(je_pg_model)
     for n in 1 : N

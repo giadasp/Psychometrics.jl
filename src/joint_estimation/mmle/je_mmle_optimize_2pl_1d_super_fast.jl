@@ -255,17 +255,19 @@ function optimize_2pl_1d_super_fast(je_mmle_model::JointEstimationMMLEModel)
             end
         end
         if any([
-            check_iter(iter; max_iter = Int64(je_mmle_model.ext_opt_settings[1])),
-            check_time(start_time; max_time = Int64(je_mmle_model.ext_opt_settings[2])),
+            check_iter(iter; max_iter = Int64(je_mmle_model.ext_opt_settings[1], verbosity = Int(ext_opt_settings[5]))),
+            check_time(start_time; max_time = Int64(je_mmle_model.ext_opt_settings[2], verbosity = Int(ext_opt_settings[5]))),
             check_f_tol_rel!(
                 new_likelihood,
                 old_likelihood;
-                f_tol_rel = je_mmle_model.ext_opt_settings[3]
+                f_tol_rel = je_mmle_model.ext_opt_settings[3],
+                verbosity = Int(ext_opt_settings[5])
                 ),
             check_x_tol_rel!(
                 new_pars,
                 old_pars;
-                x_tol_rel = je_mmle_model.ext_opt_settings[4]
+                x_tol_rel = je_mmle_model.ext_opt_settings[4],
+                verbosity = Int(ext_opt_settings[5])
             )]
             )
             stop = true
