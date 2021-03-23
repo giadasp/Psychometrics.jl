@@ -20,7 +20,7 @@ function bootstrap!(
     n_latents = size(starting_latents, 1)
     chain = Vector{Vector{Vector{Float64}}}(undef, replications)
     n_sample = Int64[]
-    Distributed.@sync Distributed.@distributed for r = 1 : replications
+    chain = Distributed.@sync Distributed.@distributed (vcat) for r = 1 : replications
         println("Replication: ", r)
         if type == "nonparametric"
             n_responses_sampled_per_item = zeros(I)
@@ -81,7 +81,7 @@ function bootstrap!(
         else
             error("Estimation method can be \"mmle\" or \"polyagamma\".")
         end
-        chain[r] = map(i_r -> get_parameters_vals(i_r), items_r)
+        [map(i_r -> get_parameters_vals(i_r), items_r)]
     end  
     map(i -> items[i].parameters.chain = map(c_r -> c_r[i], chain), 1 : I)
     return items::Vector{Item}, examinees::Vector{Examinee}
