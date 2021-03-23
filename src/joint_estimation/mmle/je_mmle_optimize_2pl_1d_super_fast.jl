@@ -252,7 +252,7 @@ function optimize_2pl_1d_super_fast(je_mmle_model::JointEstimationMMLEModel)
                 Xk2, Wk2 = my_rescale(Xk, Wk, observed)
                 Wk = cubic_spline_int(Xk, Xk2, Wk2)
             end
-            X = hcat(ones(K), Xk2)
+            X = hcat(ones(K), Xk2[2:(K+1)])
         end
         if any([
             check_iter(iter; max_iter = Int64(je_mmle_model.ext_opt_settings[1])),
