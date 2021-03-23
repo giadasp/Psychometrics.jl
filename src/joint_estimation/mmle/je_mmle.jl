@@ -14,8 +14,8 @@ function joint_estimate_mmle!(
     x_tol_rel::Float64 = 0.0001,
     f_tol_rel::Float64 = 0.000001,
     int_opt_max_time::Float64 = 100.0,
-    int_opt_x_tol_rel::Float64 = 0.0001,
-    int_opt_f_tol_rel::Float64 = 0.000001,
+    int_opt_x_tol_rel::Float64 = 0.00001,
+    int_opt_f_tol_rel::Float64 = 0.0000001,
     rescale_latent::Bool = true,
     super_fast_2pl_1d = false,
     kwargs...
