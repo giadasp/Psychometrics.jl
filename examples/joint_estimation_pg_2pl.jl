@@ -73,6 +73,7 @@ function est_pg()
         max_time = 400,
         item_sampling = false,
         examinee_sampling = false,
+        verbosity = 2, #default
     )
 
     println("a RMSE")
