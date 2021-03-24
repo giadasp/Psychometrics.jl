@@ -248,11 +248,11 @@ function optimize_2pl_1d_super_fast(je_mmle_model::JointEstimationMMLEModel)
                 observed[2] / je_mmle_model.metric[2],
             ]
             #check mean
-            if  (abs(observed[1]) > 1e-4 ) || (abs(observed[2] - 1.0) > 1e-4)
+            #if  (abs(observed[1]) > 1e-4 ) || (abs(observed[2] - 1.0) > 1e-4)
                 Xk2, Wk2 = my_rescale(Xk, Wk, observed)
                 Wk = cubic_spline_int(Xk, Xk2, Wk2)
                 X = hcat(ones(K), Xk2[2:(K+1)])
-            end
+            #end
         end
         if any([
             check_iter(iter; max_iter = Int64(je_mmle_model.ext_opt_settings[1]), verbosity = Int(je_mmle_model.ext_opt_settings[5])),

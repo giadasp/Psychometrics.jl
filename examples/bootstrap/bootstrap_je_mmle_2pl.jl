@@ -172,8 +172,7 @@ function bs()
         max_time = 500,
         x_tol_rel = 0.0001,
         super_fast_2pl_1d = true,
-
-        );
+    );
 
         println("a RMSE")
         println(sqrt(StatsBase.mean(map( (i, i_est) -> (i.parameters.a-i_est.parameters.a)^2, items, items_est))))
