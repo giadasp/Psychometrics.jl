@@ -66,18 +66,7 @@ function optimize(je_mmle_model::JointEstimationMMLEModel)
              distributed = true
         )
 
-        #rescale dist
-        if je_mmle_model.rescale_latent
-            dist = _rescale(
-                dist,
-                latents;
-                metric = je_mmle_model.metric
-            )
-            for n = 1:N
-                latents[n].prior = dist
-            end
-        end
-
+        
         # #update posteriors
  
         # latents = @sync @distributed (vcat) for n in 1:N
@@ -100,6 +89,18 @@ function optimize(je_mmle_model::JointEstimationMMLEModel)
             batch_size = batch_size_N,
             distributed = true
         )
+        #rescale dist
+        if je_mmle_model.rescale_latent
+            dist = _rescale(
+                dist,
+                latents;
+                metric = je_mmle_model.metric
+            )
+            for n = 1:N
+                latents[n].prior = dist
+            end
+        end
+
         if any([
             check_iter(iter; max_iter = Int64(je_mmle_model.ext_opt_settings[1]), verbosity = Int(je_mmle_model.ext_opt_settings[5])),
             check_time(start_time; max_time = Int64(je_mmle_model.ext_opt_settings[2]), verbosity = Int(je_mmle_model.ext_opt_settings[5])),
