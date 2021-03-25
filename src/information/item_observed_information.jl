@@ -54,7 +54,7 @@ It is equal to the item expected information.
 - **`response_val::Float64`** : Required. A scalar response. 
 
 # Output
-A ``2 \\times 2`` matrix of the observed (expected) informations. 
+A ``2 \times 2`` matrix of the observed (expected) informations. 
 """
 function _item_observed_information(
     parameters::Parameters2PL,
@@ -79,7 +79,7 @@ _item_observed_information(
 # Description
 
 It computes the observed information (-second derivative of the likelihood) with respect to the 3 parameters of the 3PL model. 
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -88,7 +88,7 @@ It follows the parametrization \$a(θ - b)\$.
 - **`response_val::Float64`** : Required. A scalar response. 
 
 # Output
-A ``3 \\times 3`` matrix of the observed informations. 
+A ``3 \times 3`` matrix of the observed informations. 
 """
 function _item_observed_information(
     parameters::Parameters3PL,

@@ -9,7 +9,7 @@ _latent_information(latent::Latent1D, parameters::Parameters1PL)
 # Description
 
 It computes the information (second derivative of the likelihood) with respect to the 1-dimensional latent variable under the 1PL model.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -36,7 +36,7 @@ _latent_information(latent::Latent1D, parameters::Parameters2PL)
 # Description
 
 It computes the information (-second derivative of the likelihood) with respect to the 1-dimensional latent variable under the 2PL model.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -63,7 +63,7 @@ _latent_information(latent::Latent1D, parameters::Parameters3PL)
 # Description
 
 It computes the information (-second derivative of the likelihood) with respect to the 1-dimensional latent variable under the 3PL model.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 

@@ -250,7 +250,7 @@ get_design_matrix(responses::Vector{Response}, I::Int64, N::Int64)
 
 # Description
 
-Returns the ``I \\times N `` design matrix.
+Returns the ``I \times N `` design matrix.
 """
 function get_design_matrix(responses::Vector{Response}, I::Int64, N::Int64)
     has_answered = map(r -> CartesianIndex(r.item_idx, r.examinee_idx), responses)
@@ -266,7 +266,7 @@ get_response_matrix(responses::Vector{Response}, I::Int64, N::Int64)
 
 # Description
 
-Transform vector of `Response`s in a ``I \\times N`` response matrix.
+Transform vector of `Response`s in a ``I \times N`` response matrix.
 A non given answer has value `0.0`.
 """
 function get_response_matrix(responses::Vector{Response}, I::Int64, N::Int64)
@@ -281,7 +281,7 @@ end
 get_responses(response_matrix::Matrix{Float64}, design_matrix::Matrix{Float64}, items::Vector{<:AbstractItem}, examinees::Vector{<:AbstractExaminee})
 ```
 
-Transforms a ``I \\times N`` response matrix in a vector of `Response`s given a valid `design_matrix`, a vector of `Item`s and a vector of `Examinee`s.
+Transforms a ``I \times N`` response matrix in a vector of `Response`s given a valid `design_matrix`, a vector of `Item`s and a vector of `Examinee`s.
 """
 function get_responses(
     response_matrix::Matrix{Float64},

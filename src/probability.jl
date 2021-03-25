@@ -9,7 +9,7 @@ __probability(latent_val::Float64, parameters::Parameters1PL)
 # Description
 
 It computes the probability (ICF) of a correct response for item `parameters` under the 1PL model at `latent_val` point.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -32,7 +32,7 @@ _probability(latent::Latent1D, parameters::Parameters1PL)
 # Description
 
 It computes the probability (ICF) of a correct response for item `parameters` under the 1PL model at `Latent1D` point.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -56,7 +56,7 @@ _probability(latent::Latent1D, parameters::Parameters1PL, g_item::Vector{Float64
 
 It computes the probability (ICF) of a correct response for item `parameters` under the 1PL model at `Latent1D` point.
 It updates the gradient vectors if they are not empty.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -99,7 +99,7 @@ __probability(latent_val::Float64, parameters::Parameters2PL)
 # Description
 
 It computes the probability (ICF) of a correct response for item `parameters` under the 2PL model at `latent_val` point.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -122,7 +122,7 @@ _probability(latent::Latent1D, parameters::Parameters2PL)
 # Description
 
 It computes the probability (ICF) of a correct response for item `parameters` under the 2PL model at `Latent1D` point.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 - **`latent::Latent1D`** : Required. A 1-dimensional `Latent1D` latent variable. 
@@ -145,7 +145,7 @@ _probability(latent::Latent1D, parameters::Parameters2PL, g_item::Vector{Float64
 
 It computes the probability (ICF) of a correct response for item `parameters` under the 2PL model at `Latent1D` point.
 It updates the gradient vectors if they are not empty.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -197,7 +197,7 @@ __probability(latent_val::Float64, parameters::Parameters3PL)
 # Description
 
 It computes the probability (ICF) of a correct response for item `parameters` under the 3PL model at `latent_val` point.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -221,7 +221,7 @@ _probability(latent::Latent1D, parameters::Parameters3PL)
 # Description
 
 It computes the probability (ICF) of a correct response for item `parameters` under the 3PL model at `Latent1D` point.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -245,7 +245,7 @@ _probability(latent::Latent1D, parameters::Parameters3PL,  g_item::Vector{Float6
 
 It computes the probability (ICF) of a correct response for item `parameters` under the 3PL model at `Latent1D` point.
 It updates the gradient vectors if they are not empty.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -299,7 +299,7 @@ __probability(latent_vals::Vector{Float64}, parameters::ParametersNPL)
 
 It computes the probability (ICF) of a correct response for item `parameters` under the 3PL model at `latent_vals` points.
 N-dimensional latent.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -324,7 +324,7 @@ _probability(latent::LatentND, parameters::ParametersNPL)
 
 It computes the probability (ICF) of a correct response for item `parameters` under the 3PL model at `Latent1D` point.
 It updates the gradient vectors if they are not empty.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -421,17 +421,17 @@ probability(parameters_matrix::Matrix{Float64}, latent_matrix::Matrix{Float64})
 # Description
 
 It computes the probability (ICF) of a correct response for item parameters and latents values provided in matrix form.
-Not suitable for 3PL models, for such a kind of model use probability_3PL().
-It follows the parametrization ``a \\theta - b ``.
+Not suitable for 3PL models, for such a kind of model use `probability_3PL()`.
+It follows the parametrization ``a \theta - b``.
 
 # Arguments
 
-- **`parameters_matrix::Matrix{Float64}`** : Required. A `I x (n_latents + 1)` matrix with item parameters. intercept (b) must be in first column, latents coefficients (a_j) in next columns (2, ..., n_latents + 1). 
-- **`latent_matrix::Matrix{Float64}`** : Required. A \$n\_latents \\times N\$ or `(n_latents + 1) x N` matrix with latents values. 
+- **`parameters_matrix::Matrix{Float64}`** : Required. A ``I x (\text{n_latents}+ 1)`` matrix with item parameters. intercept (b) must be in first column, latents coefficients (``a_j``) in next columns ``(2, ..., \text{n_latents} + 1)``. 
+- **`latent_matrix::Matrix{Float64}`** : Required. A ``\text{n_latents} \times N`` or ``(\text{n_latents} + 1) x N`` matrix with latents values. 
 
-# Output
+# Outputs
 
-A `I x N` `Float64` matrix. 
+A ``I x N`` `Float64` matrix. 
 """
 function probability(parameters_matrix::Matrix{Float64}, latents_matrix::Matrix{Float64})
     if size(latents_matrix, 1) == (size(parameters_matrix, 2)-1)
@@ -450,16 +450,16 @@ probability_3PL(parameters_matrix::Matrix{Float64}, latent_matrix::Matrix{Float6
 # Description
 
 Only for models which has guessing parameter (c) in last row of parameters_matrix. It computes the probability (ICF) of a correct response for item parameters and latents values provided in matrix form.
-It follows the parametrization ``a \\theta - b ``.
+It follows the parametrization ``a \theta - b``.
 
 # Arguments
 
-- **`parameters_matrix::Matrix{Float64}`** : Required. A `I x (n_latents + 1)` matrix with item parameters. intercept (b) must be in first column, latents coefficients (a_j) in next columns (2, ..., n_latents + 1). 
-- **`latent_matrix::Matrix{Float64}`** : Required. A \$n\_latents \\times N\$ matrix with latents values. 
+- **`parameters_matrix::Matrix{Float64}`** : Required. A ``I x (\text{n_latents}+ 1)`` matrix with item parameters. intercept (b) must be in first column, latents coefficients (``a_j``) in next columns ``(2, ..., \text{n_latents} + 1)``. 
+- **`latent_matrix::Matrix{Float64}`** : Required. A ``\text{n_latents} \times N`` matrix with latents values. 
 
 # Output
 
-A `I x N` `Float64` matrix. 
+A ``I x N`` `Float64` matrix. 
 """
 function probability_3PL(
     parameters_matrix::Matrix{Float64},

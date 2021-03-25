@@ -13,7 +13,7 @@ latent_information(examinee::AbstractExaminee, item::AbstractItem)
 # Description
 
 An abstraction of `_latent_information(latent::AbstractLatent, parameters::AbstractParametersBinary)` on an examinee and an item.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -35,7 +35,7 @@ latent_information(examinee::AbstractExaminee, items::Vector{<:AbstractItem})
 # Description
 
 An abstraction of `_latent_information(latent::AbstractLatent, parameters::AbstractParametersBinary)` on an examinee and items.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -47,9 +47,9 @@ A `Float64` vector.
 
 # Example
 
-Compute the Fisher information for the latent/s of the examinees (second derivatives of the likelihood with respect to ``\\theta``) and each item.
+Compute the Fisher information for the latent/s of the examinees (second derivatives of the likelihood with respect to ``\theta``) and each item.
 
-\$\$E_\\theta_n \\[ I(\\theta_n | b_i) \\] \$\$
+````E_\theta_n \\[ I(\theta_n | b_i) \\] ````
 
 ```julia
 examinee = Examinee(); #default examinee factory
@@ -72,7 +72,7 @@ latent_information(
 # Description
 
 An abstraction of `_latent_information(latent::AbstractLatent, parameters::AbstractParametersBinary)` on examinees and items.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -80,7 +80,7 @@ It follows the parametrization \$a(θ - b)\$.
 - **`items::Vector{<:AbstractItem}`** : Required. 
 
 # Output
-A ``N \\times I`` matrix of latent informations (matrices or scalars). 
+A ``N \times I`` matrix of latent informations (matrices or scalars). 
 
 ```@example
 examinees = [Examinee(); for n = 1 : 100]; #default examinee factory
@@ -107,7 +107,7 @@ end
 # Description
 
 Abstraction of _item_expected_information(latent, parameters) on Vector{<:AbstractExaminee} and items::Vector{<:AbstractItem}.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -135,7 +135,7 @@ item_expected_information(
 # Description
 
 Abstraction of _item_expected_information(latent, parameters) on Vector{<:AbstractExaminee} and items::Vector{<:AbstractItem}.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -143,7 +143,7 @@ It follows the parametrization \$a(θ - b)\$.
 - **`examinees::Vector{<:AbstractExaminee}`** : Required. Size N x 1.
 
 # Output
-A ``N \\times I`` matrix of expected informations (matrices or scalars). 
+A ``N \times I`` matrix of expected informations (matrices or scalars). 
 
 ```@example
 examinee = Examinee(1); # default examinee random factory (1-D latent)
@@ -228,7 +228,7 @@ items = vcat([items_2PL, items_3PL]...) # create vector of items
 
 responses = answer(examinees, items) # generate responses
 #obs_item_info = item_observed_information(items, examinees, responses) # do not run
-#^ This returns an error since Julia cannot sum ``2 \\times 2`` matrices with ``3 \\times 3`` matrices.
+#^ This returns an error since Julia cannot sum ``2 \times 2`` matrices with ``3 \times 3`` matrices.
 # Instead do this ⌄.
 obs_items_info_2PL = item_observed_information(items_2PL, examinees, responses)
 obs_items_info_3PL = item_observed_information(items_3PL, examinees, responses)
@@ -264,17 +264,17 @@ latent_information(
 
 It computes the information function (IIF) for item parameters at latents values provided in matrix form.
 Not suitable for 3PL models, for such a kind of model use `latent_information_3PL()`.
-It follows the parametrization ``a \\theta - b ``.
+It follows the parametrization ``a \theta - b ``.
 See the docs of [`latent_information(examinee::AbstractExaminee, item::AbstractItem)`](@ref) for details.
 
 # Arguments
 
-- **`latents_matrix::Matrix{Float64}`** : Required. A \$n\_latents \\times N\$ matrix with latents values. 
-- **`parameters_matrix::Matrix{Float64}`** : Required. A \$(n\_latents + 1) \\times I\$ matrix with item parameters. intercept (b) must be in first row, latents coefficients ``(a_j)`` in next rows ``(2, \\ldots, n_latents + 1)``. 
+- **`latents_matrix::Matrix{Float64}`** : Required. A ``\text{n_latents} \times N`` matrix with latents values. 
+- **`parameters_matrix::Matrix{Float64}`** : Required. A ``(\text{n_latents} + 1) \times I`` matrix with item parameters. intercept (b) must be in first row, latents coefficients ``(a_j)`` in next rows ``(2, \\ldots, n_latents + 1)``. 
     
 # Output
 
-A ``I \\times N`` `Float64` matrix. 
+A ``I \times N`` `Float64` matrix. 
 """
 function latent_information(
     latents_matrix::Matrix{Float64},
@@ -300,16 +300,16 @@ latent_information_3PL(
 
 Only for models which has guessing parameter (c) in last row of parameters_matrix.
 It computes the information function (IIF) for item parameters at latents values provided in matrix form.
-It follows the parametrization ``a \\theta - b ``.
+It follows the parametrization ``a \theta - b ``.
 
 # Arguments
 
-- **`latents_matrix::Matrix{Float64}`** : Required. A \$n\_latents \\times N\$ matrix with latents values. 
-- **`parameters_matrix::Matrix{Float64}`** : Required. A \$(n\_latents + 1) \\times I\$ matrix with item parameters. intercept (b) must be in first row, latents coefficients (a_j) in next rows (2, ..., n_latents + 1). 
+- **`latents_matrix::Matrix{Float64}`** : Required. A ``\text{n_latents} \times N`` matrix with latents values. 
+- **`parameters_matrix::Matrix{Float64}`** : Required. A ``(\text{n_latents} + 1) \times I`` matrix with item parameters. intercept (b) must be in first row, latents coefficients (a_j) in next rows (2, ..., n_latents + 1). 
 
 # Output
 
-A ``I \\times N`` `Float64` matrix. 
+A ``I \times N`` `Float64` matrix. 
 """
 function latent_information_3PL(
     latents_matrix::Matrix{Float64},

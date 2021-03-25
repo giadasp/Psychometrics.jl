@@ -10,7 +10,7 @@ _item_expected_information(parameters::Parameters1PL, latent::Latent1D)
 # Description
 
 It computes the expected information (-second derivative of the likelihood) with respect to the difficulty parameter of the 1PL model.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -37,7 +37,7 @@ _item_expected_information(parameters::Parameters2PL, latent::Latent1D)
 # Description
 
 It computes the expected information (-second derivative of the likelihood) with respect to the 2 parameters of the 2PL model.
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 
 # Arguments
 
@@ -46,7 +46,7 @@ It follows the parametrization \$a(θ - b)\$.
 
 # Output
 
-A ``2 \\times 2`` matrix of the expected informations. 
+A ``2 \times 2`` matrix of the expected informations. 
 """
 function _item_expected_information(parameters::Parameters2PL, latent::Latent1D)
     p = _probability(latent, parameters)
@@ -67,7 +67,7 @@ _item_expected_information(parameters::Parameters3PL, latent::Latent1D)
 # Description
 
 It computes the expected information (-second derivative of the likelihood) with respect to the 3 parameters of the 3PL model. 
-It follows the parametrization \$a(θ - b)\$.
+It follows the parametrization ``a(θ - b)``.
 It should be always positive.
 
 # Arguments
@@ -75,7 +75,7 @@ It should be always positive.
 - **`latent::Latent1D`** : Required. A 1-dimensional `Latent1D` latent variable. 
 
 # Output
-A ``3 \\times 3`` matrix of the expected informations. 
+A ``3 \times 3`` matrix of the expected informations. 
 """
 function _item_expected_information(parameters::Parameters3PL, latent::Latent1D)
     p = _probability(latent, parameters)
