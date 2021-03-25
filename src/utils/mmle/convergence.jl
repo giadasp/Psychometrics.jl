@@ -8,9 +8,9 @@ function check_iter(
     end
     if current_iter >= max_iter
     println(
-            "max_iter reached after ",
+            "Maximum number of iterations reached after ",
             Int(current_iter),
-            " iterations",
+            " iterations.",
         )
         return true
     else
@@ -26,9 +26,9 @@ function check_time(
     current_time = time()-start_time
     if current_time>= max_time
     println(
-            "max_time reached after ",
+            "Max time reached after ",
             current_time,
-            " seconds",
+            " seconds.",
         )
         return true
     else
@@ -49,8 +49,9 @@ function check_f_tol_rel!(
     end
     if f_rel < f_tol_rel
         println(
-            "f_tol_rel reached"
+            "Likelihood maximum relative tolerance reached."
         )
+        println("Likelihood: ", new_likelihood)
         old_likelihood = copy(new_likelihood)
         return true
     else
@@ -72,8 +73,9 @@ function check_f_tol_rel!(
     end
     if f_rel < f_tol_rel
         println(
-            "f_tol_rel reached"
+            "Likelihood maximum relative tolerance reached."
         )
+        println("Likelihood: ", new_likelihood)
         old_likelihood = copy(new_likelihood)
         return true
     else
@@ -95,8 +97,9 @@ function check_f_tol_rel!(
     end
     if f_rel < f_tol_rel
         println(
-            "f_tol_rel reached"
-        )
+            "Likelihood maximum relative tolerance reached."
+            )
+        println("Likelihood: ", new_likelihood)
         old_likelihood = copy(new_likelihood)
         return true
     else
@@ -117,8 +120,9 @@ function check_x_tol_rel!(
     end
     if delta_pars <= x_tol_rel
         println(
-           "X ToL reached"
-        )
+            "Item parameters maximum relative tolerance reached."
+            )
+        println("x_rel max: ", delta_pars)
         old_pars .= new_pars
         return true
     else
@@ -140,8 +144,9 @@ function check_x_tol_rel!(
     end
     if delta_pars <= x_tol_rel
         println(
-           "X ToL reached"
+            "Item parameters maximum relative tolerance reached."
         )
+        println("x_rel max: ", delta_pars)
         old_pars .= new_pars
         return true
     else
@@ -163,8 +168,8 @@ function check_x_tol_rel!(
     end
     if delta_pars <= x_tol_rel
         println(
-           "X ToL reached"
-        )
+            "Item parameters maximum relative tolerance reached."
+            )
         old_pars .= new_pars
         return true
     else
@@ -186,8 +191,9 @@ function check_x_tol_rel!(
     end
     if delta_latents <= x_tol_rel
         println(
-           "X ToL reached"
-        )
+            "Item parameters maximum relative tolerance reached."
+            )
+        println("x_rel max: ", delta_pars)
         old_latents .= new_latents
         return true
     else
