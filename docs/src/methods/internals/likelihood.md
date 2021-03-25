@@ -4,13 +4,29 @@
     CurrentModule = Psychometrics
 ```
 
-## Using Structs
-
 ```@docs
-_likelihood(
+__likelihood(
+    response_val::Float64,
+    latent_val::Float64,
+    parameters::AbstractParametersBinary;
+    weight::Float64 = 1.0
+)
+__log_likelihood(
     response_val::Float64,
     latent_val::Float64,
     parameters::AbstractParametersBinary,
+)
+_likelihood(
+    response_val::Float64,
+    latent_val::Float64,
+    item::AbstractItem;
+    weight::Float64 = 1.0
+)
+_likelihood(
+    response::AbstractResponse,
+    latent_val::Float64,
+    item::AbstractItem;
+    weight::Float64 = 1.0
 )
 _log_likelihood(
     response_val::Float64,

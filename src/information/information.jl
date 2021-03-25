@@ -49,7 +49,7 @@ A `Float64` vector.
 
 Compute the Fisher information for the latent/s of the examinees (second derivatives of the likelihood with respect to ``\\theta``) and each item.
 
-``E_\\theta_n \\[ I(\\theta_n | b_i) \\] ``
+\$\$E_\\theta_n \\[ I(\\theta_n | b_i) \\] \$\$
 
 ```julia
 examinee = Examinee(); #default examinee factory
@@ -99,12 +99,10 @@ end
 #   Item expected information            #
 ##########################################
 """
-```julia
-item_expected_information(
-    item::AbstractItem,
-    examinee::AbstractExaminee,
-)
-```
+    item_expected_information(
+        item::AbstractItem,
+        examinee::AbstractExaminee,
+    )
 
 # Description
 
@@ -271,12 +269,12 @@ See the docs of [`latent_information(examinee::AbstractExaminee, item::AbstractI
 
 # Arguments
 
-- **`latents_matrix::Matrix{Float64}`** : Required. A ``n_latents \\times N`` matrix with latents values. 
-- **`parameters_matrix::Matrix{Float64}`** : Required. A ``(n_latents + 1) \\times I`` matrix with item parameters. intercept (b) must be in first row, latents coefficients ``(a_j)`` in next rows ``(2, \\ldots, n_latents + 1)``. 
+- **`latents_matrix::Matrix{Float64}`** : Required. A \$n\_latents \\times N\$ matrix with latents values. 
+- **`parameters_matrix::Matrix{Float64}`** : Required. A \$(n\_latents + 1) \\times I\$ matrix with item parameters. intercept (b) must be in first row, latents coefficients ``(a_j)`` in next rows ``(2, \\ldots, n_latents + 1)``. 
     
 # Output
 
-A ``I \\time N`` `Float64` matrix. 
+A ``I \\times N`` `Float64` matrix. 
 """
 function latent_information(
     latents_matrix::Matrix{Float64},
@@ -306,12 +304,12 @@ It follows the parametrization ``a \\theta - b ``.
 
 # Arguments
 
-- **`latents_matrix::Matrix{Float64}`** : Required. A `n_latents x N` matrix with latents values. 
-- **`parameters_matrix::Matrix{Float64}`** : Required. A `(n_latents + 1) x I` matrix with item parameters. intercept (b) must be in first row, latents coefficients (a_j) in next rows (2, ..., n_latents + 1). 
+- **`latents_matrix::Matrix{Float64}`** : Required. A \$n\_latents \\times N\$ matrix with latents values. 
+- **`parameters_matrix::Matrix{Float64}`** : Required. A \$(n\_latents + 1) \\times I\$ matrix with item parameters. intercept (b) must be in first row, latents coefficients (a_j) in next rows (2, ..., n_latents + 1). 
 
 # Output
 
-A `I x N` `Float64` matrix. 
+A ``I \\times N`` `Float64` matrix. 
 """
 function latent_information_3PL(
     latents_matrix::Matrix{Float64},

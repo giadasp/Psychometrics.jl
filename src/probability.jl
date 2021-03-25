@@ -427,7 +427,7 @@ It follows the parametrization ``a \\theta - b ``.
 # Arguments
 
 - **`parameters_matrix::Matrix{Float64}`** : Required. A `I x (n_latents + 1)` matrix with item parameters. intercept (b) must be in first column, latents coefficients (a_j) in next columns (2, ..., n_latents + 1). 
-- **`latent_matrix::Matrix{Float64}`** : Required. A `n_latents x N` or `(n_latents + 1) x N` matrix with latents values. 
+- **`latent_matrix::Matrix{Float64}`** : Required. A \$n\_latents \\times N\$ or `(n_latents + 1) x N` matrix with latents values. 
 
 # Output
 
@@ -455,7 +455,7 @@ It follows the parametrization ``a \\theta - b ``.
 # Arguments
 
 - **`parameters_matrix::Matrix{Float64}`** : Required. A `I x (n_latents + 1)` matrix with item parameters. intercept (b) must be in first column, latents coefficients (a_j) in next columns (2, ..., n_latents + 1). 
-- **`latent_matrix::Matrix{Float64}`** : Required. A `n_latents x N` matrix with latents values. 
+- **`latent_matrix::Matrix{Float64}`** : Required. A \$n\_latents \\times N\$ matrix with latents values. 
 
 # Output
 

@@ -1,7 +1,7 @@
 """
     get_latents(examinees::Vector{<:AbstractExaminee})
 
-    #Description 
+#Description 
 
 Returns the latent objects of a vector of examinees as a vector of subtypes of `AbstractLatent`.
 """
@@ -13,7 +13,7 @@ end
 """
     get_latents_vals(examinees::Vector{<:AbstractExaminee})
 
-    #Description 
+#Description 
 
 Returns a matrix with latent values displayed by row.
 """

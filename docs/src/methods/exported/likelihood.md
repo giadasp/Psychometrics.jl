@@ -6,11 +6,6 @@
 
 ```@docs
 log_likelihood(
-    response_val::Float64,
-    latent_val::Float64,
-    parameters::AbstractParametersBinary,
-)
-log_likelihood(
     response::AbstractResponse,
     examinee::AbstractExaminee,
     item::AbstractItem,
