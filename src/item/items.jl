@@ -1,6 +1,6 @@
 
 """
-get_parameters_vals(items::Vector{<:AbstractItem})
+    get_parameters_vals(items::Vector{<:AbstractItem})
 
 # Description
 
@@ -27,7 +27,7 @@ return permutedims(reduce(hcat, ret))
 end
 
 """
-get_parameters(items::Vector{<:AbstractItem})
+    get_parameters(items::Vector{<:AbstractItem})
 
 # Description
 

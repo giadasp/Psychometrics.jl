@@ -54,7 +54,11 @@ Pages = [
     "../methods/exported/probability.md",
     "../methods/exported/information.md",
     "../methods/exported/likelihood.md",
-
+    "../methods/exported/assessment.md",
+    "../methods/exported/calibration.md",
+    "../methods/exported/joint_estimation.md",
+    "../methods/exported/online.md",
+    "../methods/exported/distributions.md",
 ]
 Depth = 1
 ```

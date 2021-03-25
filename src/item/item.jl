@@ -87,7 +87,7 @@ function empty_chain!(item::AbstractItem)
 end
 
 """
-    chain_append!(item::AbstractItem; sampling = false)
+    chain_append!(item::AbstractItem)
 """
 function chain_append!(item::AbstractItem)
     _chain_append!(item.parameters)

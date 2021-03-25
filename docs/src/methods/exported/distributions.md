@@ -1,6 +1,29 @@
 # Distributions
 
-```@autodocs
-Modules = [Psychometrics]
-Pages   = ["dist.jl"]
+```@meta
+CurrentModule = Psychometrics
+```
+
+## PolyaGamma
+
+```@docs
+PolyaGamma
+```
+
+## TruncatedGamma
+
+```@docs
+TruncatedGamma
+```
+
+## TruncatedInverseGaussian
+
+```@docs
+TruncatedInverseGaussian
+```
+
+## TruncatedNormal
+
+```@docs
+TruncatedNormal
 ```

@@ -120,6 +120,7 @@ export
     latent_information,
     item_observed_information,
     item_expected_information,
+    latent_information_3PL,
     add_prior!,
     get_item_by_id,
     get_parameters,
