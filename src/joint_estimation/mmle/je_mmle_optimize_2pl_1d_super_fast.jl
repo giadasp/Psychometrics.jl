@@ -240,8 +240,8 @@ function optimize_2pl_1d_super_fast(je_mmle_model::JointEstimationMMLEModel)
             Wk,
             phi,
         )
-        Wk = LinearAlgebra.BLAS.gemv('T', one(Float64), posterior, oneoverN) #if Wk depends only on the likelihoods
         if je_mmle_model.rescale_latent
+            Wk = LinearAlgebra.BLAS.gemv('T', one(Float64), posterior, oneoverN) #if Wk depends only on the likelihoods
             observed = [LinearAlgebra.dot(Wk, Xk), sqrt(LinearAlgebra.dot(Wk, Xk .^ 2))]
             observed = [
                 observed[1] - je_mmle_model.metric[1],
