@@ -3,8 +3,8 @@ TruncatedInverseGaussian(μ, λ, l, u)
 rand(PolyaGamma(1, 2))
 using Plots
 using StatsPlots
-
 using Distributions
+
 a = rand(LogNormal(0, 0.25), 500)
 b = rand(Normal(0, 1), 500)
 theta = rand(Normal(0, 1), 10_000)
