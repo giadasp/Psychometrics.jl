@@ -8,6 +8,7 @@ function bootstrap!(
     type = "parametric",
     sample_fraction = 0.9,
     design = "incomplete", #"complete"
+    rescale_latent = false,
     kwargs...
 )
 
@@ -75,7 +76,7 @@ function bootstrap!(
         items_r = map(i -> i, items)
         n_not_sampled = setdiff(collect(1:N), n_sample)
         if method == "mmle"
-            joint_estimate_mmle!(items_r, examinees_r, responses_r; rescale_latent = false, kwargs...)
+            joint_estimate_mmle!(items_r, examinees_r, responses_r; rescale_latent = rescale_latent, kwargs...)
         elseif method == "polyagamma"
             joint_estimate_pg!(items_r, examinees_r, responses_r; kwargs...)
         else
