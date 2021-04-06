@@ -220,6 +220,8 @@ item_observed_information(
 It computes the sum of the item observed informations across the responses.
 Items (latents) must be of the same type.
 
+# Example 1
+
 ```@example
 examinees = [Examinee(n) for n = 1 : 100]; #default examinee factory (1-D latent)
 items_2PL = [Item(i, Parameters2PL()) for i = 1 : 30]; #2PL item factory
@@ -232,6 +234,28 @@ responses = answer(examinees, items) # generate responses
 # Instead do this ⌄.
 obs_items_info_2PL = item_observed_information(items_2PL, examinees, responses)
 obs_items_info_3PL = item_observed_information(items_3PL, examinees, responses)
+```
+
+# Example 2. Compute the standard errors of item parameter estimates using the observed responses and estimated abilities.
+
+```@example
+# The package LinearAlgebra is required to compute the inverse of the matrix.
+using LinearAlgebra
+
+# Randomly generate examinees, items and responses.
+examinees = [Examinee(n) for n = 1 : 10]
+items = [Item(i) for i = 1:40];
+responses = answer(examinees, items);
+responses_per_item = map(i -> get_responses_by_item_id(i.id, responses), items);
+
+items_obs_info = [sum([item_observed_information(items[i], examinees[r.examinee_idx], r) for r in responses_per_item[i]] for i in 1:40];
+
+#Using the inverse of the matrix:
+inv_items_obs_info = inv.(items_obs_info);
+item_parameters_standard_errors_inv = [[sqrt(i[1,1]), sqrt(i[2,2])] for i in inv_items_obs_info]
+
+#Using the inverse of the diagonal:
+item_parameters_standard_errors_diag = [[sqrt(1/i[1,1]), sqrt(1/i[2,2])] for i in items_obs_info]
 ```
 """
 function item_observed_information(

@@ -50,9 +50,10 @@ A ``2 \times 2`` matrix of the expected informations.
 """
 function _item_expected_information(parameters::Parameters2PL, latent::Latent1D)
     p = _probability(latent, parameters)
-    i_aa = (1 - p) * p * (latent.val - parameters.b)^2
-    i_ab = -parameters.a * (1 - p) * p * (latent.val - parameters.b)
-    i_bb = parameters.a^2 * (1 - p) * p
+    p_1_p = (1 - p) * p
+    i_aa = p_1_p * (latent.val - parameters.b)^2
+    i_ab = -parameters.a * p_1_p * (latent.val - parameters.b)
+    i_bb = parameters.a^2 * p_1_p
     return [i_aa i_ab; i_ab i_bb]::Matrix{Float64}
 end
 

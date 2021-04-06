@@ -28,7 +28,10 @@ function _item_observed_information(
     latent::Latent1D,
     response_val::Float64
 )
-    return _item_expected_information(parameters, latent)::Matrix{Float64}
+    p = _probability(latent, parameters)
+    i_bb = - (- p^2) * (1 - p) * p / (p^2) # v p.49 Kim, Baker: - L_22
+    return i_bb::Float64
+   # return _item_expected_information(parameters, latent)::Matrix{Float64}
 end
 
 ########################################################################
@@ -45,7 +48,9 @@ _item_observed_information(
 
 # Description
 
-It is equal to the item expected information.
+Theoretically, it should be equal to its expected counterpart.
+However, it is used to compute the standard errors of item parameter estimates which are based on the log-likelihood (which is based on the responses).
+Look at the example in the documentation of the exported method.
 
 # Arguments
 
@@ -54,7 +59,7 @@ It is equal to the item expected information.
 - **`response_val::Float64`** : Required. A scalar response. 
 
 # Output
-A ``2 \times 2`` matrix of the observed (expected) informations. 
+A ``2 \times 2`` matrix of the observed informations. 
 """
 function _item_observed_information(
     parameters::Parameters2PL,
@@ -63,9 +68,7 @@ function _item_observed_information(
 )
     #return _item_expected_information(parameters, latent)::Matrix{Float64}
     p = _probability(latent, parameters)
-    i = (1 - p) * p
-    h = (- p^2) * i
-    j = response_val * i
+    h = (- p^2) * (1 - p) * p
     den = p^2
     i_aa = - h * (latent.val - parameters.b)^2 / den # v p.49 Kim, Baker: - L_11
     i_ab =
