@@ -28,10 +28,7 @@ function _item_observed_information(
     latent::Latent1D,
     response_val::Float64
 )
-    p = _probability(latent, parameters)
-    i_bb = - (- p^2) * (1 - p) * p / (p^2) # v p.49 Kim, Baker: - L_22
-    return i_bb::Float64
-   # return _item_expected_information(parameters, latent)::Matrix{Float64}
+    return _item_expected_information(parameters, latent)::Float64
 end
 
 ########################################################################
@@ -68,15 +65,14 @@ function _item_observed_information(
 )
     #return _item_expected_information(parameters, latent)::Matrix{Float64}
     p = _probability(latent, parameters)
-    h = (- p^2) * (1 - p) * p
-    den = p^2
-    i_aa = - h * (latent.val - parameters.b)^2 / den # v p.49 Kim, Baker: - L_11
+    p_1_p = p * (1 - p)
+    i_aa = p_1_p * (latent.val - parameters.b)^2 # v p.49 Kim, Baker: - L_11
     i_ab =
         (
-            p * ((parameters.a * (latent.val - parameters.b) * h) +
-            (p * (response_val - p)))
-        ) / den # X p.50 Kim, Baker: - L_12 #TODO
-    i_bb = - parameters.a^2 * h / den # v p.49 Kim, Baker: - L_22
+             ((parameters.a * (latent.val - parameters.b) * (- p) * p_1_p) +
+             (response_val - p))
+        )  # X p.50 Kim, Baker: - L_12 #TODO
+    i_bb = - parameters.a^2 * p_1_p # v p.49 Kim, Baker: - L_22
     return [i_aa i_ab; i_ab i_bb]::Matrix{Float64}
 end
 

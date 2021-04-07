@@ -23,7 +23,7 @@ A `Float64` scalar.
 """
 function _item_expected_information(parameters::Parameters1PL, latent::Latent1D)
     p = _probability(latent, parameters)
-    return (latent.val - parameters.b)^2 * p * (1 - p)::Float64
+    return p * (1 - p)::Float64
 end
 
 ########################################################################
